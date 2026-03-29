@@ -14,6 +14,10 @@ Use when working with Atlassian CLI (acli) to install, authenticate, and manage 
 
 Use when creating, organizing, or prioritizing issues in Linear. Covers the Linear Method best practices: issue writing, priority levels, enablers vs blockers, hierarchy, cycles, workflows, labels, relations, backlog hygiene, and project scoping.
 
+### ousterhout
+
+Software design principles from John Ousterhout's *A Philosophy of Software Design*. Minimizes complexity through deep modules, information hiding, and strategic programming.
+
 ## Installation
 
 Install all skills from this repo:
