@@ -243,19 +243,20 @@ Initial focus: Project setup, operations, and charter management
 
 ### 3.1 Standard Fields
 
-**Applied across all templates:**
+**Base fields available to templates:**
 
 | Field | Type | Options | Always Present |
 |-------|------|---------|----------------|
 | Status | SINGLE_SELECT | Todo, In Progress, Done | ✓ (built-in) |
-| Priority | SINGLE_SELECT | High, Medium, Low | ✓ (created) |
-| Size | SINGLE_SELECT | XS, S, M, L, XL | ✓ (created) |
-| Type | SINGLE_SELECT | Bug, Feature, Improvement, Spike | ✓ (created) |
+| Priority | SINGLE_SELECT | High, Medium, Low | Default |
+| Size | SINGLE_SELECT | XS, S, M, L, XL | Optional |
+| Type | SINGLE_SELECT | Bug, Feature, Improvement, Spike | Optional |
 
 **Notes:**
-- Status field is built-in to all GitHub Projects V2
-- Other fields are created during setup
-- All templates use same field structure for consistency
+- Status field is built-in to all GitHub Projects V2 (cannot be removed or replaced)
+- Templates choose which additional fields to create from the base set
+- Templates can define custom fields that replace or supplement base fields (see field_overrides)
+- Most templates use Priority, Size, Type for consistency, but some substitute domain-specific fields
 
 ### 3.2 Template Definitions
 
@@ -276,17 +277,20 @@ Initial focus: Project setup, operations, and charter management
   "name": "bug-tracker",
   "display_name": "Bug Tracker",
   "description": "Issue triage and resolution workflow",
-  "fields": ["Status", "Priority", "Severity", "Type"],
+  "fields": ["Status", "Severity", "Type"],
   "field_overrides": {
     "Severity": {
       "type": "SINGLE_SELECT",
       "options": ["Critical", "High", "Medium", "Low"],
-      "replaces": "Priority"
+      "replaces": "Priority",
+      "description": "Bug-specific priority field with severity levels"
     }
   },
   "use_case": "Bug triage and resolution"
 }
 ```
+
+**Field override behavior:** When `replaces` is specified, the base field (Priority) is NOT created, and the override field (Severity) is created instead with the specified options.
 
 **3. Feature Development** (Product work)
 ```json
@@ -364,6 +368,40 @@ Initial focus: Project setup, operations, and charter management
 - `roadmap.json`
 - `research.json`
 - `release-planning.json`
+
+### 3.4 Field Override Semantics
+
+**Two override operations:**
+
+1. **`replaces`** - Substitute a base field with a domain-specific field
+   - Base field is NOT created
+   - Override field is created instead with specified options
+   - Example: Bug Tracker uses "Severity" (Critical/High/Medium/Low) instead of "Priority"
+
+2. **`adds_to`** - Add a custom field alongside base fields
+   - All listed base fields are created
+   - Additional custom field is also created
+   - Example: Roadmap adds "Quarter" (Q1/Q2/Q3/Q4) alongside "Status" and "Priority"
+
+**Implementation in `scripts/apply-template.sh`:**
+```bash
+for field in "${TEMPLATE_FIELDS[@]}"; do
+  if is_override_field "$field"; then
+    operation=$(get_override_operation "$field")
+    if [ "$operation" = "replaces" ]; then
+      # Skip creating base field that's being replaced
+      replaced_field=$(get_replaced_field "$field")
+      create_custom_field "$field"
+    elif [ "$operation" = "adds_to" ]; then
+      # Create base fields first, then add custom field
+      create_custom_field "$field"
+    fi
+  else
+    # Standard base field
+    create_base_field "$field"
+  fi
+done
+```
 
 ---
 
@@ -581,9 +619,31 @@ User response:
 ```
 
 **Fields:**
-- `charter_suggested`: Has agent suggested creating charter? (avoid repeating)
-- `last_scope_check`: Last time agent checked for scope changes
-- `skip_charter_prompts`: User said "no more charter suggestions"
+- `charter_suggested`: Has agent suggested creating charter? (avoid repeating suggestion)
+- `last_scope_check`: Last time agent checked for scope changes (ISO 8601 timestamp)
+- `skip_charter_prompts`: User said "no more charter suggestions" (suppresses future prompts)
+
+**Scope check triggers (when `last_scope_check` is updated):**
+
+1. **Bulk issue creation** - Creating 5+ issues at once suggests scope expansion
+2. **Major feature mentioned** - User conversation mentions adding significant new functionality
+3. **Charter update** - After charter is modified, check if new deliverables need issues
+4. **Periodic check** - Every 7 days of active development (prevents scope drift going unnoticed)
+
+**Scope check logic in `gh-project-operations`:**
+```bash
+# Check if scope check is needed
+days_since_last_check=$(days_since "$LAST_SCOPE_CHECK")
+new_issues_count=$(count_new_issues_this_session)
+
+if [ "$new_issues_count" -ge 5 ] || [ "$days_since_last_check" -ge 7 ]; then
+  # Trigger scope check
+  if charter_exists && scope_appears_different; then
+    suggest_charter_update
+    update_coordination_state "last_scope_check" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  fi
+fi
+```
 
 ---
 
@@ -597,28 +657,27 @@ User response:
 
 **Handling:**
 ```
-Check: gh CLI available?
-  ↓ NOT FOUND
-Agent: "GitHub CLI (gh) is not installed. I can guide you through installation:
+Skill detects: gh command not found
+  ↓
+Skill exits with error code 1 and message
+  ↓
+Agent sees error output and responds to user:
+
+Agent: "GitHub CLI (gh) is not installed. Here's how to install it:
 
         macOS:   brew install gh
-        Linux:   See https://github.com/cli/cli#installation
+        Linux:   https://github.com/cli/cli#installation
         Windows: winget install GitHub.cli
 
-        Which platform are you on?"
+        After installing, verify with: gh --version
 
-User responds with platform
-  ↓
-Agent provides exact commands
-  ↓
-Agent: "Ready to verify. Run this command:
-        gh --version
+        Let me know when it's installed and I'll retry."
 
-        What output do you see?"
-
-User confirms installation
+User installs gh CLI
   ↓
-Agent proceeds with operation
+User: "installed" or "done"
+  ↓
+Agent re-invokes skill (will now pass prerequisite check)
 ```
 
 #### 2. Authentication Issues
@@ -627,29 +686,30 @@ Agent proceeds with operation
 
 **Handling:**
 ```
-Run: gh auth status
-  ↓ NOT AUTHENTICATED
-Agent: "You're not authenticated with GitHub. Let's fix that:
+Skill detects: gh auth status returns "not logged in"
+  ↓
+Skill exits with error code 1 and message
+  ↓
+Agent sees error output and responds to user:
+
+Agent: "You're not authenticated with GitHub. Please run this command
+        to authenticate:
 
         gh auth login --web
 
-        This will open your browser for OAuth authentication. The gh CLI needs
-        the 'project' scope to manage GitHub Projects.
+        This will open your browser for OAuth authentication. Make sure
+        to grant the 'project' scope when prompted.
 
-        Ready to proceed?"
+        After authenticating, let me know and I'll retry the operation."
 
-User confirms
+User runs command and authenticates
   ↓
-Agent: "Please run: gh auth login --web
-
-        Then run: gh auth status
-
-        Let me know when you see 'Token scopes: ... project ...' in the output."
-
-User confirms authentication
+User: "done" or "authenticated"
   ↓
-Agent verifies and proceeds
+Agent re-invokes skill (will now pass auth check)
 ```
+
+**Implementation note:** Skills cannot pause mid-execution. When prerequisites fail, the skill exits immediately with an error message. The agent then guides the user through fixing the issue and retries.
 
 #### 3. API Failures (Partial Success)
 
@@ -928,10 +988,18 @@ Actions:
 1. **Validate inputs** - Parse and check all filters/data before API calls
 2. **Dry-run query** - Test fetch to verify query works
 3. **Show preview** - Display count and sample of affected items
-4. **Execute** - Proceed with operation
+   ```
+   Example: "Found 12 items matching criteria. Sample (first 3):
+            - Fix login bug
+            - Update API docs
+            - Refactor auth module
+
+            Proceeding with update..."
+   ```
+4. **Execute** - Proceed immediately after showing preview (no pause for confirmation)
 5. **Report detailed results** - Success/failure counts, list failures
 
-**No explicit confirmation required** - Agent proceeds after showing preview (trust + interactive recovery model)
+**Rationale:** Agent shows preview for transparency but proceeds automatically. User can interrupt if needed, and interactive recovery handles any issues that arise. This balances user awareness with execution speed.
 
 ---
 
@@ -1386,6 +1454,72 @@ fi
 ...
 ```
 
+### 9.4 Test Execution Strategy
+
+**Test runner:** `skills/gh-project-shared/tests/run-tests.sh`
+
+**Execution modes:**
+
+1. **Manual (development)**
+   ```bash
+   cd skills/gh-project-shared/tests
+   ./run-tests.sh              # Run all tests
+   ./run-tests.sh unit         # Run unit tests only
+   ./run-tests.sh integration  # Run integration tests only
+   ./run-tests.sh error        # Run error scenario tests only
+   ```
+
+2. **Pre-commit hook (optional)**
+   ```bash
+   # .git/hooks/pre-commit
+   #!/bin/bash
+   cd skills/gh-project-shared/tests
+   ./run-tests.sh unit || exit 1
+   ```
+
+3. **CI/CD (GitHub Actions)**
+   ```yaml
+   # .github/workflows/test.yml
+   name: Test Skills
+   on: [push, pull_request]
+   jobs:
+     test:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v2
+         - name: Install dependencies
+           run: |
+             brew install gh jq
+             gh --version
+         - name: Run tests
+           run: |
+             cd skills/gh-project-shared/tests
+             ./run-tests.sh
+           env:
+             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+   ```
+
+**Test success criteria:**
+- Exit code 0 = all tests passed
+- Exit code 1 = one or more tests failed
+- Detailed output shows which tests passed/failed
+
+**Test fixture management:**
+- Fixtures in `tests/fixtures/` directory
+- Created once, reused across tests
+- Cleaned up after test suite completes
+
+**Who maintains tests:**
+- Skill developers write tests for new features
+- Test suite runs in CI on every PR
+- Breaking changes must update tests
+
+**Test isolation:**
+- Each test creates temporary test projects
+- Uses unique project names (timestamped)
+- Cleans up test projects after completion
+- Never mutates production projects
+
 ---
 
 ## 10. Implementation Considerations
@@ -1406,30 +1540,78 @@ fi
 
 **User projects:**
 - Default owner: `@me`
-- Single repo typical
+- Single repo typical (current repo)
 - Config in repo: `.github/project-config.json`
 
 **Organization projects:**
-- Owner: `orgname`
+- Owner: `orgname` (user specifies during setup)
 - Multi-repo supported
 - Can link multiple repos to one project
-- Config stored in primary repo or org .github repo
+- Config stored in primary repo (where setup was run)
 
-**Implementation:**
+**How multi-repo linking works:**
+
+**Handled by:** `gh-project-setup` skill during project creation
+
+**User specification:**
+```
+User: "Create project for repos agent-skills, superpowers, and dotfiles"
+  or
+User: "Create org project for acme-corp repos: api, web, mobile"
+```
+
+**Agent parsing:**
+- Detects owner type (user vs org) from context or explicit mention
+- Parses list of repositories from user message
+- Confirms with user before creating
+
+**Implementation in `scripts/create-project.sh`:**
 ```bash
+# Parse owner and repos from user input
+OWNER="${1:-@me}"
+shift
+REPOS=("$@")  # All remaining args are repo names
+
 # Detect owner type
-if gh api "/users/$OWNER" | jq -e '.type == "Organization"'; then
-  # Organization project
-  OWNER_TYPE="org"
+if [ "$OWNER" != "@me" ]; then
+  if gh api "/users/$OWNER" | jq -e '.type == "Organization"'; then
+    OWNER_TYPE="org"
+  else
+    OWNER_TYPE="user"
+  fi
 else
-  # User project
   OWNER_TYPE="user"
 fi
 
-# Link multiple repos (org projects)
-for repo in "${REPOS[@]}"; do
-  gh project link "$PROJECT_NUM" --owner "$OWNER" --repo "$repo"
-done
+# Create project
+PROJECT_NUM=$(gh project create --owner "$OWNER" --title "$TITLE" --format json | jq -r '.number')
+
+# Link repos (automatically links current repo for user projects)
+if [ "$OWNER_TYPE" = "user" ] && [ ${#REPOS[@]} -eq 0 ]; then
+  # User project, no explicit repos: link current repo
+  gh project link "$PROJECT_NUM" --owner "$OWNER"
+elif [ ${#REPOS[@]} -gt 0 ]; then
+  # Multiple repos specified: link each one
+  for repo in "${REPOS[@]}"; do
+    gh project link "$PROJECT_NUM" --owner "$OWNER" --repo "$repo"
+  done
+fi
+
+# Save config in current repo
+save_config "$PROJECT_NUM" "$OWNER" "${REPOS[@]}"
+```
+
+**User flow example:**
+```
+User: "Set up a project for my org's api, web, and mobile repos"
+  ↓
+Agent: "I'll create an organization project. What's the org name?"
+  ↓
+User: "acme-corp"
+  ↓
+Agent: "Creating project for org 'acme-corp' with repos: api, web, mobile"
+  ↓
+gh-project-setup creates project and links all three repos
 ```
 
 ### 10.3 Performance Considerations
