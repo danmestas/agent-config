@@ -1791,6 +1791,8 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
 ### Task 10: create-project.sh - Project Creation
 
+**Implementation Note:** Script must include multi-repo linking logic and save complete config to `.github/project-config.json` including project ID, field IDs, and linked_repos array per spec section 2.1.
+
 **Files:**
 - Create: `skills/gh-project-setup/scripts/create-project.sh`
 
@@ -1892,6 +1894,8 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
 ### Task 11: configure-fields.sh - Field Configuration
 
+**Implementation Note:** Must extract and return field option IDs in parseable format (e.g., JSON with field_id and option_ids). Output should allow apply-template.sh to build the field_options structure for config file per spec section 2.1.
+
 **Files:**
 - Create: `skills/gh-project-setup/scripts/configure-fields.sh`
 
@@ -1971,6 +1975,11 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ---
 
 ### Task 12: apply-template.sh - Template Application
+
+**Implementation Note:** Must implement field override semantics per spec section 3.4:
+- `replaces`: Skip creating the base field, create override field instead
+- `adds_to`: Create both base field and override field
+Use process substitution or temp file instead of pipe to avoid bash subshell variable issues with option ID arrays.
 
 **Files:**
 - Create: `skills/gh-project-setup/scripts/apply-template.sh`
@@ -4257,6 +4266,12 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 ---
 
 ### Task 23: Create Main Charter Entry Point
+
+**Implementation Note:** Per spec section 8.3, command interface should be:
+- `add-section <name> --content <text>` - Add new section
+- `update-section <name> --append <text>` - Append to section
+- `update-section <name> --replace <text>` - Replace section
+- `log-change <entry>` - Add to Change Log
 
 **Files:**
 - Create: `skills/gh-project-charter/gh-project-charter.sh`
