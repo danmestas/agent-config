@@ -1,5 +1,6 @@
 # skills/gh-project-shared/scripts/context-detector.sh
 #!/bin/bash
+set -e
 
 # Detect repository type by analyzing files
 detect_repo_type() {

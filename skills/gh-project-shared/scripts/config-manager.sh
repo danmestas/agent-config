@@ -1,5 +1,6 @@
 # skills/gh-project-shared/scripts/config-manager.sh
 #!/bin/bash
+set -e
 
 CONFIG_FILE=".github/project-config.json"
 
@@ -10,7 +11,7 @@ get_project_id() {
     return 1
   fi
   local project_id
-  project_id=$(jq -r ".projects[] | select(.number == $project_num) | .id" "$CONFIG_FILE")
+  project_id=$(jq -r --argjson num "$project_num" '.projects[] | select(.number == $num) | .id' "$CONFIG_FILE")
   if [ -z "$project_id" ] || [ "$project_id" = "null" ]; then
     echo "Error: Project $project_num not found in config" >&2
     return 1
@@ -26,7 +27,7 @@ get_project_config() {
     return 1
   fi
   local config
-  config=$(jq ".projects[] | select(.number == $project_num)" "$CONFIG_FILE")
+  config=$(jq --argjson num "$project_num" '.projects[] | select(.number == $num)' "$CONFIG_FILE")
   if [ -z "$config" ] || [ "$config" = "null" ]; then
     echo "Error: Project $project_num not found in config" >&2
     return 1
@@ -82,8 +83,10 @@ validate_config_file() {
 get_field_id() {
   local project_num=$1
   local field_name=$2
+  local field_key="${field_name}_field_id"
   local field_id
-  field_id=$(jq -r ".projects[] | select(.number == $project_num) | .fields.${field_name}_field_id" "$CONFIG_FILE")
+  field_id=$(jq -r --argjson num "$project_num" --arg key "$field_key" \
+    '.projects[] | select(.number == $num) | .fields[$key]' "$CONFIG_FILE")
   if [ -z "$field_id" ] || [ "$field_id" = "null" ]; then
     echo "Error: Field '$field_name' not found for project $project_num" >&2
     return 1
@@ -97,7 +100,8 @@ get_field_option_id() {
   local field_name=$2
   local option_name=$3
   local option_id
-  option_id=$(jq -r ".projects[] | select(.number == $project_num) | .field_options.$field_name.$option_name" "$CONFIG_FILE")
+  option_id=$(jq -r --argjson num "$project_num" --arg fn "$field_name" --arg on "$option_name" \
+    '.projects[] | select(.number == $num) | .field_options[$fn][$on]' "$CONFIG_FILE")
   if [ -z "$option_id" ] || [ "$option_id" = "null" ]; then
     echo "Error: Option '$option_name' not found for field '$field_name'" >&2
     return 1

@@ -1,5 +1,6 @@
 # skills/gh-project-shared/scripts/error-handler.sh
 #!/bin/bash
+set -e
 
 ERROR_LOG=".github/project-errors.log"
 
@@ -38,6 +39,8 @@ require_prerequisite() {
   local check_command=$1
   local error_message=$2
   local installation_guide=$3
+  # SAFETY: check_command should only contain hardcoded strings, never user input.
+  # This eval is safe when called from our scripts (e.g., "command -v gh").
   if ! eval "$check_command" &>/dev/null; then
     output_error "Prerequisite Missing" "$error_message" "$installation_guide"
     log_error "Prerequisite check failed: $error_message"
