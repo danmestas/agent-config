@@ -1,14 +1,27 @@
 #!/bin/bash
 # skills/gh-project-operations/scripts/item-management.sh
+# Set DRY_RUN=1 to echo commands instead of executing them.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../gh-project-shared/scripts/config-manager.sh" 2>/dev/null || true
+
+_run_item_cmd() {
+  if [ "${DRY_RUN:-}" = "1" ]; then
+    echo "$1"
+  else
+    eval "$1" 2>&1
+  fi
+}
 
 add_issue_to_project() {
   local project_num="$1"
   local issue_url="$2"
 
-  eval "gh project item-add $project_num --owner @me --url \"$issue_url\" --format json" 2>&1
+  local cmd="gh project item-add $project_num --owner @me --url \"$issue_url\""
+  if [ "${DRY_RUN:-}" != "1" ]; then
+    cmd="$cmd --format json"
+  fi
+  _run_item_cmd "$cmd"
 }
 
 update_item_field() {
@@ -38,17 +51,23 @@ update_item_field() {
       ;;
   esac
 
-  eval "$cmd" 2>&1
+  _run_item_cmd "$cmd"
 }
 
 archive_item() {
   local item_id="$1"
   local project_id=$(get_project_id)
 
-  eval "gh project item-archive --id \"$item_id\" --owner @me --project-id \"$project_id\"" 2>&1
+  _run_item_cmd "gh project item-archive --id \"$item_id\" --owner @me --project-id \"$project_id\""
 }
 
 list_project_items() {
   local project_num="$1"
-  eval "gh project item-list $project_num --owner @me --format json" | jq '.'
+  local cmd="gh project item-list $project_num --owner @me --format json"
+
+  if [ "${DRY_RUN:-}" = "1" ]; then
+    echo "$cmd"
+  else
+    eval "$cmd" | jq '.'
+  fi
 }

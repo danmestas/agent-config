@@ -1,6 +1,7 @@
 #!/bin/bash
 # skills/gh-project-operations/tests/test-issue-crud.sh
 
+export DRY_RUN=1
 source "$(dirname "$0")/../scripts/issue-crud.sh"
 
 PASS=0

@@ -1,6 +1,7 @@
 #!/bin/bash
 # skills/gh-project-operations/tests/test-item-management.sh
 
+export DRY_RUN=1
 source "$(dirname "$0")/../scripts/item-management.sh"
 source "$(dirname "$0")/../../gh-project-shared/scripts/config-manager.sh" 2>/dev/null || true
 

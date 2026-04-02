@@ -1,5 +1,14 @@
 #!/bin/bash
 # skills/gh-project-operations/scripts/issue-crud.sh
+# Set DRY_RUN=1 to echo commands instead of executing them.
+
+_run_cmd() {
+  if [ "${DRY_RUN:-}" = "1" ]; then
+    echo "$1"
+  else
+    eval "$1" 2>&1
+  fi
+}
 
 create_issue() {
   local title="$1"
@@ -17,18 +26,23 @@ create_issue() {
     cmd="$cmd --assignee $assignee"
   fi
 
-  eval "$cmd" 2>&1
+  _run_cmd "$cmd"
 }
 
 list_issues() {
   local filter="$1"
-  local cmd="gh issue list --json number,title,state,labels"
+  local cmd="gh issue list"
 
   if [ -n "$filter" ]; then
     cmd="$cmd --search \"$filter\""
   fi
 
-  eval "$cmd" | jq '.'
+  if [ "${DRY_RUN:-}" = "1" ]; then
+    echo "$cmd"
+  else
+    cmd="$cmd --json number,title,state,labels"
+    eval "$cmd" | jq '.'
+  fi
 }
 
 update_issue() {
@@ -51,10 +65,10 @@ update_issue() {
     cmd="$cmd --add-label \"$labels\""
   fi
 
-  eval "$cmd" 2>&1
+  _run_cmd "$cmd"
 }
 
 delete_issue() {
   local issue_number="$1"
-  eval "gh issue delete $issue_number --yes" 2>&1
+  _run_cmd "gh issue delete $issue_number --yes"
 }
