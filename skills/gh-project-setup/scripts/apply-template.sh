@@ -24,6 +24,12 @@ if [ -z "$PROJECT_NUM" ] || [ -z "$OWNER" ] || [ -z "$TEMPLATE_NAME" ]; then
   exit 1
 fi
 
+# Validate PROJECT_NUM is numeric (Issue 5)
+if ! [[ "$PROJECT_NUM" =~ ^[0-9]+$ ]]; then
+  echo "Error: PROJECT_NUM must be numeric" >&2
+  exit 1
+fi
+
 # Load template
 TEMPLATE_FILE="$TEMPLATES_DIR/${TEMPLATE_NAME}.json"
 if [ ! -f "$TEMPLATE_FILE" ]; then
@@ -44,17 +50,39 @@ OVERRIDES=$(echo "$TEMPLATE" | jq -r '.field_overrides // {}')
 # Track created field IDs for config
 declare -A FIELD_IDS
 declare -A FIELD_OPTIONS
+declare -A SKIP_FIELDS
 
-# Create standard fields
-for field in $FIELDS; do
+# First pass: identify fields to skip due to 'replaces' (Issue 1)
+while IFS= read -r field; do
+  [ -z "$field" ] && continue
+  OVERRIDE=$(echo "$OVERRIDES" | jq -r ".$field // null")
+  if [ "$OVERRIDE" != "null" ]; then
+    REPLACES=$(echo "$OVERRIDE" | jq -r '.replaces // ""')
+    if [ -n "$REPLACES" ]; then
+      SKIP_FIELDS[$REPLACES]=1
+      echo "Note: $field will replace $REPLACES" >&2
+    fi
+  fi
+done < <(echo "$TEMPLATE" | jq -r '.fields[]?')
+
+# Second pass: create fields (Issue 4: use while read instead of for loop)
+while IFS= read -r field; do
+  [ -z "$field" ] && continue
+
+  # Check if this field should be skipped due to 'replaces' (Issue 1)
+  if [ "${SKIP_FIELDS[$field]:-}" = "1" ]; then
+    echo "Skipping $field (replaced by override)" >&2
+    continue
+  fi
   # Check if this field has an override
   OVERRIDE=$(echo "$OVERRIDES" | jq -r ".$field // null")
 
   if [ "$OVERRIDE" != "null" ]; then
-    # Custom field with override
+    # Custom field with override (supports both 'replaces' and 'adds_to' semantics)
+    # - replaces: Skip base field (handled above), create only override
+    # - adds_to: Create both base field and override (implicit - Issue 7)
     FIELD_TYPE=$(echo "$OVERRIDE" | jq -r '.type')
     OPTIONS=$(echo "$OVERRIDE" | jq -r '.options | join(",")')
-    REPLACES=$(echo "$OVERRIDE" | jq -r '.replaces // ""')
 
     echo "Creating custom field: $field ($FIELD_TYPE)"
     FIELD_JSON=$(bash "$SCRIPT_DIR/configure-fields.sh" "$PROJECT_NUM" "$OWNER" "$field" "$FIELD_TYPE" "$OPTIONS")
@@ -62,9 +90,9 @@ for field in $FIELDS; do
     FIELD_ID=$(echo "$FIELD_JSON" | jq -r '.id')
     FIELD_IDS[$field]=$FIELD_ID
 
-    # Store option IDs (use process substitution to avoid subshell)
+    # Store option IDs with :: separator (Issue 2, Issue 3)
     while IFS='|' read -r opt_name opt_id; do
-      FIELD_OPTIONS["${field,,}_$opt_name"]=$opt_id
+      FIELD_OPTIONS["${field,,}::${opt_name,,}"]=$opt_id
     done < <(echo "$FIELD_JSON" | jq -r '.options[]? | "\(.name)|\(.id)"')
 
   elif [ "$field" = "Status" ]; then
@@ -73,9 +101,9 @@ for field in $FIELDS; do
     STATUS_FIELD_ID=$(gh project field-list "$PROJECT_NUM" --owner "$OWNER" --format json | jq -r '.fields[] | select(.name == "Status") | .id')
     FIELD_IDS[Status]=$STATUS_FIELD_ID
 
-    # Get Status field options (use process substitution to avoid subshell)
+    # Get Status field options with :: separator (Issue 3)
     while IFS='|' read -r opt_name opt_id; do
-      FIELD_OPTIONS["status_${opt_name,,}"]=$opt_id
+      FIELD_OPTIONS["status::${opt_name,,}"]=$opt_id
     done < <(gh project field-list "$PROJECT_NUM" --owner "$OWNER" --format json | \
       jq -r '.fields[] | select(.name == "Status") | .options[]? | "\(.name)|\(.id)"')
 
@@ -94,7 +122,7 @@ for field in $FIELDS; do
         OPTIONS="Bug,Feature,Improvement,Spike"
         ;;
       *)
-        echo "Warning: Unknown field $field, skipping"
+        echo "Warning: Unknown field $field, skipping" >&2
         continue
         ;;
     esac
@@ -105,12 +133,12 @@ for field in $FIELDS; do
     FIELD_ID=$(echo "$FIELD_JSON" | jq -r '.id')
     FIELD_IDS[$field]=$FIELD_ID
 
-    # Store option IDs (use process substitution to avoid subshell)
+    # Store option IDs with :: separator (Issue 2, Issue 3)
     while IFS='|' read -r opt_name opt_id; do
-      FIELD_OPTIONS["${field,,}_${opt_name,,}"]=$opt_id
+      FIELD_OPTIONS["${field,,}::${opt_name,,}"]=$opt_id
     done < <(echo "$FIELD_JSON" | jq -r '.options[]? | "\(.name)|\(.id)"')
   fi
-done
+done < <(echo "$TEMPLATE" | jq -r '.fields[]?')
 
 # Save configuration
 CONFIG_DATA=$(jq -n \
@@ -147,8 +175,8 @@ done
 # Add field option IDs to config
 for key in "${!FIELD_OPTIONS[@]}"; do
   opt_id="${FIELD_OPTIONS[$key]}"
-  # Parse field name and option name from key (format: fieldname_optionname)
-  IFS='_' read -r field_part opt_part <<< "$key"
+  # Parse field name and option name from key (format: fieldname::optionname) (Issue 3)
+  IFS='::' read -r field_part opt_part <<< "$key"
   CONFIG_DATA=$(echo "$CONFIG_DATA" | jq --arg fp "$field_part" --arg op "$opt_part" --arg oid "$opt_id" '.field_options[$fp] += {($op): $oid}')
 done
 
