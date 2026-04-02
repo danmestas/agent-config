@@ -79,11 +79,14 @@ skills/gh-project-setup/
 ```
 skills/gh-project-operations/
 ├── SKILL.md
+├── gh-project-operations.sh    # Main entry point
 ├── scripts/
-│   ├── issue-crud.sh
-│   ├── bulk-operations.sh
-│   ├── query-parser.sh
-│   └── csv-parser.sh
+│   ├── issue-crud.sh           # Issue CRUD operations
+│   ├── item-management.sh      # Project item management
+│   ├── bulk-operations.sh      # Bulk create/update/archive
+│   ├── query-parser.sh         # Query-based item selection
+│   ├── csv-parser.sh           # CSV import/export
+│   └── coordinator.sh          # Charter coordination logic
 └── references/
     └── operation-patterns.md
 ```
@@ -2636,7 +2639,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 # skills/gh-project-operations/tests/test-item-management.sh
 
 source "$(dirname "$0")/../scripts/item-management.sh"
-source "$(dirname "$0")/../../gh-project-shared/lib/config-manager.sh"
+source "$(dirname "$0")/../../gh-project-shared/scripts/config-manager.sh"
 
 PASS=0
 FAIL=0
@@ -2756,7 +2759,7 @@ Expected: FAIL with "source: no such file"
 # skills/gh-project-operations/scripts/item-management.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../../gh-project-shared/lib/config-manager.sh"
+source "$SCRIPT_DIR/../../gh-project-shared/scripts/config-manager.sh"
 
 # Add issue to project
 # Args: project_num, issue_url
@@ -2840,7 +2843,7 @@ Edit: `skills/gh-project-operations/scripts/item-management.sh`
 # skills/gh-project-operations/scripts/item-management.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../../gh-project-shared/lib/config-manager.sh"
+source "$SCRIPT_DIR/../../gh-project-shared/scripts/config-manager.sh"
 
 add_issue_to_project() {
   local project_num="$1"
@@ -3363,11 +3366,11 @@ Expected: FAIL with "No such file"
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../gh-project-shared/lib/gh-check.sh"
-source "$SCRIPT_DIR/../gh-project-shared/lib/gh-auth.sh"
-source "$SCRIPT_DIR/lib/issue-crud.sh"
-source "$SCRIPT_DIR/lib/item-management.sh"
-source "$SCRIPT_DIR/lib/bulk-operations.sh"
+source "$SCRIPT_DIR/../gh-project-shared/scripts/gh-check.sh"
+source "$SCRIPT_DIR/../gh-project-shared/scripts/gh-auth.sh"
+source "$SCRIPT_DIR/scripts/issue-crud.sh"
+source "$SCRIPT_DIR/scripts/item-management.sh"
+source "$SCRIPT_DIR/scripts/bulk-operations.sh"
 
 show_help() {
   cat <<EOF
@@ -3453,9 +3456,21 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 Edit: `skills/gh-project-operations/gh-project-operations.sh`
 
-Add complete command implementations for create, list, update, delete, bulk, add, and export commands following the pattern from the design (parsing options, validation, calling library functions).
+Add complete command implementations. Each command follows the same pattern:
+1. Parse options with `while [[ $# -gt 0 ]]; case` loop
+2. Validate required options
+3. Call `check_gh_installed` and `check_gh_authenticated`
+4. Call the appropriate library function
+5. Check for scope changes via coordinator (for create/update)
 
-Full implementation available in the design spec section 6.3.
+Commands to implement:
+- **create**: `--title`, `--body`, `--label`, `--assignee` → `create_issue()`
+- **list**: `--filter` → `list_issues()`
+- **update**: `--issue`, `--title`, `--body`, `--label` → `update_issue()`
+- **delete**: `--issue` → `delete_issue()`
+- **bulk**: `--project`, `--from`, `--to`, `--mode` → `bulk_update_status()` or `bulk_archive_completed()`
+- **add**: `--project`, `--issue/--url` → `add_issue_to_project()`
+- **export**: `--project`, `--output` → `export_to_csv()`
 
 - [ ] **Step 7: Commit all commands**
 
@@ -3636,7 +3651,7 @@ Create comprehensive SKILL.md covering:
 - Examples
 - Integration points
 
-Full documentation content available in design spec section 6.4.
+Use spec sections 6.1-6.3 (Operations skill) and section 5 (Coordination) as reference for documentation content. The SKILL.md description field should match the trigger description from spec section 1.3.
 
 - [ ] **Step 2: Save documentation**
 
@@ -3961,9 +3976,14 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 Edit: `skills/gh-project-charter/scripts/charter-create.sh`
 
-Add complete implementation that reads template, replaces all placeholders (PROJECT_NAME, PROJECT_NUM, DATE, GOALS_PLACEHOLDER, etc.), and writes to output file.
-
-Full implementation available in design spec section 7.2.
+Add complete implementation:
+1. Read template from `$TEMPLATE_FILE` (charter-minimal.md)
+2. Replace all placeholders: `{{PROJECT_NAME}}`, `{{PROJECT_NUM}}`, `{{DATE}}`, `{{GOALS_PLACEHOLDER}}`, `{{IN_SCOPE_PLACEHOLDER}}`, `{{OUT_OF_SCOPE_PLACEHOLDER}}`, `{{SUCCESS_CRITERIA_PLACEHOLDER}}`
+3. Set date placeholders to current date via `$(date +%Y-%m-%d)`
+4. Set unfilled optional placeholders to "TBD"
+5. Create output directory with `mkdir -p "$(dirname "$output_file")"`
+6. Write populated content to output file (default: `docs/project-charter.md`)
+7. Print confirmation with file path
 
 - [ ] **Step 7: Commit implementation**
 
@@ -4130,10 +4150,25 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 Edit: `skills/gh-project-charter/scripts/charter-sections.sh`
 
 Add complete AWK-based implementations for:
-- update_section: Finds section, replaces content until next section
-- add_to_section: Finds subsection, appends content before next section
 
-Full implementation available in design spec section 7.3.
+**update_section(charter_file, section_name, new_content):**
+1. Use AWK to find `## $section_name` header
+2. Print header, then print new_content
+3. Skip all lines until next `## ` header
+4. Continue printing rest of file
+5. Write to temp file, then `mv` back
+
+**add_to_section(charter_file, section_name, content):**
+1. Use AWK to find `### $section_name` subsection header
+2. Track when inside target section
+3. When next `###` or `##` found, insert content before it
+4. Write to temp file, then `mv` back
+
+**add_new_section(charter_file, section_name, content):**
+1. Find `## Change Log` header (always last core section)
+2. Insert new `## $section_name` + content before Change Log
+3. If section-template exists in `templates/section-templates/`, use it as base
+4. Write to temp file, then `mv` back
 
 - [ ] **Step 7: Commit implementations**
 
@@ -4175,7 +4210,7 @@ test_help() {
 # Test: create command
 test_create_command() {
   RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh create \
-    --project "Test" --number 1 --purpose "Testing" 2>&1)
+    --project "Test" --number 1 --goals "Testing" 2>&1)
   if echo "$RESULT" | grep -q "Generating charter"; then
     PASS=$((PASS + 1))
   else
@@ -4184,35 +4219,61 @@ test_create_command() {
   fi
 }
 
-# Test: update command
-test_update_command() {
-  RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh update \
-    --section "Goals" --content "New content" 2>&1)
+# Test: update-section command (replace mode)
+test_update_section_replace() {
+  RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh update-section \
+    "Goals" --replace "New goals content" 2>&1)
   if echo "$RESULT" | grep -q "Updating"; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
-    echo "FAIL: Should handle update command"
+    echo "FAIL: Should handle update-section --replace"
   fi
 }
 
-# Test: add command
-test_add_command() {
-  RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh add \
-    --section "In Scope" --content "New item" 2>&1)
-  if echo "$RESULT" | grep -q "Adding"; then
+# Test: update-section command (append mode)
+test_update_section_append() {
+  RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh update-section \
+    "Scope" --append "Additional scope item" 2>&1)
+  if echo "$RESULT" | grep -q "Appending"; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
-    echo "FAIL: Should handle add command"
+    echo "FAIL: Should handle update-section --append"
+  fi
+}
+
+# Test: add-section command
+test_add_section() {
+  RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh add-section \
+    "Risks & Assumptions" --content "New risk identified" 2>&1)
+  if echo "$RESULT" | grep -q "Adding section"; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: Should handle add-section"
+  fi
+}
+
+# Test: log-change command
+test_log_change() {
+  RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh log-change \
+    "Expanded scope to include webhooks" 2>&1)
+  if echo "$RESULT" | grep -q "Logged"; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: Should handle log-change"
   fi
 }
 
 # Run tests
 test_help
 test_create_command
-test_update_command
-test_add_command
+test_update_section_replace
+test_update_section_append
+test_add_section
+test_log_change
 
 echo "Tests: $PASS passed, $FAIL failed"
 [ $FAIL -eq 0 ]
@@ -4228,14 +4289,15 @@ Expected: FAIL with "No such file"
 ```bash
 #!/bin/bash
 # skills/gh-project-charter/gh-project-charter.sh
+# Command interface per spec section 8.3
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../gh-project-shared/lib/gh-check.sh"
-source "$SCRIPT_DIR/../gh-project-shared/lib/gh-auth.sh"
-source "$SCRIPT_DIR/lib/charter-create.sh"
-source "$SCRIPT_DIR/lib/charter-sections.sh"
+source "$SCRIPT_DIR/../gh-project-shared/scripts/gh-check.sh"
+source "$SCRIPT_DIR/../gh-project-shared/scripts/gh-auth.sh"
+source "$SCRIPT_DIR/scripts/charter-create.sh"
+source "$SCRIPT_DIR/scripts/charter-sections.sh"
 
 CHARTER_FILE="docs/project-charter.md"
 
@@ -4244,19 +4306,18 @@ show_help() {
 Usage: gh-project-charter.sh <command> [options]
 
 Commands:
-  create    Create new project charter
-  update    Update charter section
-  add       Add to charter section
-  view      View charter
-  log       Add changelog entry
-
-Options:
-  --help    Show this help message
+  create          Create new project charter
+  update-section  Update existing section (--append or --replace)
+  add-section     Add new section to charter
+  log-change      Log entry to Change Log section
+  view            View charter
 
 Examples:
-  gh-project-charter.sh create --project "My Project" --number 1 --purpose "Build feature"
-  gh-project-charter.sh update --section "Goals" --content "New purpose"
-  gh-project-charter.sh add --section "In Scope" --content "- New item"
+  gh-project-charter.sh create --project "My Project" --number 1 --goals "Build feature"
+  gh-project-charter.sh update-section "Goals" --replace "New goals text"
+  gh-project-charter.sh update-section "Scope" --append "New scope item"
+  gh-project-charter.sh add-section "Risks & Assumptions" --content "..."
+  gh-project-charter.sh log-change "Added risk mitigation strategies"
 EOF
 }
 
@@ -4268,17 +4329,27 @@ case "$COMMAND" in
   create)
     echo "Generating charter"
     ;;
-  update)
-    echo "Updating charter"
+  update-section)
+    SECTION="${1:-}"
+    shift || true
+    MODE="${1:-}"
+    if [ "$MODE" = "--append" ]; then
+      echo "Appending to $SECTION"
+    elif [ "$MODE" = "--replace" ]; then
+      echo "Updating $SECTION"
+    else
+      echo "ERROR: update-section requires --append or --replace" >&2
+      exit 1
+    fi
     ;;
-  add)
-    echo "Adding to charter"
+  add-section)
+    echo "Adding section"
+    ;;
+  log-change)
+    echo "Logged change"
     ;;
   view)
     echo "Viewing charter"
-    ;;
-  log)
-    echo "Adding changelog entry"
     ;;
   --help|help)
     show_help
@@ -4311,14 +4382,18 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 Edit: `skills/gh-project-charter/gh-project-charter.sh`
 
-Add complete command implementations for:
-- create: Parse options, validate, call generate_charter
-- update: Parse options, validate, call update_section + add_changelog_entry
-- add: Parse options, validate, call add_to_section + add_changelog_entry
-- view: Display charter content
-- log: Add manual changelog entry
+Add complete command implementations following spec section 8.3 command interface:
 
-Full implementation available in design spec section 7.4.
+- **create**: Parse `--project`, `--number`, `--goals` options. Validate required fields. Call `generate_charter`. Output path to created file.
+- **update-section**: Parse section name (positional arg). Support `--replace` (calls `update_section`) and `--append` (calls `add_to_section`). Auto-log change via `add_changelog_entry`.
+- **add-section**: Parse section name (positional arg) and `--content`. Add new section to charter using template from `templates/section-templates/` if available, otherwise create blank section. Auto-log change.
+- **log-change**: Parse message (positional arg). Call `add_changelog_entry` with timestamped entry.
+- **view**: Read and display `$CHARTER_FILE`. Accept optional `--section` to show specific section.
+
+All commands should:
+1. Call `check_gh_installed` and `check_gh_authenticated`
+2. Validate `$CHARTER_FILE` exists (except `create`)
+3. Use structured ERROR output on failure
 
 - [ ] **Step 7: Commit all commands**
 
@@ -4350,7 +4425,7 @@ Create comprehensive SKILL.md covering:
 - Integration points
 - Philosophy (start minimal, progressive enhancement, living document)
 
-Full documentation content available in design spec section 7.5.
+Use spec section 8 (Charter Evolution) for documentation content. The SKILL.md description field should match the trigger description from spec section 1.3. Include the command interface from spec section 8.3 (add-section, update-section, log-change).
 
 - [ ] **Step 2: Save documentation**
 
