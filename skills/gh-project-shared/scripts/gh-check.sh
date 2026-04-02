@@ -1,5 +1,5 @@
-# skills/gh-project-shared/scripts/gh-check.sh
 #!/bin/bash
+# skills/gh-project-shared/scripts/gh-check.sh
 set -e
 
 # Check if gh CLI is installed
@@ -15,7 +15,11 @@ EOF
 
   # Check version
   local version
-  version=$(gh --version 2>&1 | head -1 | awk '{print $3}')
+  version=$(gh --version 2>&1 | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+  if [ -z "$version" ]; then
+    echo "Warning: Could not parse gh CLI version" >&2
+    return 0
+  fi
   echo "Found gh CLI version: $version" >&2
   return 0
 }
