@@ -39,8 +39,17 @@ require_prerequisite() {
   local check_command=$1
   local error_message=$2
   local installation_guide=$3
-  # SAFETY: check_command should only contain hardcoded strings, never user input.
-  # This eval is safe when called from our scripts (e.g., "command -v gh").
+
+  # SECURITY: Validate check_command to prevent arbitrary code execution.
+  # Only allow safe patterns: "command -v <toolname>" where toolname is alphanumeric, dash, or underscore.
+  if ! [[ "$check_command" =~ ^command\ -v\ [a-zA-Z0-9_-]+$ ]]; then
+    log_error "SECURITY: Invalid prerequisite check command format: $check_command"
+    output_error "Prerequisite Check Error" "Invalid prerequisite check format" "Contact system administrator"
+    exit 1
+  fi
+
+  # SAFETY: check_command has been validated to match safe pattern above.
+  # This eval is now protected against arbitrary code execution.
   if ! eval "$check_command" &>/dev/null; then
     output_error "Prerequisite Missing" "$error_message" "$installation_guide"
     log_error "Prerequisite check failed: $error_message"
