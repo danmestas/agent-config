@@ -22,6 +22,22 @@ Use when creating, organizing, or prioritizing issues in Linear. Covers the Line
 
 Software design principles from John Ousterhout's *A Philosophy of Software Design*. Minimizes complexity through deep modules, information hiding, and strategic programming.
 
+### gh-project-setup
+
+Create and configure GitHub Projects V2 with context-aware template selection. Supports 6 templates (kanban, bug-tracker, feature-development, roadmap, research, release-planning) with field override semantics. Handles multi-repo and organization projects.
+
+### gh-project-operations
+
+Daily GitHub project operations: create/list/update/delete issues, manage project items, bulk operations (batch/CSV/query-based), CSV export. Coordinates with charter skill for scope change detection.
+
+### gh-project-charter
+
+Progressive project charter documentation. Create charters from templates, update sections (goals/scope/success criteria), add new sections, track changes via changelog. Supports the full lifecycle from minimal charter to comprehensive documentation.
+
+### gh-project-shared
+
+Shared utilities for the gh-project-* skills (not directly invoked). Provides: gh CLI validation, authentication checking, config file management, context detection for template suggestions, and error handling with logging.
+
 ## Installation
 
 Install all skills from this repo:
