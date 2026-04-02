@@ -176,7 +176,8 @@ done
 for key in "${!FIELD_OPTIONS[@]}"; do
   opt_id="${FIELD_OPTIONS[$key]}"
   # Parse field name and option name from key (format: fieldname::optionname) (Issue 3)
-  IFS='::' read -r field_part opt_part <<< "$key"
+  field_part="${key%%::*}"  # Everything before ::
+  opt_part="${key#*::}"      # Everything after ::
   CONFIG_DATA=$(echo "$CONFIG_DATA" | jq --arg fp "$field_part" --arg op "$opt_part" --arg oid "$opt_id" '.field_options[$fp] += {($op): $oid}')
 done
 
