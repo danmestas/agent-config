@@ -25,7 +25,7 @@ if [ -z "$PROJECT_NUM" ] || [ -z "$OWNER" ] || [ -z "$FIELD_NAME" ] || [ -z "$FI
 fi
 
 # Create field
-echo "Creating field: $FIELD_NAME ($FIELD_TYPE)"
+echo "Creating field: $FIELD_NAME ($FIELD_TYPE)" >&2
 
 if [ "$FIELD_TYPE" = "SINGLE_SELECT" ]; then
   if [ -z "$FIELD_OPTIONS" ]; then
@@ -47,5 +47,10 @@ else
     --format json)
 fi
 
-echo "Field created successfully"
+if [ -z "$FIELD_JSON" ]; then
+  echo "Error: Field creation returned empty response" >&2
+  exit 1
+fi
+
+echo "Field created successfully" >&2
 echo "$FIELD_JSON"
