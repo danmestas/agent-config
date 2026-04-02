@@ -22,7 +22,18 @@ check_project_scope() {
   local scopes
   scopes=$(gh auth status 2>&1 | grep "Token scopes:" | cut -d: -f2-)
 
-  if ! echo "$scopes" | grep -q "project"; then
+  # Validate that scope extraction succeeded
+  if [ -z "$scopes" ]; then
+    cat >&2 <<EOF
+ERROR: Scope Detection Failed
+Message: Unable to extract token scopes from gh auth status
+Suggested Action: Ensure gh is properly authenticated and try again
+EOF
+    return 1
+  fi
+
+  # Use exact matching with quotes to avoid false positives (e.g., admin:project_v2, projects)
+  if ! echo "$scopes" | grep -q "'project'"; then
     cat >&2 <<EOF
 ERROR: Missing Scope
 Message: GitHub token missing 'project' scope
