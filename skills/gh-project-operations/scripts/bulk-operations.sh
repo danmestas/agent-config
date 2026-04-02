@@ -16,7 +16,8 @@ bulk_create_issues() {
   case "$mode" in
     array)
       local arr_name="$1"
-      eval "local data=(\"\${${arr_name}}\")"
+      local arr_ref="${arr_name}[@]"
+      local data=("${!arr_ref}")
       for item in "${data[@]}"; do
         IFS='|' read -r title body labels <<< "$item"
         echo "Creating: $title"
@@ -45,6 +46,22 @@ bulk_update_status() {
   local from_status="$2"
   local to_status="$3"
 
+  # Input validation
+  if [ -z "$project_num" ]; then
+    echo "Error: project_num is required" >&2
+    return 1
+  fi
+
+  if [ -z "$from_status" ]; then
+    echo "Error: from_status is required" >&2
+    return 1
+  fi
+
+  if [ -z "$to_status" ]; then
+    echo "Error: to_status is required" >&2
+    return 1
+  fi
+
   echo "Updating items from '$from_status' to '$to_status'"
 
   local items=$(list_project_items "$project_num" 2>/dev/null | jq -r ".items[] | select(.fieldValues.Status == \"$from_status\") | .id" 2>/dev/null)
@@ -65,6 +82,13 @@ bulk_update_status() {
 # Args: project_num
 bulk_archive_completed() {
   local project_num="$1"
+
+  # Input validation
+  if [ -z "$project_num" ]; then
+    echo "Error: project_num is required" >&2
+    return 1
+  fi
+
   echo "Archiving completed items from project $project_num"
 
   local items=$(list_project_items "$project_num" 2>/dev/null | jq -r '.items[] | select(.fieldValues.Status == "Done") | .id' 2>/dev/null)
@@ -117,6 +141,17 @@ import_from_csv() {
 export_to_csv() {
   local project_num="$1"
   local output_file="$2"
+
+  # Input validation
+  if [ -z "$project_num" ]; then
+    echo "Error: project_num is required" >&2
+    return 1
+  fi
+
+  if [ -z "$output_file" ]; then
+    echo "Error: output_file is required" >&2
+    return 1
+  fi
 
   echo "Exporting project $project_num..."
   local items=$(list_project_items "$project_num" 2>/dev/null)

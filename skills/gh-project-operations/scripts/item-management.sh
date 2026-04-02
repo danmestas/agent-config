@@ -17,6 +17,17 @@ add_issue_to_project() {
   local project_num="$1"
   local issue_url="$2"
 
+  # Input validation
+  if [ -z "$project_num" ]; then
+    echo "Error: project_num is required" >&2
+    return 1
+  fi
+
+  if [ -z "$issue_url" ]; then
+    echo "Error: issue_url is required" >&2
+    return 1
+  fi
+
   local cmd="gh project item-add $project_num --owner @me --url \"$issue_url\""
   if [ "${DRY_RUN:-}" != "1" ]; then
     cmd="$cmd --format json"
@@ -29,6 +40,27 @@ update_item_field() {
   local field_name="$2"
   local value="$3"
   local field_type="$4"
+
+  # Input validation
+  if [ -z "$item_id" ]; then
+    echo "Error: item_id is required" >&2
+    return 1
+  fi
+
+  if [ -z "$field_name" ]; then
+    echo "Error: field_name is required" >&2
+    return 1
+  fi
+
+  if [ -z "$value" ]; then
+    echo "Error: value is required" >&2
+    return 1
+  fi
+
+  if [ -z "$field_type" ]; then
+    echo "Error: field_type is required" >&2
+    return 1
+  fi
 
   local project_id=$(get_project_id)
   local field_id=$(get_field_id "$field_name")
@@ -56,6 +88,13 @@ update_item_field() {
 
 archive_item() {
   local item_id="$1"
+
+  # Input validation
+  if [ -z "$item_id" ]; then
+    echo "Error: item_id is required" >&2
+    return 1
+  fi
+
   local project_id=$(get_project_id)
 
   _run_item_cmd "gh project item-archive --id \"$item_id\" --owner @me --project-id \"$project_id\""
@@ -63,6 +102,13 @@ archive_item() {
 
 list_project_items() {
   local project_num="$1"
+
+  # Input validation
+  if [ -z "$project_num" ]; then
+    echo "Error: project_num is required" >&2
+    return 1
+  fi
+
   local cmd="gh project item-list $project_num --owner @me --format json"
 
   if [ "${DRY_RUN:-}" = "1" ]; then
