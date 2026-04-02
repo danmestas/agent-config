@@ -1,0 +1,7 @@
+{
+  "name": "kanban",
+  "display_name": "Kanban Board",
+  "description": "Simple workflow for general task tracking",
+  "fields": ["Status", "Priority"],
+  "use_case": "General task tracking, simple projects"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "roadmap",
+  "display_name": "Product Roadmap",
+  "description": "Strategic planning and quarterly tracking",
+  "fields": ["Status", "Priority", "Quarter"],
+  "field_overrides": {
+    "Quarter": {
+      "type": "SINGLE_SELECT",
+      "options": ["Q1", "Q2", "Q3", "Q4"],
+      "adds_to": ["Status", "Priority"],
+      "description": "Quarterly planning field"
+    }
+  },
+  "use_case": "Strategic planning, quarterly goals"
+}

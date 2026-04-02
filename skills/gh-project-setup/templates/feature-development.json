@@ -1,0 +1,7 @@
+{
+  "name": "feature-development",
+  "display_name": "Feature Development",
+  "description": "Product feature development workflow",
+  "fields": ["Status", "Priority", "Size", "Type"],
+  "use_case": "Building new features"
+}

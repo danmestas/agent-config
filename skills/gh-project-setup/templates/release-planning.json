@@ -1,0 +1,15 @@
+{
+  "name": "release-planning",
+  "display_name": "Release Planning",
+  "description": "Version and release coordination",
+  "fields": ["Status", "Priority", "Release"],
+  "field_overrides": {
+    "Release": {
+      "type": "SINGLE_SELECT",
+      "options": ["v1.0", "v1.1", "v2.0", "Next"],
+      "adds_to": ["Status", "Priority"],
+      "description": "Release version tracking"
+    }
+  },
+  "use_case": "Release coordination, version management"
+}

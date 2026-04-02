@@ -1,0 +1,15 @@
+{
+  "name": "research",
+  "display_name": "Research & Spikes",
+  "description": "Technical investigation and exploration",
+  "fields": ["Status", "Outcome"],
+  "field_overrides": {
+    "Outcome": {
+      "type": "SINGLE_SELECT",
+      "options": ["Success", "Learning", "Blocked"],
+      "replaces": "Priority",
+      "description": "Research outcome tracking"
+    }
+  },
+  "use_case": "Technical investigation, proof-of-concepts"
+}

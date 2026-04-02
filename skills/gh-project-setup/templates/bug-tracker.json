@@ -1,0 +1,15 @@
+{
+  "name": "bug-tracker",
+  "display_name": "Bug Tracker",
+  "description": "Issue triage and resolution workflow",
+  "fields": ["Status", "Severity", "Type"],
+  "field_overrides": {
+    "Severity": {
+      "type": "SINGLE_SELECT",
+      "options": ["Critical", "High", "Medium", "Low"],
+      "replaces": "Priority",
+      "description": "Bug-specific priority field with severity levels"
+    }
+  },
+  "use_case": "Bug triage and resolution"
+}
