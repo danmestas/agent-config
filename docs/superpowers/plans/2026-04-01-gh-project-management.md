@@ -19,7 +19,8 @@
 skills/gh-project-shared/
 ├── SKILL.md (reference doc, not invocable)
 ├── scripts/
-│   ├── gh-check.sh           # Verify gh CLI & auth
+│   ├── gh-check.sh           # Verify gh CLI installation
+│   ├── gh-auth.sh            # Check authentication & scope
 │   ├── config-manager.sh     # Read/write .github/project-config.json
 │   ├── context-detector.sh   # Analyze repo, suggest templates
 │   └── error-handler.sh      # Interactive error recovery
@@ -27,8 +28,10 @@ skills/gh-project-shared/
 │   └── gh-api-reference.md   # GitHub API documentation
 └── tests/
     ├── unit/
-    │   ├── test-context-detector.sh
+    │   ├── test-gh-check.sh
+    │   ├── test-gh-auth.sh
     │   ├── test-config-manager.sh
+    │   ├── test-context-detector.sh
     │   └── test-error-handler.sh
     ├── integration/
     │   ├── test-full-setup.sh
