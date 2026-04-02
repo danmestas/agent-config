@@ -1,8 +1,6 @@
 #!/bin/bash
 # skills/gh-project-operations/scripts/issue-crud.sh
 
-# Create a new issue
-# Args: title, body, labels, assignee
 create_issue() {
   local title="$1"
   local body="$2"
@@ -19,24 +17,20 @@ create_issue() {
     cmd="$cmd --assignee $assignee"
   fi
 
-  echo "$cmd"
+  eval "$cmd" 2>&1
 }
 
-# List issues with optional filter
-# Args: filter (e.g., "is:open label:bug")
 list_issues() {
   local filter="$1"
-  local cmd="gh issue list"
+  local cmd="gh issue list --json number,title,state,labels"
 
   if [ -n "$filter" ]; then
     cmd="$cmd --search \"$filter\""
   fi
 
-  echo "$cmd"
+  eval "$cmd" | jq '.'
 }
 
-# Update an issue
-# Args: issue_number, title, body, labels
 update_issue() {
   local issue_number="$1"
   local title="$2"
@@ -57,12 +51,10 @@ update_issue() {
     cmd="$cmd --add-label \"$labels\""
   fi
 
-  echo "$cmd"
+  eval "$cmd" 2>&1
 }
 
-# Delete an issue
-# Args: issue_number
 delete_issue() {
   local issue_number="$1"
-  echo "gh issue delete $issue_number --yes"
+  eval "gh issue delete $issue_number --yes" 2>&1
 }
