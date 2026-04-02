@@ -53,6 +53,54 @@ else
   FAIL=$((FAIL + 1))
 fi
 
+# Test empty repository (no indicators)
+EMPTY_TEST_DIR=$(mktemp -d)
+cd "$EMPTY_TEST_DIR"
+git init >/dev/null 2>&1
+
+EMPTY_INDICATORS=$(detect_repo_type 2>/dev/null)
+if [ "$EMPTY_INDICATORS" = "[]" ]; then
+  echo "✓ detect_repo_type returns empty array for empty repo"
+  PASS=$((PASS + 1))
+else
+  echo "✗ detect_repo_type should return [] for empty repo, got: $EMPTY_INDICATORS"
+  FAIL=$((FAIL + 1))
+fi
+
+EMPTY_RECOMMENDATION=$(recommend_template "" 2>/dev/null)
+EMPTY_REASONING=$(echo "$EMPTY_RECOMMENDATION" | jq -r '.reasoning')
+if [ "$EMPTY_REASONING" = "[]" ]; then
+  echo "✓ recommend_template returns empty reasoning array for empty repo"
+  PASS=$((PASS + 1))
+else
+  echo "✗ recommend_template should return empty reasoning array, got: $EMPTY_REASONING"
+  FAIL=$((FAIL + 1))
+fi
+
+cd /
+rm -rf "$EMPTY_TEST_DIR"
+
+# Test score capping at 100
+CAPPED_TEST_DIR=$(mktemp -d)
+cd "$CAPPED_TEST_DIR"
+git init >/dev/null 2>&1
+touch package.json CHANGELOG.md
+mkdir -p docs/releases docs/research docs/roadmap
+
+# Score with many indicators and matching conversation should be capped at 100
+CAPPED_SCORES=$(score_templates "research spike investigation roadmap Q1 release feature bug" 2>/dev/null)
+MAX_SCORE=$(echo "$CAPPED_SCORES" | jq '[.[] | select(. > 100)] | length')
+if [ "$MAX_SCORE" -eq 0 ]; then
+  echo "✓ Scores are properly capped at 100"
+  PASS=$((PASS + 1))
+else
+  echo "✗ Some scores exceed 100: $(echo "$CAPPED_SCORES" | jq -c 'to_entries | map(select(.value > 100))')"
+  FAIL=$((FAIL + 1))
+fi
+
+cd /
+rm -rf "$CAPPED_TEST_DIR"
+
 cd /
 rm -rf "$TEST_DIR"
 

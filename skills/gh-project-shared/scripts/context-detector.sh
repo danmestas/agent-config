@@ -27,7 +27,21 @@ detect_repo_type() {
   [ -f "ROADMAP.md" ] && indicators+=("ROADMAP.md")
 
   # Output as JSON array
-  printf '%s\n' "${indicators[@]}" | jq -R . | jq -s .
+  if [ ${#indicators[@]} -eq 0 ]; then
+    echo '[]'
+  else
+    printf '%s\n' "${indicators[@]}" | jq -R . | jq -s .
+  fi
+}
+
+# Helper function to cap score at 100
+cap_score() {
+  local score=$1
+  if [ $score -gt 100 ]; then
+    echo 100
+  else
+    echo $score
+  fi
 }
 
 # Score templates based on indicators and conversation
@@ -49,6 +63,7 @@ score_templates() {
   if echo "$conversation" | grep -qi "bug"; then
     bug_score=$((bug_score + 30))
   fi
+  bug_score=$(cap_score $bug_score)
   scores=$(echo "$scores" | jq ".\"bug-tracker\" = $bug_score")
 
   # Score Feature Development
@@ -59,6 +74,7 @@ score_templates() {
   if echo "$conversation" | grep -qi "feature"; then
     feature_score=$((feature_score + 20))
   fi
+  feature_score=$(cap_score $feature_score)
   scores=$(echo "$scores" | jq ".\"feature-development\" = $feature_score")
 
   # Score Release Planning
@@ -72,6 +88,7 @@ score_templates() {
   if echo "$conversation" | grep -qi "release"; then
     release_score=$((release_score + 20))
   fi
+  release_score=$(cap_score $release_score)
   scores=$(echo "$scores" | jq ".\"release-planning\" = $release_score")
 
   # Score Roadmap
@@ -82,6 +99,7 @@ score_templates() {
   if echo "$conversation" | grep -qi "roadmap\|quarter\|Q[1-4]"; then
     roadmap_score=$((roadmap_score + 30))
   fi
+  roadmap_score=$(cap_score $roadmap_score)
   scores=$(echo "$scores" | jq ".roadmap = $roadmap_score")
 
   # Score Research
@@ -92,6 +110,7 @@ score_templates() {
   if echo "$conversation" | grep -qi "research\|spike\|investigation"; then
     research_score=$((research_score + 30))
   fi
+  research_score=$(cap_score $research_score)
   scores=$(echo "$scores" | jq ".research = $research_score")
 
   echo "$scores"
@@ -114,16 +133,45 @@ recommend_template() {
   local max_score
   max_score=$(echo "$scores" | jq -r ".[\"$recommendation\"]")
 
-  # Build reasoning
+  # Build reasoning with detailed explanations
   local reasoning=()
+  local indicator_count
+  indicator_count=$(echo "$indicators" | jq 'length')
+
+  if [ "$indicator_count" -gt 0 ]; then
+    reasoning+=("Detected $indicator_count indicators in repository")
+  fi
+
   if echo "$indicators" | jq -e '.[] | select(. == "CHANGELOG.md")' >/dev/null; then
-    reasoning+=("CHANGELOG.md found")
+    reasoning+=("Found CHANGELOG.md (suggests release planning workflow)")
   fi
+
   if echo "$indicators" | jq -e '.[] | select(contains("package"))' >/dev/null; then
-    reasoning+=("Package manager detected")
+    reasoning+=("Package manager detected (suggests active development)")
   fi
+
+  if echo "$indicators" | jq -e '.[] | select(contains("releases"))' >/dev/null; then
+    reasoning+=("Release directory found (suggests release tracking)")
+  fi
+
+  if echo "$indicators" | jq -e '.[] | select(contains("research") or contains("spike"))' >/dev/null; then
+    reasoning+=("Research/spike directory found (suggests investigation workflow)")
+  fi
+
+  if echo "$indicators" | jq -e '.[] | select(contains("roadmap"))' >/dev/null; then
+    reasoning+=("Roadmap directory found (suggests long-term planning)")
+  fi
+
   if [ -n "$conversation" ]; then
-    reasoning+=("Conversation context analyzed")
+    reasoning+=("User context analyzed for template preferences")
+  fi
+
+  # Build reasons JSON
+  local reasons_json
+  if [ ${#reasoning[@]} -eq 0 ]; then
+    reasons_json='[]'
+  else
+    reasons_json="$(printf '%s\n' "${reasoning[@]}" | jq -R . | jq -s .)"
   fi
 
   # Output structured recommendation
@@ -131,7 +179,7 @@ recommend_template() {
     --arg rec "$recommendation" \
     --argjson score "$max_score" \
     --argjson scores "$scores" \
-    --argjson reasons "$(printf '%s\n' "${reasoning[@]}" | jq -R . | jq -s .)" \
+    --argjson reasons "$reasons_json" \
     '{
       recommendation: $rec,
       confidence: (if $score >= 70 then "high" elif $score >= 50 then "medium" else "low" end),
