@@ -14,6 +14,12 @@ Skills follow the [Agent Skills format](https://github.com/anthropics/agent-skil
 | [ousterhout](skills/ousterhout) | John Ousterhout's *A Philosophy of Software Design*. Deep modules, information hiding, strategic programming, minimizing cognitive load. |
 | [tigerstyle](skills/tigerstyle) | TigerBeetle's coding style for safety-critical systems. Safety > Performance > DX, zero technical debt, NASA Power of Ten rules, assertion-heavy development. |
 
+### Language-Specific
+
+| Skill | Description |
+|-------|-------------|
+| [idiomatic-go](skills/idiomatic-go) | Jon Bodner's *Learning Go* idiomatic patterns. Anti-patterns table for error handling, slices, interfaces, concurrency, and design. Clarity over cleverness. |
+
 ### UI & Interaction Design
 
 | Skill | Description |
@@ -73,6 +79,7 @@ Skills are automatically available once installed. The agent uses them when rele
 Examples:
 
 ```
+Write a Go HTTP handler with proper error handling     # triggers idiomatic-go
 Review this module for unnecessary complexity          # triggers ousterhout
 Audit the DX of this CLI tool                          # triggers dx-audit
 Set up a GitHub project board for this repo            # triggers gh-project-setup
