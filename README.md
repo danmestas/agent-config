@@ -1,4 +1,4 @@
-# Agent Skills
+# Agent Toolkit
 
 A Claude Code plugin marketplace. Install individual plugins or the entire collection.
 
@@ -15,16 +15,22 @@ A Claude Code plugin marketplace. Install individual plugins or the entire colle
 
 ## Install
 
+Add the marketplace:
+
+```bash
+claude plugin marketplace add danmestas/agent-skills
+```
+
 Install a single plugin:
 
 ```bash
-claude plugin add danmestas/agent-skills --plugin software-philosophy
+claude plugin install software-philosophy
 ```
 
 Install all plugins:
 
 ```bash
-claude plugin add danmestas/agent-skills
+claude plugin install software-philosophy gh-project-management project-management dev-tools apple-contacts career-interview
 ```
 
 ## License
