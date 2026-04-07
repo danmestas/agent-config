@@ -18,5 +18,6 @@ Includes 6 project templates: kanban, bug-tracker, feature-development, roadmap,
 ## Install
 
 ```bash
-claude plugin add danmestas/agent-skills --plugin gh-project-management
+claude plugin marketplace add danmestas/agent-skills
+claude plugin install gh-project-management
 ```

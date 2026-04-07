@@ -13,5 +13,6 @@ Development and testing utilities.
 ## Install
 
 ```bash
-claude plugin add danmestas/agent-skills --plugin dev-tools
+claude plugin marketplace add danmestas/agent-skills
+claude plugin install dev-tools
 ```

@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "agent-skills",
+  "name": "agent-toolkit",
   "description": "Claude Code plugins for software philosophy, project management, dev tools, and productivity",
   "owner": {
     "name": "Dan Mestas",

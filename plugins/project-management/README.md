@@ -12,5 +12,6 @@ Issue tracking best practices for Linear and Jira.
 ## Install
 
 ```bash
-claude plugin add danmestas/agent-skills --plugin project-management
+claude plugin marketplace add danmestas/agent-skills
+claude plugin install project-management
 ```

@@ -16,5 +16,6 @@ Adversarial proofing for code and plans. Six complementary lenses for writing be
 ## Install
 
 ```bash
-claude plugin add danmestas/agent-skills --plugin software-philosophy
+claude plugin marketplace add danmestas/agent-skills
+claude plugin install software-philosophy
 ```

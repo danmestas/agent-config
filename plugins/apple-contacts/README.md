@@ -16,5 +16,6 @@ Manage Apple Contacts via the contactbook CLI on macOS.
 ## Install
 
 ```bash
-claude plugin add danmestas/agent-skills --plugin apple-contacts
+claude plugin marketplace add danmestas/agent-skills
+claude plugin install apple-contacts
 ```
