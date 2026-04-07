@@ -3,7 +3,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENTRY_POINT="$SCRIPT_DIR/../scripts/gh-project-charter.sh"
+ENTRY_POINT="$SCRIPT_DIR/../gh-project-charter.sh"
 
 PASS=0
 FAIL=0

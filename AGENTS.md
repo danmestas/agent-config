@@ -1,41 +1,44 @@
 <INSTRUCTIONS>
 # Repository Guidelines
 
-This repository is a Claude Code plugin marketplace. Each plugin in `plugins/` is independently installable and contains skills (instructions + optional scripts) for AI coding agents.
+This repository hosts agent skills (instructions + optional scripts) for AI coding agents. Keep this guide updated as the repo grows.
 
-## Project Structure
+## Project Structure & Module Organization
 
-- `.claude-plugin/marketplace.json`: Plugin registry
-- `plugins/<plugin-name>/`: Individual plugins
-  - `.claude-plugin/plugin.json`: Plugin manifest (required)
-  - `skills/<skill-name>/SKILL.md`: Skill instructions (required per skill)
-  - `skills/<skill-name>/scripts/`: Helper scripts (optional)
-  - `skills/<skill-name>/references/`: Reference docs (optional)
-  - `skills/<skill-name>/templates/`: Templates (optional)
-  - `skills/<skill-name>/tests/`: Tests (optional)
-  - `commands/`: Slash commands (optional)
-  - `.mcp.json`: MCP server config (optional)
-  - `README.md`: Plugin documentation
+Expected layout:
+- `skills/`: individual skills, one folder per skill
+  - `skills/<skill-name>/SKILL.md`: required instructions
+  - `skills/<skill-name>/scripts/`: optional helper scripts
+  - `skills/<skill-name>/references/`: optional reference docs
+- `scripts/`: repo-level helper scripts (optional)
+- `tests/`: any validation tests for skills (optional)
 
-## Naming Conventions
+## Build, Test, and Development Commands
 
-- Plugins: `kebab-case` directory names
+No build system is required by default.
+- If validation tooling is added, document commands here (e.g., `make lint`, `make test`).
+
+## Coding Style & Naming Conventions
+
+Use 2 spaces for indentation unless the chosen language dictates otherwise.
+Naming:
 - Skills: `kebab-case` directory names
 - Scripts: `kebab-case` filenames
+- References: `kebab-case` filenames or keep upstream naming
 
-## Plugin Manifest Rules
+## Testing Guidelines
 
-- `name`: kebab-case string
-- `version`: string (e.g. "1.0.0"), not a number
-- `author`: object `{ "name": "...", "email": "..." }`, not a string
-- `keywords`: array of strings
-- Do NOT include `agents`, `skills`, or `slashCommands` fields — these are auto-discovered
+Add tests only if automated validation is introduced. Document how to run them here.
 
-## Commit Guidelines
+## Commit & Pull Request Guidelines
 
-Use clear, imperative commit messages. PRs should include a short description and how to validate.
+Use clear, imperative commit messages (e.g., "Add Atlassian CLI Jira skill").
+PRs should include:
+- A short description of the skill or update
+- Any new dependencies or tooling
+- How to validate the change (if applicable)
 
-## Security
+## Security & Configuration Tips
 
 Never commit credentials or tokens. Use placeholders in skill docs.
 </INSTRUCTIONS>

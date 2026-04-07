@@ -1,5 +1,5 @@
 #!/bin/bash
-# skills/gh-project-operations/scripts/gh-project-operations.sh
+# skills/gh-project-operations/gh-project-operations.sh
 
 OPS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

@@ -6,7 +6,7 @@ FAIL=0
 
 # Test: help message
 test_help() {
-  RESULT=$(bash skills/gh-project-operations/scripts/gh-project-operations.sh --help 2>&1)
+  RESULT=$(bash skills/gh-project-operations/gh-project-operations.sh --help 2>&1)
   if echo "$RESULT" | grep -q "Usage:"; then
     PASS=$((PASS + 1))
   else
@@ -17,7 +17,7 @@ test_help() {
 
 # Test: create command
 test_create_command() {
-  RESULT=$(bash skills/gh-project-operations/scripts/gh-project-operations.sh create --title "Test" --body "Test body" 2>&1)
+  RESULT=$(bash skills/gh-project-operations/gh-project-operations.sh create --title "Test" --body "Test body" 2>&1)
   if echo "$RESULT" | grep -q "Creating issue"; then
     PASS=$((PASS + 1))
   else
@@ -28,7 +28,7 @@ test_create_command() {
 
 # Test: list command
 test_list_command() {
-  RESULT=$(bash skills/gh-project-operations/scripts/gh-project-operations.sh list 2>&1)
+  RESULT=$(bash skills/gh-project-operations/gh-project-operations.sh list 2>&1)
   if echo "$RESULT" | grep -q "Listing issues" || echo "$RESULT" | grep -q "gh issue list"; then
     PASS=$((PASS + 1))
   else
@@ -39,7 +39,7 @@ test_list_command() {
 
 # Test: bulk command
 test_bulk_command() {
-  RESULT=$(bash skills/gh-project-operations/scripts/gh-project-operations.sh bulk --project 1 --from "Todo" --to "Done" 2>&1)
+  RESULT=$(bash skills/gh-project-operations/gh-project-operations.sh bulk --project 1 --from "Todo" --to "Done" 2>&1)
   if echo "$RESULT" | grep -q "Bulk operation"; then
     PASS=$((PASS + 1))
   else
