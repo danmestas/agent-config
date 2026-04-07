@@ -1,5 +1,5 @@
 #!/bin/bash
-# skills/gh-project-charter/gh-project-charter.sh
+# skills/gh-project-charter/scripts/gh-project-charter.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
