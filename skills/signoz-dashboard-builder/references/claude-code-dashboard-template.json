@@ -1,0 +1,106 @@
+{
+  "title": "Claude Code Engineering Dashboard",
+  "description": "Practical Claude Code monitoring: token efficiency, model usage, tool activity, and session health.",
+  "tags": ["claude-code", "engineering", "productivity"],
+  "_comment": "This is a working dashboard template verified against SigNoz v0.117.1. All panels use log-based query builder with structured filters. Copy and adapt.",
+  "panels": [
+    {
+      "type": "value",
+      "title": "API Requests",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "model EXISTS"
+      }
+    },
+    {
+      "type": "value",
+      "title": "Tool Calls",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "tool_name EXISTS"
+      }
+    },
+    {
+      "type": "value",
+      "title": "Failed Tools",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "tool_name EXISTS AND success = 'false'"
+      }
+    },
+    {
+      "type": "graph",
+      "title": "API Requests Over Time",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "model EXISTS",
+        "groupBy": "model"
+      }
+    },
+    {
+      "type": "bar (stacked)",
+      "title": "Tool Usage Over Time",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "tool_name EXISTS",
+        "groupBy": "tool_name"
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Tool Success vs Failure",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "tool_name EXISTS",
+        "groupBy": "success"
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Speed Mode",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "speed EXISTS",
+        "groupBy": "speed"
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Prompts Over Time",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count()",
+        "filter": "prompt_length EXISTS"
+      }
+    },
+    {
+      "type": "table",
+      "title": "Model Usage Summary",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count() as 'Requests'",
+        "filter": "model EXISTS",
+        "groupBy": "model",
+        "orderBy": "#SIGNOZ_VALUE desc"
+      }
+    },
+    {
+      "type": "table",
+      "title": "Tool Performance",
+      "query": {
+        "dataSource": "logs",
+        "aggregation": "count() as 'Calls'",
+        "filter": "tool_name EXISTS",
+        "groupBy": "tool_name",
+        "orderBy": "#SIGNOZ_VALUE desc"
+      }
+    }
+  ]
+}
