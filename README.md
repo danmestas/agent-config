@@ -45,6 +45,25 @@ Skills follow the [Agent Skills format](https://github.com/anthropics/agent-skil
 | [deterministic-simulation-testing](skills/deterministic-simulation-testing) | Collapse distributed systems into single-threaded simulations with controlled non-determinism. BUGGIFY fault injection, VOPR patterns, invariant checking. |
 | [midscene-testing](skills/midscene-testing) | Screenshot-driven browser smoke testing via Midscene's headless Puppeteer mode. Ad-hoc UI validation, Datastar/HTMX/SSE testing, report consolidation. |
 
+### Web Frameworks
+
+| Skill | Description |
+|-------|-------------|
+| [datastar-tao](skills/datastar-tao) | The Tao of Datastar — philosophy for hypermedia-driven web apps. Backend owns state, SSE, HTML-over-the-wire, DOM morphing. |
+| [datastar-patterns](skills/datastar-patterns) | Datastar UI implementation patterns — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling. |
+
+### Observability
+
+| Skill | Description |
+|-------|-------------|
+| [signoz-dashboard-builder](skills/signoz-dashboard-builder) | Create and update SigNoz dashboards via MCP API. Panels for metrics, logs, traces, and Claude Code telemetry. |
+
+### Knowledge Management
+
+| Skill | Description |
+|-------|-------------|
+| [knowledge-base](skills/knowledge-base) | LLM-maintained knowledge bases as Obsidian-compatible wikis. Ingest sources, query accumulated research, lint for consistency. |
+
 ### DevOps & Utilities
 
 | Skill | Description |
@@ -85,6 +104,8 @@ Audit the DX of this CLI tool                          # triggers dx-audit
 Set up a GitHub project board for this repo            # triggers gh-project-setup
 Create a Jira issue for ABC-123                        # triggers atlassian-cli-jira
 Migrate my .env files to Doppler                       # triggers doppler
+Build a Datastar search component                      # triggers datastar-patterns
+Ingest this article into my research wiki              # triggers knowledge-base
 ```
 
 ## Skill Structure
