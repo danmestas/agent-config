@@ -70,6 +70,12 @@ Skills follow the [Agent Skills format](https://github.com/anthropics/agent-skil
 |-------|-------------|
 | [mgrep-code-search](skills/mgrep-code-search) | Semantic code search using mgrep. Natural language queries across code, text, PDFs, and images. Complements grep/ripgrep for finding features, understanding intent, and exploring unfamiliar codebases. |
 
+### Agent Tooling
+
+| Skill | Description |
+|-------|-------------|
+| [apm-builder](skills/apm-builder) | Build and distribute APM (Agent Package Manager) bundles. Scaffold packages, author primitives (skills, agents, instructions, hooks), target Claude Code/Copilot/Cursor, and export plugins. Full CLI reference included. |
+
 ### DevOps & Utilities
 
 | Skill | Description |
