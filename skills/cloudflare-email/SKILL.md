@@ -125,10 +125,15 @@ Cloudflare Email Service handles outbound only. To receive replies:
 - Add a routing rule: `you@yourdomain.com` → forward to a real inbox (Gmail, iCloud, etc.)
 - Replies then land in that inbox; you reply from that inbox's UI (which may itself need a Send-as alias to preserve the custom-domain `from`)
 
+## Viewing Sent Mail
+
+Dashboard → your domain → **Email Service** → **Email Sending** → **Activity Log** lists recent sends, destinations, and delivery status. Logs can take up to ~2 minutes to appear.
+
+Only mail sent through Cloudflare (REST API or Workers binding) shows up. Mail that happens to use a `from` address on a Cloudflare-verified domain but is relayed by another service (e.g. Gmail's `smtp.gmail.com` delivering a "Send mail as" alias) bypasses Cloudflare entirely and will NOT appear in the Activity Log — this is a common point of confusion when debugging whether a send actually went through this service.
+
 ## Limitations
 
 - **No SMTP.** This is the single biggest footgun — users frequently ask to point Gmail Send-as at Cloudflare. It does not work and cannot work. Redirect them to a real mailbox provider if they need SMTP.
-- **No native "Sent" folder.** Sent messages are not stored; log them yourself if audit trail matters.
 - **Per-account rate limits apply.** Check current limits in Cloudflare docs — exceed them and sends queue or reject.
 - **Bounces go to `cf-bounce.<domain>`.** Don't delete those DNS records.
 

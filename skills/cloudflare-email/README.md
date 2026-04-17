@@ -38,10 +38,14 @@ Full details in [SKILL.md](./SKILL.md).
 - Workers that send notifications without a third-party email SDK
 - Replacing paid SMTP relays for low-volume custom-domain sending
 
+## Viewing sent mail
+
+The Cloudflare dashboard has an **Activity Log** under Email Service → Email Sending showing recent sends and their status. Mail sent through a different route (e.g. Gmail's `smtp.gmail.com` with a Send-as alias) does **not** appear there, even if the `from` address is on a Cloudflare-verified domain — only direct sends via this API or a Worker do.
+
 ## Limitations
 
 - **No SMTP endpoint.** Gmail "Send mail as", Apple Mail, Outlook, Thunderbird, and any IMAP/SMTP client cannot use Cloudflare. If you need a human inbox UI with your custom domain, use Zoho Mail (free tier), Google Workspace, Fastmail, or similar.
-- **No native "Sent" folder.** Messages aren't stored — log them yourself if you need an audit trail.
+- **No IMAP / no sent-mail sync.** The Activity Log is delivery metadata, not message bodies — it won't let you view, resend, or forward the content of a prior send. Persist your own copies if you need that.
 - **Domain must be on Cloudflare DNS.** If your nameservers point elsewhere, Email Service is unavailable.
 - **Bounces go to `cf-bounce.<yourdomain>`.** Don't delete those auto-added DNS records.
 
