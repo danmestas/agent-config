@@ -64,6 +64,12 @@ Skills follow the [Agent Skills format](https://github.com/anthropics/agent-skil
 |-------|-------------|
 | [knowledge-base](skills/knowledge-base) | LLM-maintained knowledge bases as Obsidian-compatible wikis. Ingest sources, query accumulated research, lint for consistency. |
 
+### Code Search
+
+| Skill | Description |
+|-------|-------------|
+| [mgrep-code-search](skills/mgrep-code-search) | Semantic code search using mgrep. Natural language queries across code, text, PDFs, and images. Complements grep/ripgrep for finding features, understanding intent, and exploring unfamiliar codebases. |
+
 ### DevOps & Utilities
 
 | Skill | Description |
@@ -106,6 +112,7 @@ Create a Jira issue for ABC-123                        # triggers atlassian-cli-
 Migrate my .env files to Doppler                       # triggers doppler
 Build a Datastar search component                      # triggers datastar-patterns
 Ingest this article into my research wiki              # triggers knowledge-base
+Where is authentication handled in this codebase?      # triggers mgrep-code-search
 ```
 
 ## Skill Structure
