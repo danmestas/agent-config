@@ -59,7 +59,9 @@ if [[ -n "$HTML_BODY_FILE" ]]; then
   HTML_BODY="$(cat "$HTML_BODY_FILE")"
 fi
 
-PAYLOAD="$(python3 - <<PY
+export FROM TO SUBJECT TEXT_BODY HTML_BODY CC BCC REPLY_TO
+
+PAYLOAD="$(python3 - <<'PY'
 import json, os
 payload = {
     "from": os.environ["FROM"],
@@ -74,8 +76,6 @@ if os.environ.get("REPLY_TO"):  payload["reply_to"] = os.environ["REPLY_TO"]
 print(json.dumps(payload))
 PY
 )"
-
-export FROM TO SUBJECT TEXT_BODY HTML_BODY CC BCC REPLY_TO
 
 curl -sS -w "\nHTTP %{http_code}\n" \
   "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/email/sending/send" \
