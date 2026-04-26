@@ -1,0 +1,32 @@
+{
+  "name": "agent-skills",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "tsx apm-builder/cli.ts validate",
+    "build": "tsx apm-builder/cli.ts build",
+    "watch": "tsx apm-builder/cli.ts watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "citty": "^0.1.6",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.6.0",
+    "zod": "^3.23.8",
+    "chokidar": "^4.0.1",
+    "picocolors": "^1.1.1",
+    "p-limit": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
