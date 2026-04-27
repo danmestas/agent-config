@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { defineCommand, runMain } from 'citty';
 import pc from 'picocolors';
@@ -10,6 +11,8 @@ import { matchesGlob } from './lib/glob.ts';
 import { updateReadme } from './lib/docs.ts';
 import { TARGETS, type Target } from './lib/types.ts';
 import { listImplementedTargets } from './adapters/index.ts';
+import { runEvolution } from './lib/evolution/orchestrator.ts';
+import { renderReport } from './lib/evolution/render.ts';
 
 const validateCmd = defineCommand({
   meta: { name: 'validate', description: 'Validate all components' },
@@ -172,9 +175,60 @@ Describe what this ${args.type} does and how to use it.
   },
 });
 
+const evolveCmd = defineCommand({
+  meta: { name: 'evolve', description: 'Detect friction patterns in session history; emit a markdown report with proposed diffs' },
+  args: {
+    since: { type: 'string', default: '7d', description: 'Time window (e.g. 7d, 14d, 30d)' },
+    project: { type: 'string', default: 'agent-skills', description: 'Project name (matches ~/.claude/projects/<name>)' },
+    'no-llm': { type: 'boolean', default: false, description: 'Disable Haiku calls; deterministic-only' },
+    'include-arcs': { type: 'boolean', default: false, description: 'Include arc-driven proposals (slower)' },
+    'dry-run': { type: 'boolean', default: false, description: 'Detect but skip writing the report file' },
+    json: { type: 'boolean', default: false, description: 'Print JSON instead of writing markdown' },
+  },
+  async run({ args }) {
+    const sinceMs = parseDuration(args.since);
+    const report = await runEvolution({
+      repoRoot: process.cwd(),
+      project: args.project,
+      sinceMs,
+      noLlm: args['no-llm'],
+      includeArcs: args['include-arcs'],
+      dryRun: args['dry-run'],
+      json: args.json,
+    });
+    if (args.json) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+    const md = renderReport(report);
+    if (args['dry-run']) {
+      console.log(md);
+      return;
+    }
+    const reportDir = path.join(os.homedir(), '.claude', 'evolution-reports', args.project);
+    await fs.mkdir(reportDir, { recursive: true });
+    const date = new Date().toISOString().slice(0, 10);
+    const reportPath = path.join(reportDir, `${date}.md`);
+    await fs.writeFile(reportPath, md);
+    console.log(pc.green(`evolution report written: ${reportPath}`));
+    console.log(pc.cyan(`${report.findings.length} finding(s); cost: $${report.llmCostUsd.toFixed(2)}`));
+  },
+});
+
 const main = defineCommand({
   meta: { name: 'apm-builder', description: 'Multi-harness skills build tool' },
-  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd, docs: docsCmd, init: initCmd },
+  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd, docs: docsCmd, init: initCmd, evolve: evolveCmd },
 });
 
 runMain(main);
+
+function parseDuration(s: string): number {
+  const m = /^(\d+)([dhm])$/.exec(s);
+  if (!m) throw new Error(`invalid duration: ${s}`);
+  const n = Number(m[1]!);
+  const unit = m[2]!;
+  if (unit === 'd') return n * 86_400_000;
+  if (unit === 'h') return n * 3_600_000;
+  if (unit === 'm') return n * 60_000;
+  throw new Error(`unknown unit: ${unit}`);
+}

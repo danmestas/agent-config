@@ -8,20 +8,22 @@
     "build": "tsx apm-builder/cli.ts build",
     "watch": "tsx apm-builder/cli.ts watch",
     "docs": "tsx apm-builder/cli.ts docs",
+    "evolve": "tsx apm-builder/cli.ts evolve",
     "init": "tsx apm-builder/cli.ts init",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "@iarna/toml": "^2.2.5",
+    "chokidar": "^4.0.1",
     "citty": "^0.1.6",
     "gray-matter": "^4.0.3",
-    "yaml": "^2.6.0",
-    "zod": "^3.23.8",
-    "chokidar": "^4.0.1",
+    "p-limit": "^6.1.0",
     "picocolors": "^1.1.1",
-    "p-limit": "^6.1.0"
+    "yaml": "^2.6.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -31,5 +33,6 @@
   },
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "_evolution_todo": "meta-scout import deferred: package is not on npm, lives in github.com/danmestas/meta-scout monorepo at packages/meta-scout/ with no committed dist/. github: install resolves to monorepo root (named claude-doctor, no main entry); gitpkg.now.sh and gitpkg.vercel.app now return 402 Payment Required. Re-evaluate when meta-scout publishes to npm or commits a built dist/."
 }
