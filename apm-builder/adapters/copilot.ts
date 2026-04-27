@@ -1,5 +1,5 @@
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
-import { renderRulesSections, selectAndSortRules } from '../lib/rules.ts';
+import { composeRulesBody, selectRules } from '../lib/rules.ts';
 
 export const copilotAdapter: Adapter = {
   target: 'copilot',
@@ -32,7 +32,7 @@ export const copilotAdapter: Adapter = {
 
 function emitInstructions(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
   // Collect all components contributing to copilot-instructions.md.
-  const rules = selectAndSortRules(ctx.allComponents, 'copilot', 'project');
+  const rules = selectRules(ctx.allComponents, 'copilot', 'project');
   const skills = ctx.allComponents
     .filter(
       (c) =>
@@ -51,7 +51,7 @@ function emitInstructions(component: ComponentSource, ctx: AdapterContext): Emit
   }
 
   const sections: string[] = [];
-  if (rules.length > 0) sections.push(`# Rules\n\n${renderRulesSections(rules)}`);
+  if (rules.length > 0) sections.push(`# Rules\n\n${composeRulesBody(rules)}`);
   if (skills.length > 0) {
     const skillSections = skills
       .map((s) => `## ${s.manifest.name}\n\n${s.body.trim()}\n`)
