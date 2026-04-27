@@ -9,7 +9,7 @@ Multi-harness AI agent configuration monorepo. Authors write skills, plugins, ho
 The repo's directory structure mirrors the component-type schema:
 
 ```
-skills/      — type: skill   (39 components — typed agent capabilities triggered by description)
+skills/      — type: skill   (46 components — typed agent capabilities triggered by description)
 plugins/     — type: plugin  (1 component — multi-skill bundles)
 hooks/       — type: hook    (1 component — event-driven scripts)
 agents/      — type: agent   (planned)
@@ -110,6 +110,13 @@ Bundled as the [`knowledge-base`](plugins/knowledge-base) plugin (install once f
 ### Evolution
 
 - [`evolution-engine`](skills/evolution-engine) — Read recent session transcripts, detect recurring friction patterns, emit unified-diff fixes against existing skills/configs/memory. CLI: `npm run evolve`.
+- [`skill-gap-detector`](skills/skill-gap-detector) — Find *missing* skills (not edits) by scanning sessions for "I had to explain X 3+ times" clusters. Drafts proposed SKILL.md files under `~/.claude/evolution-reports/<project>/proposed-skills/` for human review.
+- [`reflect`](skills/reflect) — Structured post-task critique. Five sections (summary / went well / didn't / proposals / open questions) → markdown report. No auto-apply.
+- [`memorize`](skills/memorize) — Pairs with `/reflect`. Converts an agreed proposal or insight into a project ADR (`docs/adr/`) or personal memory (`~/.claude/projects/<project>/memory/`). Always confirms content first.
+- [`skill-eval-runner`](skills/skill-eval-runner) — Binary pass/fail evals (no scoring, per MindStudio research) for skill descriptions. Reads `skills/<name>/tests/evals.json`. Auto-fires after SKILL.md edits.
+- [`description-linter`](skills/description-linter) — Static analyzer for SKILL.md frontmatter: trigger-phrase heuristics, length cap, kebab-case names, cross-skill conflict detection. Reports only — no auto-fix.
+- [`stuck-detector`](skills/stuck-detector) — Off-ramp when the agent (or user) hits a doom-loop. Stops retrying, writes a structured handoff, asks whether to escalate / pause / continue with reduced scope.
+- [`evolution-changelog`](skills/evolution-changelog) — Maintains `EVOLUTION.md` at repo root: append-only log of applied evolution-driven changes, one bullet per change with signal, file, and one-line rationale.
 
 ### Frontend frameworks (Tooling)
 
@@ -164,7 +171,21 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 
 | Name | Type | Version | Description | Targets |
 |------|------|---------|-------------|---------|
+| description-linter | skill | 0.1.0 | Use when the user types "lint my skills", "check skill descriptions", "/lint-skills", "validate skill triggers", "audit skill descriptions", or asks whether two skills conflict on the same prompt. Also fires PostToolUse on edits to any skills/*/SKILL.md. Static-analyzes SKILL.md frontmatter for trigger quality, length, naming, and cross-skill conflicts. Does NOT auto-fix — only reports.
+ | claude-code |
+| evolution-changelog | skill | 0.1.0 | Use when the user types "/changelog evolution", "log this evolution", "track applied evolutions", "update EVOLUTION.md", or asks to record what evolution-driven changes have been applied to the repo. Also fires PostToolUse on `git apply` operations against files matching the evolution-report path pattern. Maintains the EVOLUTION.md changelog at the repo root, one date-section per day, one bullet per applied change.
+ | claude-code |
 | evolution-engine | skill | 0.1.0 | Use when the user wants to "analyze sessions", "find patterns in my agent history", "evolve config", "/evolve", "what's been frustrating you", or asks for automated suggestions for improving skills/configs based on session transcripts. Triggers on requests to surface recurring friction, propose allowlist additions, find stale memory, or generate diff-shaped recommendations against existing skills, settings, and memory files.
+ | claude-code |
+| memorize | skill | 0.1.0 | Use when the user types "/memorize", "save this learning", "make this an ADR", "capture this for future sessions", "remember this", "write this down for next time", or "save that proposal". Also auto-fires after /reflect when the user expresses agreement with a proposal. Converts a recent insight or reflection into either a project ADR or a personal memory entry. Always confirms content with the user before writing.
+ | claude-code |
+| reflect | skill | 0.1.0 | Use when the user types "/reflect", "review what we just did", "critique the last task", "what could go better", "post-task review", "retro this", or after a meaningful task ships and the agent judges a structured critique would help. Produces a markdown reflection report at ~/.claude/evolution-reports/<project>/reflections/. Does NOT auto-apply changes — output is for human review.
+ | claude-code |
+| skill-eval-runner | skill | 0.1.0 | Use when the user types "/eval skill X", "test skill X", "run evals on", "regression test skill", "eval skill", or asks whether a skill's description still triggers correctly. Also fires PostToolUse on edits to any skills/*/SKILL.md so a freshly-edited skill's triggers are immediately checked. Runs binary pass/fail evals (no scoring) per MindStudio's research.
+ | claude-code |
+| skill-gap-detector | skill | 0.1.0 | Use when the user wants to "find missing skills", "what skills should I have", "what am I explaining over and over", "/skill-gap", "audit my repeated instructions", or asks which skills they're missing based on session history. Also weekly cron-friendly. Scans recent session transcripts for "I had to explain X 3+ times" patterns and drafts proposed new SKILL.md files for human review. Does NOT auto-install.
+ | claude-code |
+| stuck-detector | skill | 0.1.0 | Use when the user says "stuck", "I'm stuck", "this isn't working", "tool keeps failing", "give up on this", "we're going in circles", "/stuck", or when the agent itself notices it has hit N consecutive tool errors in a session window. Generates a handoff summary so progress can resume in a fresh session, escalate to a stronger model, or pause for user input. Stops the doom-loop of blind retries.
  | claude-code |
 
 ### integrations
