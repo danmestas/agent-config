@@ -1,0 +1,15 @@
+{
+  "name": "vault-ingest",
+  "version": "0.1.0",
+  "description": "Ingest sources into the Obsidian wiki vault. Reads a source, extracts entities and concepts, creates or updates wiki pages, cross-references, and logs the operation. Supports files, URLs, and batch mode. Triggers on: ingest, process this source, add this to the wiki, read and file this, batch ingest, ingest all of these, ingest this url.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/vault-ingest",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/vault-ingest@v0.1.0",
+  "categories": [
+    "context-management"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

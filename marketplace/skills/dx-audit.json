@@ -1,0 +1,15 @@
+{
+  "name": "dx-audit",
+  "version": "0.1.0",
+  "description": "Use when evaluating developer experience or user experience, assessing usability of a CLI/SDK/API/UI, scoring project ergonomics, identifying friction in workflows, or when asked to audit DX or UX. Triggers on \"DX score\", \"UX audit\", \"developer experience\", \"user experience\", \"workflow friction\", \"usability audit\", \"how hard is it to use this\".",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/dx-audit",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/dx-audit@v0.1.0",
+  "categories": [
+    "backpressure"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

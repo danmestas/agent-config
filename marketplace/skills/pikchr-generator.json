@@ -1,0 +1,16 @@
+{
+  "name": "pikchr-generator",
+  "version": "0.2.0",
+  "description": "Generate, theme, and render technical diagrams across four engines (Pikchr,\nGraphViz, D2, Mermaid) with a shared 16-theme palette. Use whenever the user\nasks for a diagram, flowchart, sequence diagram, system architecture,\nstate machine, data pipeline, swim lane, network topology, ER diagram,\nclass diagram, or any boxes-and-arrows technical illustration AND mentions\npikchr, graphviz, dot, d2, or mermaid OR has indicated a preference for\ntext-defined diagrams (over excalidraw/figma). Also use when the user says\n\"draw the architecture\", \"diagram this flow\", \"make a chart of X\", \"show\nthe states\", \"graph this topology\", or asks for any visual these engines\nare suited for. Outputs themed SVG (any of 16 themes via --theme NAME).\nDo NOT use for freeform sketches that need curves and pen strokes (use\nexcalidraw), real Gantt/pie charts (use a chart library), or rich data viz.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/pikchr-generator",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/pikchr-generator@v0.2.0",
+  "categories": [
+    "tooling"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code",
+    "apm"
+  ]
+}

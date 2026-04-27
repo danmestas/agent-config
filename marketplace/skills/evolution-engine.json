@@ -1,0 +1,15 @@
+{
+  "name": "evolution-engine",
+  "version": "0.1.0",
+  "description": "Use when the user wants to \"analyze sessions\", \"find patterns in my agent history\", \"evolve config\", \"/evolve\", \"what's been frustrating you\", or asks for automated suggestions for improving skills/configs based on session transcripts. Triggers on requests to surface recurring friction, propose allowlist additions, find stale memory, or generate diff-shaped recommendations against existing skills, settings, and memory files.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/evolution-engine",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/evolution-engine@v0.1.0",
+  "categories": [
+    "evolution"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

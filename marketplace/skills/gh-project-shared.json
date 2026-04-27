@@ -1,0 +1,15 @@
+{
+  "name": "gh-project-shared",
+  "version": "0.1.0",
+  "description": "Shared utilities for GitHub project management. Not directly invoked by agents. Provides: gh CLI validation, authentication checking, config file management (.github/project-config.json), context detection for template suggestions, and error handling with logging.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/gh-project-shared",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/gh-project-shared@v0.1.0",
+  "categories": [
+    "integrations"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

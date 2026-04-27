@@ -1,0 +1,15 @@
+{
+  "name": "vault-save",
+  "version": "0.1.0",
+  "description": "Save the current conversation, answer, or insight into the Obsidian wiki vault as a structured note. Analyzes the chat, determines the right note type, creates frontmatter, files it in the correct wiki folder, and updates index, log, and hot cache. Triggers on: \"save this\", \"save that answer\", \"/save\", \"file this\", \"save to wiki\", \"save this session\", \"file this conversation\", \"keep this\", \"save this analysis\", \"add this to the wiki\".",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/vault-save",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/vault-save@v0.1.0",
+  "categories": [
+    "context-management"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

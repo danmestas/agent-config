@@ -1,0 +1,15 @@
+{
+  "name": "signoz-dashboard-builder",
+  "version": "0.1.0",
+  "description": "Use when creating or updating SigNoz dashboards via the MCP API. Triggers on requests to build dashboards, add panels, visualize metrics/logs/traces in SigNoz, or debug dashboard queries that show \"No Data\" or \"Something went wrong\". Also use when working with Claude Code telemetry in SigNoz.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/signoz-dashboard-builder",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/signoz-dashboard-builder@v0.1.0",
+  "categories": [
+    "integrations"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

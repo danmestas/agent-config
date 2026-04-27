@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*@v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+
+      - name: Parse tag
+        id: parse
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          SKILL="${TAG%@v*}"
+          VERSION="${TAG##*@v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "skill=$SKILL" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Verify component exists and version matches
+        run: |
+          SKILL="${{ steps.parse.outputs.skill }}"
+          VERSION="${{ steps.parse.outputs.version }}"
+          for dir in skills/$SKILL plugins/$SKILL rules/$SKILL; do
+            if [ -f "$dir/SKILL.md" ]; then
+              FOUND_VERSION=$(grep -E "^version:" "$dir/SKILL.md" | head -1 | sed 's/version: *//;s/[" ]//g')
+              if [ "$FOUND_VERSION" != "$VERSION" ]; then
+                echo "::error::Tag $SKILL@v$VERSION but $dir/SKILL.md declares version=$FOUND_VERSION"
+                exit 1
+              fi
+              echo "ok: $dir/SKILL.md declares version=$VERSION"
+              exit 0
+            fi
+          done
+          echo "::error::No SKILL.md found for $SKILL under skills/, plugins/, or rules/"
+          exit 1
+
+      - name: Validate
+        run: npm run validate
+
+      - name: Run release (live)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APM_TOKEN: ${{ secrets.APM_TOKEN }}
+        run: |
+          npx tsx apm-builder/cli.ts release \
+            --skill "${{ steps.parse.outputs.skill }}" \
+            --version "${{ steps.parse.outputs.version }}" \
+            --no-dry-run

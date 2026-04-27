@@ -1,0 +1,15 @@
+{
+  "name": "gh-project-charter",
+  "version": "0.1.0",
+  "description": "Use when creating project charters, documenting project goals/scope, defining success criteria, updating project documentation, or tracking scope changes",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/gh-project-charter",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/gh-project-charter@v0.1.0",
+  "categories": [
+    "integrations"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}
