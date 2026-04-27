@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use when implementing UI patterns with Datastar — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling, lazy loading, progress indicators, or keyboard shortcuts. Triggers on data-* attributes, @get/@post/@put/@patch helpers, SSE response formatting, or any \"how do I do X in Datastar\" implementation question.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/datastar-patterns",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/datastar-patterns@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/datastar-patterns",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/datastar-patterns@v0.1.0",
   "categories": [
     "tooling"
   ],

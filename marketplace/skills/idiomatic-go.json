@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use when writing, reviewing, or refactoring Go code. Triggers on .go files, go.mod presence, or any task involving Go programming. Also use when reviewing Go code for idiomaticity, error handling, concurrency patterns, or interface design.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/idiomatic-go",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/idiomatic-go@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/idiomatic-go",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/idiomatic-go@v0.1.0",
   "categories": [
     "backpressure"
   ],

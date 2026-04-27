@@ -4,7 +4,7 @@ import matter from 'gray-matter';
 import { ManifestSchema } from './schema.ts';
 import type { ComponentSource } from './types.ts';
 
-const COMPONENT_DIRS = ['skills', 'plugins', 'rules'] as const;
+const COMPONENT_DIRS = ['skills', 'plugins', 'rules', 'hooks', 'agents', 'mcp'] as const;
 
 export async function discoverComponents(repoRoot: string): Promise<ComponentSource[]> {
   const components: ComponentSource[] = [];

@@ -165,7 +165,15 @@ const initCmd = defineCommand({
       console.log(pc.red(`name must be kebab-case lowercase: ${args.name}`));
       process.exit(1);
     }
-    const topDir = args.type === 'rules' ? 'rules' : args.type === 'plugin' ? 'plugins' : 'skills';
+    const TYPE_TO_DIR: Record<string, string> = {
+      skill: 'skills',
+      plugin: 'plugins',
+      hook: 'hooks',
+      agent: 'agents',
+      rules: 'rules',
+      mcp: 'mcp',
+    };
+    const topDir = TYPE_TO_DIR[args.type] ?? 'skills';
     const dir = path.join(process.cwd(), topDir, args.name);
     await fs.mkdir(dir, { recursive: true });
     const skillPath = path.join(dir, 'SKILL.md');

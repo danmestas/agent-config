@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Local, offline voice announcements for Claude Code and Pi via Kokoro-82M TTS. Wires Notification + SubagentStop hooks so the terminal whispers progress instead of going *bing*. Useful when subagents run for minutes and you've wandered off. Use when the user wants TTS announcements, voice notifications, audible subagent feedback, or mentions \"/tts\", \"speak\", \"announce\", or \"Kokoro\". Audio never leaves the machine; no API keys.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/tts-announcer",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/tts-announcer@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/hooks/tts-announcer",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/tts-announcer@v0.1.0",
   "categories": [
     "workflow"
   ],

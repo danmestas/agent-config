@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to Obsidian canvas files with auto-positioning inside zones. Integrates with /banana for image capture. Triggers on: /canvas, canvas new, canvas add image, canvas add text, canvas add pdf, canvas add note, canvas zone, canvas list, canvas from banana, add to canvas, put this on the canvas, open canvas, create canvas.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/obsidian-canvas",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/obsidian-canvas@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/obsidian-canvas",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/obsidian-canvas@v0.1.0",
   "categories": [
     "tooling"
   ],

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use when writing safety-critical code, systems programming, infrastructure, or when a project needs rigorous coding discipline. Triggers include requests for defensive coding, assertion-heavy development, performance-conscious design, zero-technical-debt policy, or NASA Power of Ten style rules. Also use when reviewing code for correctness, safety, or performance issues.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/tigerstyle",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/tigerstyle@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/tigerstyle",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/tigerstyle@v0.1.0",
   "categories": [
     "backpressure"
   ],

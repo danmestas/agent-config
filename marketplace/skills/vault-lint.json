@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims, missing cross-references, frontmatter gaps, and empty sections. Creates or updates Dataview dashboards. Generates canvas maps. Triggers on: \"lint\", \"health check\", \"clean up wiki\", \"check the wiki\", \"wiki maintenance\", \"find orphans\", \"wiki audit\".",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/vault-lint",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/vault-lint@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/vault-lint",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/vault-lint@v0.1.0",
   "categories": [
     "context-management"
   ],

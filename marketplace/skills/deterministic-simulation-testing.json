@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use when building or testing distributed systems, consensus protocols, sync engines, replicated databases, or any system with network/disk/time non-determinism. Also use when tests are flaky due to concurrency, when debugging rare heisenbugs, or when asked about simulation testing, BUGGIFY, VOPR, or fault injection strategies.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/deterministic-simulation-testing",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/deterministic-simulation-testing@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/deterministic-simulation-testing",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/deterministic-simulation-testing@v0.1.0",
   "categories": [
     "tooling"
   ],

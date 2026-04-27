@@ -1,8 +1,23 @@
-# agent-skills
+# agent-config
 
-Multi-harness skills monorepo for AI coding agents. Authors write skills, agents, rules, hooks, MCP configs, and plugins once in canonical `SKILL.md` format; `apm-builder` emits per-harness artifacts for **Claude Code**, **APM**, **Codex**, **Gemini CLI**, **Copilot CLI**, and **Pi**.
+Multi-harness AI agent configuration monorepo. Authors write skills, plugins, hooks, agents, rules, and MCP server configs once in canonical `SKILL.md` format; `apm-builder` emits per-harness artifacts for **Claude Code**, **APM**, **Codex**, **Gemini CLI**, **Copilot CLI**, and **Pi**.
 
-> **Status (2026-04-27):** All six adapters merged. All skills are on canonical frontmatter (`name` + `version` + `description` + `type` + `targets` + `category`); `npm run validate` runs cleanly across the repo and `npm run build -- --target all` emits artifacts for every harness.
+> **Status (2026-04-27):** All six adapters merged. All components on canonical frontmatter (`name` + `version` + `description` + `type` + `targets` + `category`); `npm run validate` runs cleanly across the repo and `npm run build -- --target all` emits artifacts for every harness.
+
+## Layout
+
+The repo's directory structure mirrors the component-type schema:
+
+```
+skills/      — type: skill   (39 components — typed agent capabilities triggered by description)
+plugins/     — type: plugin  (1 component — multi-skill bundles)
+hooks/       — type: hook    (1 component — event-driven scripts)
+agents/      — type: agent   (planned)
+rules/       — type: rules   (planned)
+mcp/         — type: mcp     (planned)
+```
+
+`apm-builder/lib/discover.ts` walks all six top-level dirs.
 
 ## Taxonomy
 
@@ -24,8 +39,8 @@ Skills and configs are tagged across an 8-axis taxonomy. See [`TAXONOMY.md`](TAX
 ### Claude Code (marketplace)
 
 ```text
-/plugin marketplace add danmestas/agent-skills
-/plugin install <plugin-name>@danmestas/agent-skills
+/plugin marketplace add danmestas/agent-config
+/plugin install <plugin-name>@danmestas/agent-config
 ```
 
 Plugin available today: `knowledge-base`. Individual skills can also be installed directly — every skill in this repo is on the canonical schema and emits to `dist/claude-code/skills/<name>/`.
@@ -36,7 +51,7 @@ Plugin available today: `knowledge-base`. Individual skills can also be installe
 # apm.yml
 dependencies:
   apm:
-    - danmestas/agent-skills
+    - danmestas/agent-config
 ```
 
 ### Codex / Gemini CLI / Copilot CLI / Pi
@@ -63,7 +78,7 @@ Adapters emit native artifacts for each harness when a skill declares it in `tar
 
 ### Workflow
 
-- [`tts-announcer`](skills/tts-announcer) — Local, offline voice announcements via Kokoro-82M. Wires `Notification` + `SubagentStop` hooks so the terminal whispers progress instead of going *bing*. Targets Claude Code and Pi.
+- [`tts-announcer`](hooks/tts-announcer) — Local, offline voice announcements via Kokoro-82M. Wires `Notification` + `SubagentStop` hooks so the terminal whispers progress instead of going *bing*. Targets Claude Code and Pi.
 - [`orchestrator-mode`](skills/orchestrator-mode) — Primes a host Claude Code session as the Darkish Factory pipeline orchestrator (the §7 loop, 13-role roster, escalation classifier, audit-log conventions).
 - [`subagent-to-subharness`](skills/subagent-to-subharness) — Translates Agent-tool muscle memory into containerized `darkish spawn` dispatch. Decision tree, role mapping, framing examples.
 
@@ -256,7 +271,7 @@ Component types: `skill`, `plugin`, `hook`, `agent`, `rules`, `mcp`. See [`apm-b
 
 ## Companion repos
 
-Repos that aren't skill bundles but pair naturally with `agent-skills`:
+Repos that aren't component bundles but pair naturally with `agent-config`:
 
 - [`claude-hud-combo`](https://github.com/danmestas/claude-hud-combo) — Self-contained Deno statusline for Claude Code. Doesn't fit any of the six component types (it's a runtime artifact, not authored content), so it lives separately. Install with its own `install.sh`.
 - [`meta-scout`](https://github.com/danmestas/meta-scout) — Library that powers the [`evolution-engine`](skills/evolution-engine) skill's deeper detection (12 behavioral signals, struggle-then-success arcs). The skill currently uses two inline detectors; once `meta-scout` publishes to npm or commits a built `dist/`, a follow-up PR wires its full signal catalog into the orchestrator.

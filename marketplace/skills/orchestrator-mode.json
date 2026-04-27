@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use at session start in the Darkish Factory repo to prime as the pipeline orchestrator (host mode). Loads the §7 loop, the 13-role roster, the escalation classifier, and the rules for converting subagent muscle memory into subharness dispatch. Invoke whenever the operator types a task and you're in this repo.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/orchestrator-mode",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/orchestrator-mode@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/orchestrator-mode",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/orchestrator-mode@v0.1.0",
   "categories": [
     "workflow"
   ],

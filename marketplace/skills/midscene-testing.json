@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use when performing ad-hoc browser testing, smoke testing workflows, validating UI after frontend changes, or testing Datastar/HTMX/SSE reactive features that unit tests cannot cover. Also use when consolidating Midscene HTML reports into a single navigable document.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/midscene-testing",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/midscene-testing@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/midscene-testing",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/midscene-testing@v0.1.0",
   "categories": [
     "tooling"
   ],

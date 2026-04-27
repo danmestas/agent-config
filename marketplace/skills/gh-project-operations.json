@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use when adding/updating/deleting issues in projects, changing item statuses, bulk operations, archiving items, or managing project boards daily",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/gh-project-operations",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/gh-project-operations@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/gh-project-operations",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/gh-project-operations@v0.1.0",
   "categories": [
     "integrations"
   ],

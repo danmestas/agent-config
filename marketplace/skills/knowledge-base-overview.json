@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Use when building, maintaining, ingesting into, querying, or health-checking a markdown knowledge base or wiki. Use when the user wants to compile sources into structured knowledge, maintain an Obsidian wiki, ingest documents, ask questions against accumulated research, or run health checks on interlinked markdown pages. Triggers on requests involving knowledge bases, wiki maintenance, source ingestion, research compilation, Obsidian wiki workflows, or LLM-maintained documentation.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/knowledge-base-overview",
-  "release": "https://github.com/danmestas/agent-skills/releases/tag/knowledge-base-overview@v0.1.0",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/knowledge-base-overview",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/knowledge-base-overview@v0.1.0",
   "categories": [
     "memory-management"
   ],
