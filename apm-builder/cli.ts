@@ -137,11 +137,24 @@ const initCmd = defineCommand({
   args: {
     name: { type: 'positional', required: true, description: 'Component name (kebab-case)' },
     type: { type: 'string', default: 'skill', description: 'skill | plugin | hook | agent | rules | mcp' },
+    category: {
+      type: 'string',
+      default: 'tooling',
+      description: 'Primary category: economy | workflow | backpressure | tooling | integrations | context-management | memory-management | evolution',
+    },
   },
   async run({ args }) {
     const validTypes = ['skill', 'plugin', 'hook', 'agent', 'rules', 'mcp'];
+    const validCategories = [
+      'economy', 'workflow', 'backpressure', 'tooling', 'integrations',
+      'context-management', 'memory-management', 'evolution',
+    ];
     if (!validTypes.includes(args.type)) {
       console.log(pc.red(`unknown type: ${args.type}. Valid: ${validTypes.join(', ')}`));
+      process.exit(1);
+    }
+    if (!validCategories.includes(args.category)) {
+      console.log(pc.red(`unknown category: ${args.category}. Valid: ${validCategories.join(', ')}`));
       process.exit(1);
     }
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(args.name)) {
@@ -164,6 +177,8 @@ description: Use when [describe triggering conditions in one sentence]
 type: ${args.type}
 targets:
   - claude-code
+category:
+  primary: ${args.category}
 ---
 
 # ${args.name}
@@ -172,6 +187,7 @@ Describe what this ${args.type} does and how to use it.
 `;
     await fs.writeFile(skillPath, body);
     console.log(pc.green(`created ${path.relative(process.cwd(), skillPath)}`));
+    console.log(pc.cyan(`  category: ${args.category} (override with --category=<name>)`));
   },
 });
 

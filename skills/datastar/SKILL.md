@@ -1,6 +1,12 @@
 ---
 name: datastar
+version: 0.1.0
 description: Use when building web applications with Datastar — the hypermedia framework that drives frontend reactivity from the backend using HTML data-* attributes and Server-Sent Events. Triggers on Datastar, data-star, SSE-driven UI, hypermedia framework, backend-driven frontend, data-signals, data-on, PatchElements, or any Go/Python web app using Datastar SDKs.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: tooling
 ---
 
 # Datastar — Hypermedia-First Reactive Framework

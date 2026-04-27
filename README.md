@@ -28,7 +28,7 @@ Skills and configs are tagged across an 8-axis taxonomy. See [`TAXONOMY.md`](TAX
 /plugin install <plugin-name>@danmestas/agent-skills
 ```
 
-Plugins available today: `dev-tools`, `knowledge-base`. Individual skills can also be installed directly — every skill in this repo is on the canonical schema and emits to `dist/claude-code/skills/<name>/`.
+Plugin available today: `knowledge-base`. Individual skills can also be installed directly — every skill in this repo is on the canonical schema and emits to `dist/claude-code/skills/<name>/`.
 
 ### APM
 
@@ -93,11 +93,15 @@ Bundled as the [`knowledge-base`](plugins/knowledge-base) plugin (install once f
 
 - [`evolution-engine`](skills/evolution-engine) — Read recent session transcripts, detect recurring friction patterns, emit unified-diff fixes against existing skills/configs/memory. CLI: `npm run evolve`.
 
+### Frontend frameworks (Tooling)
+
+- [`datastar`](skills/datastar) — Datastar framework intro: hypermedia, backend-driven SSE, no client framework, no build step.
+- [`datastar-tao`](skills/datastar-tao) — *The Tao of Datastar*: hypermedia philosophy, backend-owned state, SSE, DOM morphing.
+- [`datastar-patterns`](skills/datastar-patterns) — Datastar UI implementation patterns: search, inline editing, infinite scroll, file upload, validation, polling.
+
 ### Integrations & data
 
 - [`signoz-dashboard-builder`](skills/signoz-dashboard-builder) — Build SigNoz dashboards via MCP API (metrics, logs, traces, telemetry panels).
-- [`datastar-tao`](skills/datastar-tao) — *The Tao of Datastar*: hypermedia philosophy, backend-owned state, SSE, DOM morphing.
-- [`datastar-patterns`](skills/datastar-patterns) — Datastar UI implementation patterns: search, inline editing, infinite scroll, file upload, validation, polling.
 - [`apple-contacts`](skills/apple-contacts) — Apple Contacts CRUD via the `contactbook` CLI (macOS only).
 - [`atlassian-cli-jira`](skills/atlassian-cli-jira) — Manage Jira Cloud via Atlassian CLI (`acli`): search, create, edit, transition, bulk ops, sprints.
 - [`deterministic-simulation-testing`](skills/deterministic-simulation-testing) — Collapse distributed systems into single-threaded simulations: BUGGIFY fault injection, VOPR patterns.
@@ -172,6 +176,7 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 |------|------|---------|-------------|---------|
 | apm-builder | skill | 0.1.0 | Use when building, validating, or scaffolding skills in this monorepo. Triggers: "validate skills", "build apm-builder", "scaffold a new skill", "init a hook/agent/rules/plugin", "run apm-builder", or any work on the multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini, Copilot CLI, Pi targets).
  | claude-code |
+| datastar | skill | 0.1.0 | Use when building web applications with Datastar — the hypermedia framework that drives frontend reactivity from the backend using HTML data-* attributes and Server-Sent Events. Triggers on Datastar, data-star, SSE-driven UI, hypermedia framework, backend-driven frontend, data-signals, data-on, PatchElements, or any Go/Python web app using Datastar SDKs. | claude-code |
 | datastar-patterns | skill | 0.1.0 | Use when implementing UI patterns with Datastar — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling, lazy loading, progress indicators, or keyboard shortcuts. Triggers on data-* attributes, @get/@post/@put/@patch helpers, SSE response formatting, or any "how do I do X in Datastar" implementation question. | claude-code |
 | defuddle | skill | 0.1.0 | Strip clutter from web pages before ingesting into the wiki. Removes ads, navigation, headers, footers, and boilerplate: leaving clean readable markdown that saves 40-60% tokens. Triggers on: defuddle, clean this page, strip this url, fetch and clean, clean web content before ingesting, strip ads, remove clutter, clean URL content, readable markdown from URL. | claude-code |
 | deterministic-simulation-testing | skill | 0.1.0 | Use when building or testing distributed systems, consensus protocols, sync engines, replicated databases, or any system with network/disk/time non-determinism. Also use when tests are flaky due to concurrency, when debugging rare heisenbugs, or when asked about simulation testing, BUGGIFY, VOPR, or fault injection strategies. | claude-code |
