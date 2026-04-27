@@ -60,4 +60,33 @@ describe('apm adapter', () => {
     );
     expect(result.diff).toEqual([]);
   });
+
+  it('composes project-scope rules into a single memory/constitution.md package', async () => {
+    const root = path.join(HERE, 'apm/rules-compose');
+    const baseStyle = await loadComponent(path.join(root, 'component'), root);
+    const prPolicy = await loadComponent(path.join(root, 'extra/rules/pr-policy'), root);
+    const all = [baseStyle, prPolicy];
+    const ctx: AdapterContext = {
+      config: SCOPED_CONFIG,
+      allComponents: all,
+      repoRoot: root,
+    };
+    const results = await Promise.all(all.map((c) => apmAdapter.emit(c, ctx)));
+    const flat = results.flat();
+    const constitution = flat.find((f) => f.path === 'rules-bundle/memory/constitution.md');
+    const manifest = flat.find((f) => f.path === 'rules-bundle/apm.yml');
+    const expectedConstitution = await fs.readFile(
+      path.join(root, 'expected/rules-bundle/memory/constitution.md'),
+      'utf8',
+    );
+    const expectedManifest = await fs.readFile(
+      path.join(root, 'expected/rules-bundle/apm.yml'),
+      'utf8',
+    );
+    expect(constitution?.content.toString()).toBe(expectedConstitution);
+    expect(manifest?.content.toString()).toBe(expectedManifest);
+    // Idempotence: the constitution.md must appear exactly once across all emit() calls.
+    const constitutionCount = flat.filter((f) => f.path === 'rules-bundle/memory/constitution.md').length;
+    expect(constitutionCount).toBe(1);
+  });
 });

@@ -1,0 +1,5 @@
+name: "@danmestas/rules-bundle"
+version: 1.0.0
+description: Composed project-scope rules for the agent-skills monorepo
+type: instructions
+includes: auto

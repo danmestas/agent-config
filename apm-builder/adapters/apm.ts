@@ -1,6 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
+import {
+  composeRulesSections,
+  filterRulesForTarget,
+  isPrimaryRuleForScope,
+  topoSortRules,
+} from '../lib/rules.ts';
 import type {
   Adapter,
   AdapterContext,
@@ -76,11 +82,43 @@ export const apmAdapter: Adapter = {
         return emitHook(component, ctx);
       case 'mcp':
         return emitMcp(component, ctx);
+      case 'rules':
+        return emitRules(component, ctx);
       default:
         throw new Error(`apm adapter: type "${component.manifest.type}" not yet implemented`);
     }
   },
 };
+
+function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  const scope = component.manifest.scope ?? 'project';
+  const scoped = filterRulesForTarget(ctx.allComponents, 'apm', scope);
+  const sorted = topoSortRules(scoped);
+  if (!isPrimaryRuleForScope(component, sorted)) return [];
+
+  const content = composeRulesSections(sorted);
+  const dir = scope === 'user' ? 'rules-bundle-user' : 'rules-bundle';
+  const description =
+    scope === 'user'
+      ? 'Composed user-scope rules for the agent-skills monorepo'
+      : 'Composed project-scope rules for the agent-skills monorepo';
+
+  const cfg = (ctx.config as ApmConfig) ?? {};
+  const name = cfg.package_scope ? `${cfg.package_scope}/${dir}` : dir;
+
+  const manifest: Record<string, unknown> = {
+    name,
+    version: component.manifest.version,
+    description,
+    type: 'instructions',
+    includes: 'auto',
+  };
+
+  return [
+    { path: `${dir}/memory/constitution.md`, content },
+    { path: `${dir}/apm.yml`, content: renderManifest(manifest) },
+  ];
+}
 
 function emitMcp(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
   const mcp = component.manifest.mcp;
