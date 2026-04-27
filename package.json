@@ -11,6 +11,7 @@
     "evolve": "tsx apm-builder/cli.ts evolve",
     "init": "tsx apm-builder/cli.ts init",
     "test": "vitest run",
+    "smoke": "vitest run apm-builder/tests/smoke.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
