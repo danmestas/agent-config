@@ -54,4 +54,9 @@ describe('claude-code adapter', () => {
     const result = await runGolden(claudeCodeAdapter, path.join(HERE, 'claude-code/hook-basic'));
     expect(result.diff).toEqual([]);
   });
+
+  it('emits an mcp component as .mcp.fragment.json', async () => {
+    const result = await runGolden(claudeCodeAdapter, path.join(HERE, 'claude-code/mcp-basic'));
+    expect(result.diff).toEqual([]);
+  });
 });

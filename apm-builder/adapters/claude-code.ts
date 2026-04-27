@@ -19,7 +19,9 @@ export const claudeCodeAdapter: Adapter = {
         return emitRules(component, ctx);
       case 'hook':
         return emitHook(component);
-      // Other types added in Tasks 12-13.
+      case 'mcp':
+        return emitMcp(component);
+      // Other types added in Task 13.
       default:
         throw new Error(`claude-code adapter: type "${component.manifest.type}" not yet implemented`);
     }
@@ -90,6 +92,21 @@ async function emitHook(component: ComponentSource): Promise<EmittedFile[]> {
     content: `${JSON.stringify(fragment, null, 2)}\n`,
   });
   return files;
+}
+
+function emitMcp(component: ComponentSource): EmittedFile[] {
+  const { manifest } = component;
+  if (!manifest.mcp) return [];
+  const fragment = {
+    mcpServers: {
+      [manifest.name]: {
+        command: manifest.mcp.command,
+        ...(manifest.mcp.args ? { args: manifest.mcp.args } : {}),
+        ...(manifest.mcp.env ? { env: manifest.mcp.env } : {}),
+      },
+    },
+  };
+  return [{ path: '.mcp.fragment.json', content: `${JSON.stringify(fragment, null, 2)}\n` }];
 }
 
 function topoSortRules(rules: ComponentSource[]): ComponentSource[] {
