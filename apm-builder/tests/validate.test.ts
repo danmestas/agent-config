@@ -72,4 +72,11 @@ describe('validateComponents', () => {
     ]);
     expect(errors.some((e) => e.severity === 'error' && /escapes repo root/i.test(e.message))).toBe(true);
   });
+
+  it('warns on Claude Code plugin with empty includes', () => {
+    const errors = validateComponents([
+      mk({ name: 'pl', type: 'plugin', targets: ['claude-code'], includes: [] }),
+    ]);
+    expect(errors.some((e) => e.severity === 'warning' && /empty includes/i.test(e.message))).toBe(true);
+  });
 });

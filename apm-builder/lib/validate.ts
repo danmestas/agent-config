@@ -110,6 +110,18 @@ export function validateComponents(components: ComponentSource[]): ValidationErr
     });
   }
 
+  // Marketplace schema check for Claude Code plugins.
+  for (const c of components) {
+    if (c.manifest.type !== 'plugin' || !c.manifest.targets.includes('claude-code')) continue;
+    if (!c.manifest.includes || c.manifest.includes.length === 0) {
+      errors.push({
+        severity: 'warning',
+        componentName: c.manifest.name,
+        message: 'Claude Code plugin has empty includes — marketplace listings expect at least one skill',
+      });
+    }
+  }
+
   return errors;
 }
 
