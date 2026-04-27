@@ -1,0 +1,15 @@
+{
+  "name": "apm-builder",
+  "version": "0.1.0",
+  "description": "Use when building, validating, or scaffolding skills in this monorepo. Triggers: \"validate skills\", \"build apm-builder\", \"scaffold a new skill\", \"init a hook/agent/rules/plugin\", \"run apm-builder\", or any work on the multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini, Copilot CLI, Pi targets).",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/apm-builder",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/apm-builder@v0.1.0",
+  "categories": [
+    "tooling"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

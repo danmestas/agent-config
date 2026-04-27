@@ -1,0 +1,15 @@
+{
+  "name": "autoresearch",
+  "version": "0.1.0",
+  "description": "Autonomous iterative research loop. Takes a topic, runs web searches, fetches sources, synthesizes findings, and files everything into the wiki as structured pages. Based on Karpathy's autoresearch pattern: program.md configures objectives and constraints, the loop runs until depth is reached, output goes directly into the knowledge base. Triggers on: \"/autoresearch\", \"autoresearch\", \"research [topic]\", \"deep dive into [topic]\", \"investigate [topic]\", \"find everything about [topic]\", \"research and file\", \"go research\", \"build a wiki on\".",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/autoresearch",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/autoresearch@v0.1.0",
+  "categories": [
+    "context-management"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

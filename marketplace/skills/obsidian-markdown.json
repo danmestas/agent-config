@@ -1,0 +1,15 @@
+{
+  "name": "obsidian-markdown",
+  "version": "0.1.0",
+  "description": "Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, highlights, math, and canvas syntax. Reference this when creating or editing any wiki page. Triggers on: write obsidian note, obsidian syntax, wikilink, callout, embed, obsidian markdown, wikilink format, callout syntax, embed syntax, obsidian formatting, how to write obsidian markdown.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/obsidian-markdown",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/obsidian-markdown@v0.1.0",
+  "categories": [
+    "tooling"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}

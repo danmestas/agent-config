@@ -1,0 +1,20 @@
+{
+  "name": "norman",
+  "version": "0.1.0",
+  "description": "Use when designing, reviewing, or auditing user interfaces and frontend interactions. Use when evaluating UI usability, accessibility, or interaction patterns. Triggers on requests involving button placement, form design, navigation, error messages, onboarding flows, modal dialogs, or when asked to review a UI for usability.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/norman",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/norman@v0.1.0",
+  "categories": [
+    "backpressure"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code",
+    "apm",
+    "codex",
+    "gemini",
+    "copilot",
+    "pi"
+  ]
+}

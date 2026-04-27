@@ -1,0 +1,15 @@
+{
+  "name": "gh-project-setup",
+  "version": "0.1.0",
+  "description": "Use when creating new GitHub projects, setting up project boards, configuring kanban/scrum/roadmap boards, or applying project templates. Provides context-aware template suggestions based on repository analysis and conversation. Supports 6 templates: kanban, bug-tracker, feature-development, roadmap, research, release-planning. Handles multi-repo and organization projects.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/skills/gh-project-setup",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/gh-project-setup@v0.1.0",
+  "categories": [
+    "integrations"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}
