@@ -2,7 +2,7 @@
 
 Multi-harness skills monorepo for AI coding agents. Authors write skills, agents, rules, hooks, MCP configs, and plugins once in canonical `SKILL.md` format; `apm-builder` emits per-harness artifacts for **Claude Code**, **APM**, **Codex**, **Gemini CLI**, **Copilot CLI**, and **Pi**.
 
-> **Status (2026-04-27):** All six adapters merged. Skill migrations to canonical frontmatter (Plan 7) are still pending — most pre-existing skills carry only `name` + `description` + `category` and won't yet be emitted by `apm-builder build` until they declare `version`, `type`, and `targets`. New skills authored against the canonical schema work today.
+> **Status (2026-04-27):** All six adapters merged. All skills are on canonical frontmatter (`name` + `version` + `description` + `type` + `targets` + `category`); `npm run validate` runs cleanly across the repo and `npm run build -- --target all` emits artifacts for every harness.
 
 ## Taxonomy
 
@@ -28,7 +28,7 @@ Skills and configs are tagged across an 8-axis taxonomy. See [`TAXONOMY.md`](TAX
 /plugin install <plugin-name>@danmestas/agent-skills
 ```
 
-Plugins available today: `dev-tools`, `knowledge-base`. Individual skill installs become available once Plan 7 migrates remaining skills to the canonical schema.
+Plugins available today: `dev-tools`, `knowledge-base`. Individual skills can also be installed directly — every skill in this repo is on the canonical schema and emits to `dist/claude-code/skills/<name>/`.
 
 ### APM
 
@@ -106,11 +106,101 @@ Bundled as the [`knowledge-base`](plugins/knowledge-base) plugin (install once f
 
 ## Components
 
-The table below is regenerated from canonical `SKILL.md` frontmatter via `npm run docs`. It reflects only the components that already conform to the full canonical schema (`name` + `version` + `type` + `targets`). Plan 7 migrates remaining skills.
+The table below is regenerated from canonical `SKILL.md` frontmatter via `npm run docs`. Every skill, plugin, and hook in the repo conforms to the canonical schema and appears in this table.
 
 <!-- AUTO-GENERATED: COMPONENTS -->
+### backpressure
+
 | Name | Type | Version | Description | Targets |
 |------|------|---------|-------------|---------|
+| datastar-tao | skill | 0.1.0 | Use when building hypermedia-driven web applications, server-rendered UIs, or any frontend where the backend should own state. Use when choosing between SPA and server-driven architecture. Use when reviewing frontend code for unnecessary client-side state, optimistic updates, or client-side routing. Triggers on requests involving SSE, HTML-over-the-wire, DOM morphing, HTMX, Datastar, signals, or backend-first frontend design. | claude-code |
+| dx-audit | skill | 0.1.0 | Use when evaluating developer experience or user experience, assessing usability of a CLI/SDK/API/UI, scoring project ergonomics, identifying friction in workflows, or when asked to audit DX or UX. Triggers on "DX score", "UX audit", "developer experience", "user experience", "workflow friction", "usability audit", "how hard is it to use this". | claude-code |
+| hipp | skill | 0.1.0 | Use when designing libraries, modules, or data layers that must be simple, reliable, and self-contained. Use when choosing between embedded vs server-based solutions. Use when reviewing code for unnecessary complexity, dependencies, or configuration. Triggers on requests involving zero-config design, embedded systems, long-term maintainability, or first-principles thinking. | apm, claude-code, codex, copilot, gemini, pi |
+| idiomatic-go | skill | 0.1.0 | Use when writing, reviewing, or refactoring Go code. Triggers on .go files, go.mod presence, or any task involving Go programming. Also use when reviewing Go code for idiomaticity, error handling, concurrency patterns, or interface design. | apm, claude-code, codex, copilot, gemini, pi |
+| norman | skill | 0.1.0 | Use when designing, reviewing, or auditing user interfaces and frontend interactions. Use when evaluating UI usability, accessibility, or interaction patterns. Triggers on requests involving button placement, form design, navigation, error messages, onboarding flows, modal dialogs, or when asked to review a UI for usability. | apm, claude-code, codex, copilot, gemini, pi |
+| ousterhout | skill | 0.1.0 | Use when designing modules, classes, APIs, or system architecture. Use when reviewing or refactoring code for complexity. Use when choosing between implementation approaches. Triggers on requests involving abstraction design, interface simplicity, information hiding, or reducing cognitive load. | apm, claude-code, codex, copilot, gemini, pi |
+| tigerstyle | skill | 0.1.0 | Use when writing safety-critical code, systems programming, infrastructure, or when a project needs rigorous coding discipline. Triggers include requests for defensive coding, assertion-heavy development, performance-conscious design, zero-technical-debt policy, or NASA Power of Ten style rules. Also use when reviewing code for correctness, safety, or performance issues. | apm, claude-code, codex, copilot, gemini, pi |
+
+### context-management
+
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+| autoresearch | skill | 0.1.0 | Autonomous iterative research loop. Takes a topic, runs web searches, fetches sources, synthesizes findings, and files everything into the wiki as structured pages. Based on Karpathy's autoresearch pattern: program.md configures objectives and constraints, the loop runs until depth is reached, output goes directly into the knowledge base. Triggers on: "/autoresearch", "autoresearch", "research [topic]", "deep dive into [topic]", "investigate [topic]", "find everything about [topic]", "research and file", "go research", "build a wiki on".
+ | claude-code |
+| knowledge-base | plugin | 0.1.0 | Persistent, compounding knowledge base for Claude Code. Drop sources into a vault, let an autoresearch agent synthesize a living wiki, query across sessions, and keep the structure healthy. Use when the user wants persistent notes, a knowledge graph, vault management, or mentions Obsidian, "second brain", or "persistent memory".
+ | claude-code |
+| vault-ingest | skill | 0.1.0 | Ingest sources into the Obsidian wiki vault. Reads a source, extracts entities and concepts, creates or updates wiki pages, cross-references, and logs the operation. Supports files, URLs, and batch mode. Triggers on: ingest, process this source, add this to the wiki, read and file this, batch ingest, ingest all of these, ingest this url. | claude-code |
+| vault-lint | skill | 0.1.0 | Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims, missing cross-references, frontmatter gaps, and empty sections. Creates or updates Dataview dashboards. Generates canvas maps. Triggers on: "lint", "health check", "clean up wiki", "check the wiki", "wiki maintenance", "find orphans", "wiki audit".
+ | claude-code |
+| vault-overview | skill | 0.1.0 | Claude + Obsidian knowledge companion. Sets up a persistent wiki vault, scaffolds structure from a one-sentence description, and routes to specialized sub-skills. Use for setup, scaffolding, cross-project referencing, and hot cache management. Triggers on: "set up wiki", "scaffold vault", "create knowledge base", "/wiki", "wiki setup", "obsidian vault", "knowledge base", "second brain setup", "running notetaker", "persistent memory", "llm wiki".
+ | claude-code |
+| vault-query | skill | 0.1.0 | Answer questions using the Obsidian wiki vault. Reads hot cache first, then index, then relevant pages. Synthesizes answers with citations. Files good answers back as wiki pages. Supports quick, standard, and deep modes. Triggers on: what do you know about, query:, what is, explain, summarize, find in wiki, search the wiki, based on the wiki, wiki query quick, wiki query deep. | claude-code |
+| vault-save | skill | 0.1.0 | Save the current conversation, answer, or insight into the Obsidian wiki vault as a structured note. Analyzes the chat, determines the right note type, creates frontmatter, files it in the correct wiki folder, and updates index, log, and hot cache. Triggers on: "save this", "save that answer", "/save", "file this", "save to wiki", "save this session", "file this conversation", "keep this", "save this analysis", "add this to the wiki".
+ | claude-code |
+
+### evolution
+
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+| evolution-engine | skill | 0.1.0 | Use when the user wants to "analyze sessions", "find patterns in my agent history", "evolve config", "/evolve", "what's been frustrating you", or asks for automated suggestions for improving skills/configs based on session transcripts. Triggers on requests to surface recurring friction, propose allowlist additions, find stale memory, or generate diff-shaped recommendations against existing skills, settings, and memory files.
+ | claude-code |
+
+### integrations
+
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+| apple-contacts | skill | 0.1.0 | Search, list, create, update, and delete Apple Contacts via the `contactbook` CLI on macOS. Look up contacts by name, phone, email, or organization. Manage contact groups. | claude-code |
+| atlassian-cli-jira | skill | 0.1.0 | Use when working with Atlassian CLI (acli) to install, authenticate, and manage Jira Cloud work items/issues from the command line: search (JQL), view, create, edit, assign, transition, comment, link, watch, attach, archive/unarchive, bulk operations, and project/board/sprint discovery. | claude-code |
+| cloudflare-email | skill | 0.1.0 | Use when sending outbound transactional or one-off emails from a Cloudflare-managed domain without running a mail server or paying for a mailbox provider. Triggers on needs to send email programmatically from a custom domain, send-from-my-domain requests, or replacing SMTP relays. Cloudflare Email Service is REST API + Workers only — no SMTP, so it is NOT compatible with Gmail "Send mail as", Outlook, or any SMTP client. | claude-code |
+| doppler | skill | 0.1.0 | Use when migrating .env files to Doppler secrets management, setting up Doppler for a project, or when asked to secure environment variables. Triggers on .env files containing API keys, tokens, or secrets that should not be in plaintext on disk. | claude-code |
+| gh-project-charter | skill | 0.1.0 | Use when creating project charters, documenting project goals/scope, defining success criteria, updating project documentation, or tracking scope changes | claude-code |
+| gh-project-operations | skill | 0.1.0 | Use when adding/updating/deleting issues in projects, changing item statuses, bulk operations, archiving items, or managing project boards daily | claude-code |
+| gh-project-setup | skill | 0.1.0 | Use when creating new GitHub projects, setting up project boards, configuring kanban/scrum/roadmap boards, or applying project templates. Provides context-aware template suggestions based on repository analysis and conversation. Supports 6 templates: kanban, bug-tracker, feature-development, roadmap, research, release-planning. Handles multi-repo and organization projects. | claude-code |
+| gh-project-shared | skill | 0.1.0 | Shared utilities for GitHub project management. Not directly invoked by agents. Provides: gh CLI validation, authentication checking, config file management (.github/project-config.json), context detection for template suggestions, and error handling with logging. | claude-code |
+| linear-method | skill | 0.1.0 | Use when creating, organizing, or prioritizing issues in Linear. Use when managing backlogs, setting up cycles, scoping projects, writing issue titles/descriptions, or deciding how to structure work in Linear. Also use when asked about Linear best practices. | claude-code |
+| signoz-dashboard-builder | skill | 0.1.0 | Use when creating or updating SigNoz dashboards via the MCP API. Triggers on requests to build dashboards, add panels, visualize metrics/logs/traces in SigNoz, or debug dashboard queries that show "No Data" or "Something went wrong". Also use when working with Claude Code telemetry in SigNoz. | claude-code |
+
+### memory-management
+
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+| knowledge-base-overview | skill | 0.1.0 | Use when building, maintaining, ingesting into, querying, or health-checking a markdown knowledge base or wiki. Use when the user wants to compile sources into structured knowledge, maintain an Obsidian wiki, ingest documents, ask questions against accumulated research, or run health checks on interlinked markdown pages. Triggers on requests involving knowledge bases, wiki maintenance, source ingestion, research compilation, Obsidian wiki workflows, or LLM-maintained documentation. | claude-code |
+
+### tooling
+
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+| apm-builder | skill | 0.1.0 | Use when building, validating, or scaffolding skills in this monorepo. Triggers: "validate skills", "build apm-builder", "scaffold a new skill", "init a hook/agent/rules/plugin", "run apm-builder", or any work on the multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini, Copilot CLI, Pi targets).
+ | claude-code |
+| datastar-patterns | skill | 0.1.0 | Use when implementing UI patterns with Datastar — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling, lazy loading, progress indicators, or keyboard shortcuts. Triggers on data-* attributes, @get/@post/@put/@patch helpers, SSE response formatting, or any "how do I do X in Datastar" implementation question. | claude-code |
+| defuddle | skill | 0.1.0 | Strip clutter from web pages before ingesting into the wiki. Removes ads, navigation, headers, footers, and boilerplate: leaving clean readable markdown that saves 40-60% tokens. Triggers on: defuddle, clean this page, strip this url, fetch and clean, clean web content before ingesting, strip ads, remove clutter, clean URL content, readable markdown from URL. | claude-code |
+| deterministic-simulation-testing | skill | 0.1.0 | Use when building or testing distributed systems, consensus protocols, sync engines, replicated databases, or any system with network/disk/time non-determinism. Also use when tests are flaky due to concurrency, when debugging rare heisenbugs, or when asked about simulation testing, BUGGIFY, VOPR, or fault injection strategies. | claude-code |
+| mgrep-code-search | skill | 0.1.0 | Semantic code search using mgrep for efficient codebase exploration. This skill should be used when searching or exploring codebases with more than 30 non-gitignored files and/or nested directory structures. It provides natural language semantic search that complements traditional grep/ripgrep for finding features, understanding intent, and exploring unfamiliar code.
+ | claude-code |
+| midscene-testing | skill | 0.1.0 | Use when performing ad-hoc browser testing, smoke testing workflows, validating UI after frontend changes, or testing Datastar/HTMX/SSE reactive features that unit tests cannot cover. Also use when consolidating Midscene HTML reports into a single navigable document. | claude-code |
+| obsidian-bases | skill | 0.1.0 | Create and edit Obsidian Bases (.base files): Obsidian's native database layer for dynamic tables, card views, list views, filters, formulas, and summaries over vault notes. Triggers on: create a base, add a base file, obsidian bases, base view, filter notes, formula, database view, dynamic table, task tracker base, reading list base. | claude-code |
+| obsidian-canvas | skill | 0.1.0 | Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to Obsidian canvas files with auto-positioning inside zones. Integrates with /banana for image capture. Triggers on: /canvas, canvas new, canvas add image, canvas add text, canvas add pdf, canvas add note, canvas zone, canvas list, canvas from banana, add to canvas, put this on the canvas, open canvas, create canvas. | claude-code |
+| obsidian-markdown | skill | 0.1.0 | Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, highlights, math, and canvas syntax. Reference this when creating or editing any wiki page. Triggers on: write obsidian note, obsidian syntax, wikilink, callout, embed, obsidian markdown, wikilink format, callout syntax, embed syntax, obsidian formatting, how to write obsidian markdown. | claude-code |
+| pikchr-generator | skill | 0.2.0 | Generate, theme, and render technical diagrams across four engines (Pikchr,
+GraphViz, D2, Mermaid) with a shared 16-theme palette. Use whenever the user
+asks for a diagram, flowchart, sequence diagram, system architecture,
+state machine, data pipeline, swim lane, network topology, ER diagram,
+class diagram, or any boxes-and-arrows technical illustration AND mentions
+pikchr, graphviz, dot, d2, or mermaid OR has indicated a preference for
+text-defined diagrams (over excalidraw/figma). Also use when the user says
+"draw the architecture", "diagram this flow", "make a chart of X", "show
+the states", "graph this topology", or asks for any visual these engines
+are suited for. Outputs themed SVG (any of 16 themes via --theme NAME).
+Do NOT use for freeform sketches that need curves and pen strokes (use
+excalidraw), real Gantt/pie charts (use a chart library), or rich data viz.
+ | apm, claude-code |
+
+### workflow
+
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+| tts-announcer | hook | 0.1.0 | Local, offline voice announcements for Claude Code and Pi via Kokoro-82M TTS. Wires Notification + SubagentStop hooks so the terminal whispers progress instead of going *bing*. Useful when subagents run for minutes and you've wandered off. Use when the user wants TTS announcements, voice notifications, audible subagent feedback, or mentions "/tts", "speak", "announce", or "Kokoro". Audio never leaves the machine; no API keys.
+ | claude-code, pi |
 <!-- /AUTO-GENERATED: COMPONENTS -->
 
 ## Building
