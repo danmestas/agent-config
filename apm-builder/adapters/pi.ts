@@ -66,7 +66,11 @@ function emitAgentsMdContribution(
   )[0];
   if (!leader || leader.manifest.name !== component.manifest.name) return [];
 
-  const content = composeAgentsMd(contributors, 'pi', ctx.config as never);
+  const content = composeAgentsMd({
+    target: 'pi',
+    components: ctx.allComponents,
+    sectionOrder: ['rules', 'agents', 'skills'],
+  });
   return [{ path: '.pi/AGENTS.md', content }];
 }
 function emitPluginPackage(
