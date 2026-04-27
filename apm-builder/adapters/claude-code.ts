@@ -21,7 +21,8 @@ export const claudeCodeAdapter: Adapter = {
         return emitHook(component);
       case 'mcp':
         return emitMcp(component);
-      // Other types added in Task 13.
+      case 'plugin':
+        return emitPlugin(component, ctx);
       default:
         throw new Error(`claude-code adapter: type "${component.manifest.type}" not yet implemented`);
     }
@@ -107,6 +108,27 @@ function emitMcp(component: ComponentSource): EmittedFile[] {
     },
   };
   return [{ path: '.mcp.fragment.json', content: `${JSON.stringify(fragment, null, 2)}\n` }];
+}
+
+function emitPlugin(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  const { manifest } = component;
+  const includedSkillNames: string[] = [];
+  for (const inc of manifest.includes ?? []) {
+    const resolvedDir = path.normalize(path.join(component.relativeDir, inc));
+    const target = ctx.allComponents.find((c) => c.relativeDir === resolvedDir);
+    if (target && target.manifest.type === 'skill') {
+      includedSkillNames.push(target.manifest.name);
+    }
+  }
+  const json = {
+    name: manifest.name,
+    version: manifest.version,
+    description: manifest.description,
+    skills: includedSkillNames,
+  };
+  return [
+    { path: '.claude-plugin/plugin.json', content: `${JSON.stringify(json, null, 2)}\n` },
+  ];
 }
 
 function topoSortRules(rules: ComponentSource[]): ComponentSource[] {

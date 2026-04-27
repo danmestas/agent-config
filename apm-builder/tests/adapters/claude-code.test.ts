@@ -59,4 +59,19 @@ describe('claude-code adapter', () => {
     const result = await runGolden(claudeCodeAdapter, path.join(HERE, 'claude-code/mcp-basic'));
     expect(result.diff).toEqual([]);
   });
+
+  it('emits a plugin component listing included skills', async () => {
+    const root = path.join(HERE, 'claude-code/plugin-basic');
+    const plugin = await loadComponent(path.join(root, 'component'), root);
+    const skill = await loadComponent(path.join(root, 'sibling-skill'), root);
+    const all = [plugin, skill];
+    const emitted = await claudeCodeAdapter.emit(plugin, {
+      config: {},
+      allComponents: all,
+      repoRoot: root,
+    });
+    const pluginJson = emitted.find((f) => f.path === '.claude-plugin/plugin.json');
+    const expected = await fs.readFile(path.join(root, 'expected/.claude-plugin/plugin.json'), 'utf8');
+    expect(pluginJson?.content.toString()).toBe(expected);
+  });
 });
