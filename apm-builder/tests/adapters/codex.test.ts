@@ -37,4 +37,53 @@ describe('codex adapter', () => {
     const result = await runGolden(codexAdapter, path.join(HERE, 'codex/rules-basic'));
     expect(result.diff).toEqual([]);
   });
+
+  it('composes skill + agent + rules into one AGENTS.md (default order)', async () => {
+    const root = path.join(HERE, 'codex/composition');
+    const skill = await loadComponent(path.join(root, 'component'), root);
+    const agent = await loadComponent(path.join(root, 'extra/agents/code-reviewer'), root);
+    const rule = await loadComponent(path.join(root, 'extra/rules/pr-policy'), root);
+    const all = [skill, agent, rule];
+    // Invoke for every component — exactly one should emit AGENTS.md.
+    const results = await Promise.all(
+      all.map((c) =>
+        codexAdapter.emit(c, { config: {}, allComponents: all, repoRoot: root }),
+      ),
+    );
+    const agentsMd = results.flat().filter((f) => f.path === 'AGENTS.md');
+    expect(agentsMd).toHaveLength(1); // idempotency: only one emission across N invocations
+    const expected = await fs.readFile(path.join(root, 'expected/AGENTS.md'), 'utf8');
+    expect(agentsMd[0]?.content.toString()).toBe(expected);
+  });
+
+  it('honors codex.agents_md_section_order from config', async () => {
+    const root = path.join(HERE, 'codex/composition-custom-order');
+    const skill = await loadComponent(path.join(root, 'component'), root);
+    const all = [skill];
+    const ctx: AdapterContext = {
+      config: { agents_md_section_order: ['skills', 'rules', 'agents'] },
+      allComponents: all,
+      repoRoot: root,
+    };
+    const emitted = await codexAdapter.emit(skill, ctx);
+    const agentsMd = emitted.find((f) => f.path === 'AGENTS.md');
+    const expected = await fs.readFile(path.join(root, 'expected/AGENTS.md'), 'utf8');
+    expect(agentsMd?.content.toString()).toBe(expected);
+  });
+
+  it('returns empty array when invoked on non-first content-bearing component', async () => {
+    const root = path.join(HERE, 'codex/composition');
+    const skill = await loadComponent(path.join(root, 'component'), root);
+    const agent = await loadComponent(path.join(root, 'extra/agents/code-reviewer'), root);
+    const rule = await loadComponent(path.join(root, 'extra/rules/pr-policy'), root);
+    const all = [skill, agent, rule];
+    // sample-skill is alphabetically last; pr-policy is middle; code-reviewer first.
+    // So invoking on rule (pr-policy) should return [].
+    const emitted = await codexAdapter.emit(rule, {
+      config: {},
+      allComponents: all,
+      repoRoot: root,
+    });
+    expect(emitted).toEqual([]);
+  });
 });
