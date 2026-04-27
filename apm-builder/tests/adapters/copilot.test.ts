@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import matter from 'gray-matter';
 import { copilotAdapter } from '../../adapters/copilot.ts';
 import { ManifestSchema } from '../../lib/schema.ts';
 import type { ComponentSource } from '../../lib/types.ts';
+import { runBuild } from '../../lib/build.ts';
 
 const HERE = path.resolve(fileURLToPath(import.meta.url), '..');
 
@@ -132,4 +134,64 @@ describe('copilot adapter', () => {
       ).rejects.toThrow(/copilot.*not supported/i);
     },
   );
+});
+
+describe('copilot adapter — end-to-end via runBuild', () => {
+  it('builds rules + skills + hook into dist/copilot/', async () => {
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'apm-builder-copilot-e2e-'));
+    const files: Record<string, string> = {
+      'apm-builder.config.yaml': 'copilot:\n  hooks_dir: ".github/hooks"\n',
+      'rules/style/SKILL.md':
+        '---\nname: style\nversion: 1.0.0\ndescription: style\ntype: rules\ntargets: [copilot]\nscope: project\n---\n\nUse 2-space indent.\n',
+      'skills/foo/SKILL.md':
+        '---\nname: foo\nversion: 1.0.0\ndescription: foo\ntype: skill\ntargets: [copilot]\n---\n\nFoo body.\n',
+      'skills/tts/SKILL.md':
+        '---\nname: tts\nversion: 1.0.0\ndescription: tts\ntype: hook\ntargets: [copilot]\nhooks:\n  Stop:\n    command: hooks/announce.sh\n---\n\nHook body.\n',
+    };
+    for (const [rel, content] of Object.entries(files)) {
+      const full = path.join(repo, rel);
+      await fs.mkdir(path.dirname(full), { recursive: true });
+      await fs.writeFile(full, content);
+    }
+    const result = await runBuild({ repoRoot: repo, targets: ['copilot'], outDir: 'dist' });
+    // The skill warning ("⚠️ best-effort") is expected; no errors.
+    expect(result.errors.filter((e) => e.severity === 'error')).toEqual([]);
+    expect(result.errors.some((e) => e.severity === 'warning')).toBe(true);
+
+    const instructions = await fs.readFile(
+      path.join(repo, 'dist/copilot/copilot-instructions.md'),
+      'utf8',
+    );
+    expect(instructions).toContain('# Rules');
+    expect(instructions).toContain('## style');
+    expect(instructions).toContain('# Skills');
+    expect(instructions).toContain('## foo');
+
+    const hookFile = await fs.readFile(
+      path.join(repo, 'dist/copilot/.github/hooks/Stop-tts.json'),
+      'utf8',
+    );
+    expect(JSON.parse(hookFile)).toEqual({
+      event: 'Stop',
+      matcher: '*',
+      command: 'hooks/announce.sh',
+      type: 'command',
+    });
+  });
+
+  it('runBuild rejects plugin/agent/mcp targeting copilot via validator', async () => {
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'apm-builder-copilot-rej-'));
+    await fs.mkdir(path.join(repo, 'plugins/bad'), { recursive: true });
+    await fs.writeFile(
+      path.join(repo, 'plugins/bad/SKILL.md'),
+      '---\nname: bad\nversion: 1.0.0\ndescription: d\ntype: plugin\ntargets: [copilot]\nincludes: []\n---\n\nx\n',
+    );
+    const result = await runBuild({ repoRoot: repo, targets: ['copilot'], outDir: 'dist' });
+    expect(result.errors.some((e) => e.severity === 'error' && /plugin.*copilot/i.test(e.message))).toBe(true);
+    const distExists = await fs
+      .stat(path.join(repo, 'dist'))
+      .then(() => true)
+      .catch(() => false);
+    expect(distExists).toBe(false);
+  });
 });
