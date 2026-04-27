@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { matchesGlob } from '../lib/build.ts';
+import { matchesGlob } from '../lib/glob.ts';
 
 describe('matchesGlob', () => {
   it('matches an exact name', () => {

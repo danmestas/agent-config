@@ -4,6 +4,7 @@ import pLimit from 'p-limit';
 import { discoverComponents } from './discover.ts';
 import { validateComponents, type ValidationError } from './validate.ts';
 import { loadRepoConfig } from './config.ts';
+import { matchesGlob } from './glob.ts';
 import { getAdapter } from '../adapters/index.ts';
 import type { Target } from './types.ts';
 
@@ -68,7 +69,4 @@ export async function runBuild(opts: BuildOptions): Promise<BuildResult> {
   return { errors, written };
 }
 
-export function matchesGlob(name: string, pattern: string): boolean {
-  const re = new RegExp('^' + pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
-  return re.test(name);
-}
+export { matchesGlob } from './glob.ts';
