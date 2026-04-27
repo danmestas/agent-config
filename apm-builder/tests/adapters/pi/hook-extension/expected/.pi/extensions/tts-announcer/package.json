@@ -1,0 +1,10 @@
+{
+  "name": "tts-announcer",
+  "version": "1.0.0",
+  "description": "Announces task completion via TTS",
+  "main": "index.ts",
+  "type": "module",
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*"
+  }
+}

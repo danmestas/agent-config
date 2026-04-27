@@ -1,0 +1,20 @@
+{
+  "name": "pi-powers",
+  "version": "0.1.0",
+  "description": "Superpowers skills ported to Pi coding agent — TDD, debugging, brainstorming, code review, and structured workflows",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "^0.34.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": ["pi", "coding-agent", "superpowers", "skills", "tdd", "debugging"],
+  "license": "MIT"
+}

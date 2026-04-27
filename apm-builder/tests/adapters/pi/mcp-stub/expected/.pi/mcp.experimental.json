@@ -1,0 +1,14 @@
+{
+  "_note": "EXPERIMENTAL — Pi does not natively support MCP as of this writing (see https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent#no-mcp). This file's format is pending; it is emitted so the canonical source is preserved across the build, not because Pi reads it. Track upstream Pi MCP support and revise the adapter when the format is defined.",
+  "mcpServers": {
+    "filesystem-mcp": {
+      "command": "node",
+      "args": [
+        "server.js"
+      ],
+      "env": {
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}
