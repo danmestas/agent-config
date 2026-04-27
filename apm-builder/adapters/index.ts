@@ -1,11 +1,13 @@
 import type { Adapter, Target } from '../lib/types.ts';
 import { claudeCodeAdapter } from './claude-code.ts';
+import { codexAdapter } from './codex.ts';
 import { geminiAdapter } from './gemini.ts';
 
 const REGISTRY: Partial<Record<Target, Adapter>> = {
   'claude-code': claudeCodeAdapter,
+  codex: codexAdapter,
   gemini: geminiAdapter,
-  // apm, codex, copilot, pi adapters land in their own plans.
+  // apm, copilot, pi adapters land in their own plans.
 };
 
 export function getAdapter(target: Target): Adapter | undefined {

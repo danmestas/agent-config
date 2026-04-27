@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "command": "hooks/audit.sh",
+        "matcher": "Bash"
+      }
+    ],
+    "Stop": [
+      {
+        "command": "hooks/announce.sh"
+      }
+    ]
+  }
+}

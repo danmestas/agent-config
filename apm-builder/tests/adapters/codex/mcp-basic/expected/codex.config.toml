@@ -1,0 +1,10 @@
+[mcp_servers.another-server]
+command = "python3"
+args = ["main.py"]
+
+[mcp_servers.my-mcp]
+command = "node"
+args = ["server.js"]
+
+[mcp_servers.my-mcp.env]
+LOG_LEVEL = "debug"
