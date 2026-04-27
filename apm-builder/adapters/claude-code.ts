@@ -1,6 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import YAML from 'yaml';
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
+
+function yamlValue(v: string): string {
+  // Use yaml.stringify to safely encode a single scalar (with quoting if needed).
+  // stringify of a string adds a trailing newline; trim it.
+  return YAML.stringify(v).trimEnd();
+}
 
 export const claudeCodeAdapter: Adapter = {
   target: 'claude-code',
@@ -31,7 +38,12 @@ export const claudeCodeAdapter: Adapter = {
 
 function emitSkill(component: ComponentSource): EmittedFile[] {
   const { manifest, body } = component;
-  const frontmatter = ['---', `name: ${manifest.name}`, `description: ${manifest.description}`, '---'].join('\n');
+  const frontmatter = [
+    '---',
+    `name: ${yamlValue(manifest.name)}`,
+    `description: ${yamlValue(manifest.description)}`,
+    '---',
+  ].join('\n');
   return [
     {
       path: `skills/${manifest.name}/SKILL.md`,
@@ -42,7 +54,7 @@ function emitSkill(component: ComponentSource): EmittedFile[] {
 
 function emitAgent(component: ComponentSource): EmittedFile[] {
   const { manifest, body } = component;
-  const lines = ['---', `name: ${manifest.name}`, `description: ${manifest.description}`];
+  const lines = ['---', `name: ${yamlValue(manifest.name)}`, `description: ${yamlValue(manifest.description)}`];
   if (manifest.agent?.tools) lines.push(`tools: [${manifest.agent.tools.join(', ')}]`);
   if (manifest.agent?.model) lines.push(`model: ${manifest.agent.model}`);
   if (manifest.agent?.color) lines.push(`color: ${manifest.agent.color}`);
@@ -60,6 +72,7 @@ function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile
   const allRules = ctx.allComponents
     .filter((c) => c.manifest.type === 'rules' && c.manifest.targets.includes('claude-code'))
     .filter((c) => (c.manifest.scope ?? 'project') === scope);
+  if (allRules.length === 0) return []; // defensive: should be unreachable since the calling component is itself in allRules
   const sorted = topoSortRules(allRules);
   if (sorted[0]?.manifest.name !== component.manifest.name) return [];
 
@@ -83,10 +96,13 @@ async function emitHook(component: ComponentSource): Promise<EmittedFile[]> {
     });
     const scriptPath = path.join(dir, def.command);
     const scriptExists = await fs.stat(scriptPath).then(() => true).catch(() => false);
-    if (scriptExists) {
-      const content = await fs.readFile(scriptPath);
-      files.push({ path: def.command, content, mode: 0o755 });
+    if (!scriptExists) {
+      throw new Error(
+        `claude-code adapter: hook "${event}" in component "${manifest.name}" references missing script: ${def.command} (expected at ${scriptPath})`,
+      );
     }
+    const content = await fs.readFile(scriptPath);
+    files.push({ path: def.command, content, mode: 0o755 });
   }
   files.push({
     path: '.claude/settings.fragment.json',

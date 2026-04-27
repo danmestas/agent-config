@@ -74,4 +74,29 @@ describe('claude-code adapter', () => {
     const expected = await fs.readFile(path.join(root, 'expected/.claude-plugin/plugin.json'), 'utf8');
     expect(pluginJson?.content.toString()).toBe(expected);
   });
+
+  it('escapes YAML special chars in description and name', async () => {
+    const result = await runGolden(claudeCodeAdapter, path.join(HERE, 'claude-code/skill-with-special-chars'));
+    expect(result.diff).toEqual([]);
+  });
+
+  it('throws when hook references a missing script', async () => {
+    // Reuse hook-basic fixture but mutate manifest in-memory to point at a non-existent script.
+    const root = path.join(HERE, 'claude-code/hook-basic');
+    const raw = await fs.readFile(path.join(root, 'component/SKILL.md'), 'utf8');
+    const parsed = matter(raw);
+    const manifest = ManifestSchema.parse({
+      ...parsed.data,
+      hooks: { Stop: { command: 'hooks/missing.sh' } },
+    });
+    const component: ComponentSource = {
+      dir: path.join(root, 'component'),
+      relativeDir: 'component',
+      manifest,
+      body: parsed.content,
+    };
+    await expect(
+      claudeCodeAdapter.emit(component, { config: {}, allComponents: [component], repoRoot: root }),
+    ).rejects.toThrow(/missing script/);
+  });
 });
