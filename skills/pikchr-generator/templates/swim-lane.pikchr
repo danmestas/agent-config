@@ -1,0 +1,29 @@
+# Swim lane template — three lanes with steps in each.
+laneH = 1.0
+laneW = 5.0
+
+# Lane 1
+LANE1: box wid laneW ht laneH thin color gray
+"Frontend" big ljust at LANE1.w + (0.1, 0)
+
+# Lane 2
+LANE2: box wid laneW ht laneH thin color gray with .n at LANE1.s
+"Backend" big ljust at LANE2.w + (0.1, 0)
+
+# Lane 3
+LANE3: box wid laneW ht laneH thin color gray with .n at LANE2.s
+"Database" big ljust at LANE3.w + (0.1, 0)
+
+# Steps
+S1: box "Click" fit at LANE1.w + (1.2, 0) rad 5px fill 0xdbeafe
+arrow right from S1.e
+S2: box "Validate" fit rad 5px fill 0xdbeafe
+arrow right
+S3: box "Submit" fit rad 5px fill 0xdbeafe
+
+# Cross-lane arrow
+arrow from S3.s down to (S3.s.x, LANE2.s.y) "POST" rjust
+B1: box "Process" fit at (S3.s.x, LANE2.c.y) rad 5px fill 0xfef3c7
+
+arrow from B1.s down to (B1.s.x, LANE3.c.y) "INSERT" rjust
+D1: cylinder "Persist" fit at (B1.s.x, LANE3.c.y) fill 0xecfdf5

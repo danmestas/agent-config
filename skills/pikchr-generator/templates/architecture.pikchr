@@ -1,0 +1,21 @@
+# System architecture template — component layout with stdlib macros.
+# Compile with: compile.sh --with-stdlib
+
+right
+Web: box "Web App" fit fill 0xdbeafe color 0x1e40af rad 5px
+arrow
+API: box "API Gateway" fit fill 0xdbeafe color 0x1e40af rad 5px
+arrow
+Auth: lambda("Auth")
+move
+Svc: lambda("Service") at API.s + (0, -1.2)
+arrow from API.s down to Svc.n
+arrow from Svc.s down
+DB: db("Postgres")
+
+# Side: cache + queue
+Cache: box "Redis" fit fill 0xfee2e2 color 0xb91c1c rad 5px at Svc.e + (1.5, 0)
+arrow from Svc.e right to Cache.w "cache" above
+
+Queue: queue("Jobs") at DB.e + (1.5, 0)
+arrow from Svc.e + (0, -0.6) right then down to Queue.n

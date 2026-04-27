@@ -1,0 +1,30 @@
+# Pikchr stdlib — pseudo-primitives via define macros.
+# Prepend to user sources via `compile.sh --with-stdlib`.
+# Each macro takes a label as $1.
+#
+# IMPORTANT: $1 must appear UNQUOTED in macro bodies — pikchr does token-level
+# lexical substitution BEFORE parsing, so "$1" is already a single string token
+# when the lexer sees it.
+#
+# Colors use the 7-token sentinel palette (see lib/themeize.sh for the mapping):
+#   #010203 = bg        #0a0b0c = fg         #101112 = line
+#   #202122 = accent    #303132 = muted      #404142 = surface    #505152 = border
+#
+# After compile.sh pipes the SVG through themeize.sh, these sentinels are
+# rewritten to var(--bg), var(--fg), etc., and the chosen theme's palette
+# is applied via a <style> block injected at the top of the SVG.
+#
+# Role assignment:
+#   - Primary actions/actors/decisions use accent (#202122) with INVERTED
+#     text (bg-colored labels) for high contrast against the accent fill.
+#   - Passive data stores use surface (#404142) with standard fg text.
+#   - Secondary infra + annotations use muted (#303132) with standard fg text.
+
+define db        { cylinder $1 fit fill 0x404142 color 0x0a0b0c thickness 1.5px }
+define cloud     { ellipse  $1 fit fill 0x404142 color 0x0a0b0c thickness 1.5px wid 0.9 }
+define actor     { box      $1 fit fill 0x202122 color 0x010203 thickness 1.5px rad 0.5cm }
+define queue     { oval     $1 fit fill 0x303132 color 0x0a0b0c thickness 1.5px }
+define lambda    { box      $1 fit fill 0x202122 color 0x010203 thickness 1.5px rad 8px }
+define datastore { file     $1 fit fill 0x404142 color 0x0a0b0c thickness 1.5px }
+define decision  { diamond  $1 fit fill 0x202122 color 0x010203 thickness 1.5px }
+define note      { box      $1 fit fill 0x303132 color 0x0a0b0c thickness 1px dashed }

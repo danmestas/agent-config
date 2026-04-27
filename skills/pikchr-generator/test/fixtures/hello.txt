@@ -1,0 +1,2 @@
+# hello.txt (should NOT be recognized by render.sh)
+this is not a diagram

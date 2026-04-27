@@ -1,0 +1,54 @@
+/* Pikchr blueprint palette — engineering docs feel.
+   Cool blues + cyan, no warm accents. */
+
+:root {
+  --pikchr-fg: #0f172a;
+  --pikchr-bg: #f8fafc;
+  --pikchr-muted: #475569;
+  --pikchr-accent-1: #1e40af;
+  --pikchr-accent-2: #0891b2;
+  --pikchr-accent-3: #6366f1;
+  --pikchr-accent-4: #7c3aed;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pikchr-fg: #cbd5e1;
+    --pikchr-bg: #020617;
+    --pikchr-muted: #94a3b8;
+    --pikchr-accent-1: #60a5fa;
+    --pikchr-accent-2: #22d3ee;
+    --pikchr-accent-3: #818cf8;
+    --pikchr-accent-4: #a78bfa;
+  }
+}
+
+[data-theme="dark"] {
+  --pikchr-fg: #cbd5e1;
+  --pikchr-bg: #020617;
+  --pikchr-muted: #94a3b8;
+  --pikchr-accent-1: #60a5fa;
+  --pikchr-accent-2: #22d3ee;
+  --pikchr-accent-3: #818cf8;
+  --pikchr-accent-4: #a78bfa;
+}
+
+[data-theme="light"] {
+  --pikchr-fg: #0f172a;
+  --pikchr-bg: #f8fafc;
+  --pikchr-muted: #475569;
+  --pikchr-accent-1: #1e40af;
+  --pikchr-accent-2: #0891b2;
+  --pikchr-accent-3: #6366f1;
+  --pikchr-accent-4: #7c3aed;
+}
+
+.pikchr {
+  color: var(--pikchr-fg);
+  background: var(--pikchr-bg);
+  padding: 1rem;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.pikchr svg { display: block; max-width: 100%; height: auto; }
+.pikchr svg text { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }

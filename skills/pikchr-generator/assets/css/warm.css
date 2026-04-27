@@ -1,0 +1,54 @@
+/* Pikchr warm palette — marketing / landing-page feel.
+   Warm tones, friendlier rounded edges. */
+
+:root {
+  --pikchr-fg: #292524;
+  --pikchr-bg: #fffbeb;
+  --pikchr-muted: #78716c;
+  --pikchr-accent-1: #ea580c;
+  --pikchr-accent-2: #ca8a04;
+  --pikchr-accent-3: #be185d;
+  --pikchr-accent-4: #16a34a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pikchr-fg: #f5f5f4;
+    --pikchr-bg: #1c1917;
+    --pikchr-muted: #a8a29e;
+    --pikchr-accent-1: #fb923c;
+    --pikchr-accent-2: #facc15;
+    --pikchr-accent-3: #f472b6;
+    --pikchr-accent-4: #4ade80;
+  }
+}
+
+[data-theme="dark"] {
+  --pikchr-fg: #f5f5f4;
+  --pikchr-bg: #1c1917;
+  --pikchr-muted: #a8a29e;
+  --pikchr-accent-1: #fb923c;
+  --pikchr-accent-2: #facc15;
+  --pikchr-accent-3: #f472b6;
+  --pikchr-accent-4: #4ade80;
+}
+
+[data-theme="light"] {
+  --pikchr-fg: #292524;
+  --pikchr-bg: #fffbeb;
+  --pikchr-muted: #78716c;
+  --pikchr-accent-1: #ea580c;
+  --pikchr-accent-2: #ca8a04;
+  --pikchr-accent-3: #be185d;
+  --pikchr-accent-4: #16a34a;
+}
+
+.pikchr {
+  color: var(--pikchr-fg);
+  background: var(--pikchr-bg);
+  padding: 1.25rem;
+  border-radius: 12px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+.pikchr svg { display: block; max-width: 100%; height: auto; }
+.pikchr svg text { font-family: Georgia, "Times New Roman", serif; }
