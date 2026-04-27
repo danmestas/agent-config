@@ -26,9 +26,18 @@ export const piAdapter: Adapter = {
   },
 };
 
-// Stubs replaced in Tasks 4-8:
-function emitSkill(_component: ComponentSource): EmittedFile[] {
-  throw new Error('not implemented (Task 4)');
+function emitSkill(component: ComponentSource): EmittedFile[] {
+  const { manifest, body } = component;
+  // Pi skills follow the Agent Skills standard: frontmatter is just
+  // name + description. All other manifest fields are stripped during emission
+  // (version, type, targets, etc. are infrastructure metadata, not skill content).
+  const frontmatter = ['---', `name: ${manifest.name}`, `description: ${manifest.description}`, '---'].join('\n');
+  return [
+    {
+      path: `.pi/skills/${manifest.name}/SKILL.md`,
+      content: `${frontmatter}\n\n${body.trimStart()}`,
+    },
+  ];
 }
 function emitAgentsMdContribution(
   _component: ComponentSource,
