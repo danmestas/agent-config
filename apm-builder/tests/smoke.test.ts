@@ -11,6 +11,11 @@ import { updateReadme, COMPONENTS_BEGIN, COMPONENTS_END } from '../lib/docs.ts';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '../..');
 const CLI_ENTRY = path.join(REPO_ROOT, 'apm-builder/cli.ts');
+const TSX_BIN = path.join(
+  REPO_ROOT,
+  'node_modules/.bin',
+  process.platform === 'win32' ? 'tsx.cmd' : 'tsx',
+);
 
 interface CliResult {
   code: number | null;
@@ -20,7 +25,7 @@ interface CliResult {
 
 function runCli(cwd: string, args: string[], env: NodeJS.ProcessEnv = {}): Promise<CliResult> {
   return new Promise((resolve, reject) => {
-    const child = spawn('npx', ['--no-install', 'tsx', CLI_ENTRY, ...args], {
+    const child = spawn(TSX_BIN, [CLI_ENTRY, ...args], {
       cwd,
       env: { ...process.env, ...env },
     });
