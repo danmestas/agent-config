@@ -1,0 +1,7 @@
+name: "@danmestas/pikchr-generator"
+version: 1.2.0
+description: Themed diagram generation with Kroki fallback
+author: dan@example.com
+license: MIT
+type: skill
+includes: auto
