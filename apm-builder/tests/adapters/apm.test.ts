@@ -85,6 +85,15 @@ describe('apm adapter', () => {
     expect(pluginJson?.content.toString()).toBe(expectedJson);
   });
 
+  it('respects overrides.apm.package_name', async () => {
+    const result = await runGolden(
+      apmAdapter,
+      path.join(HERE, 'apm/override-name'),
+      SCOPED_CONFIG,
+    );
+    expect(result.diff).toEqual([]);
+  });
+
   it('composes project-scope rules into a single memory/constitution.md package', async () => {
     const root = path.join(HERE, 'apm/rules-compose');
     const baseStyle = await loadComponent(path.join(root, 'component'), root);
