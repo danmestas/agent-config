@@ -64,6 +64,8 @@ Adapters emit native artifacts for each harness when a skill declares it in `tar
 ### Workflow
 
 - [`tts-announcer`](skills/tts-announcer) — Local, offline voice announcements via Kokoro-82M. Wires `Notification` + `SubagentStop` hooks so the terminal whispers progress instead of going *bing*. Targets Claude Code and Pi.
+- [`orchestrator-mode`](skills/orchestrator-mode) — Primes a host Claude Code session as the Darkish Factory pipeline orchestrator (the §7 loop, 13-role roster, escalation classifier, audit-log conventions).
+- [`subagent-to-subharness`](skills/subagent-to-subharness) — Translates Agent-tool muscle memory into containerized `darkish spawn` dispatch. Decision tree, role mapping, framing examples.
 
 ### Project & process (Integrations)
 
@@ -204,6 +206,8 @@ excalidraw), real Gantt/pie charts (use a chart library), or rich data viz.
 
 | Name | Type | Version | Description | Targets |
 |------|------|---------|-------------|---------|
+| orchestrator-mode | skill | 0.1.0 | Use at session start in the Darkish Factory repo to prime as the pipeline orchestrator (host mode). Loads the §7 loop, the 13-role roster, the escalation classifier, and the rules for converting subagent muscle memory into subharness dispatch. Invoke whenever the operator types a task and you're in this repo. | claude-code |
+| subagent-to-subharness | skill | 0.1.0 | Use when you would normally dispatch a subagent via the Agent tool but you're operating as the Darkish Factory orchestrator. Translates the muscle memory into subharness dispatch. Maps task shapes to the right harness role, frames the task in caveman-standard, reads worker output back, decides next step. | claude-code |
 | tts-announcer | hook | 0.1.0 | Local, offline voice announcements for Claude Code and Pi via Kokoro-82M TTS. Wires Notification + SubagentStop hooks so the terminal whispers progress instead of going *bing*. Useful when subagents run for minutes and you've wandered off. Use when the user wants TTS announcements, voice notifications, audible subagent feedback, or mentions "/tts", "speak", "announce", or "Kokoro". Audio never leaves the machine; no API keys.
  | claude-code, pi |
 <!-- /AUTO-GENERATED: COMPONENTS -->
