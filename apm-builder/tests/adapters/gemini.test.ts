@@ -45,4 +45,36 @@ describe('gemini adapter', () => {
     const count = results.flat().filter((f) => f.path === 'GEMINI.md').length;
     expect(count).toBe(1);
   });
+
+  it('emits a hook component with .gemini/settings fragment + script', async () => {
+    const result = await runGolden(geminiAdapter, path.join(HERE, 'gemini/hook-basic'));
+    expect(result.diff).toEqual([]);
+  });
+
+  it('rejects a Claude Code event name (PreToolUse) on a Gemini hook', async () => {
+    const root = path.join(HERE, 'gemini/hook-basic');
+    const fakeManifest = {
+      name: 'bad',
+      version: '1.0.0',
+      description: 'd',
+      type: 'hook' as const,
+      targets: ['gemini' as const],
+      hooks: { PreToolUse: { command: 'hooks/x.sh' } },
+    };
+    const fake: ComponentSource = {
+      dir: root,
+      relativeDir: 'hooks/bad',
+      body: '',
+      manifest: fakeManifest as ComponentSource['manifest'],
+    };
+    await expect(
+      geminiAdapter.emit(fake, { config: {}, allComponents: [fake], repoRoot: root }),
+    ).rejects.toThrow(/PreToolUse/);
+  });
+
+  it('rejects a hook script that does not honor the JSON-on-stdout contract', async () => {
+    await expect(
+      runGolden(geminiAdapter, path.join(HERE, 'gemini/hook-bad-stdout')),
+    ).rejects.toThrow(/JSON-on-stdout/);
+  });
 });

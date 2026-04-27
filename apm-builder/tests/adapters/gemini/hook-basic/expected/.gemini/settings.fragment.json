@@ -1,0 +1,17 @@
+{
+  "_comment": "Gemini hook contract: scripts referenced below MUST emit valid JSON on stdout. Use stderr for any logging. See https://geminicli.com/docs/hooks/",
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "*",
+        "command": "${GEMINI_PROJECT_DIR}/hooks/before-tool.sh"
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "command": "${GEMINI_PROJECT_DIR}/hooks/before-tool.sh"
+      }
+    ]
+  }
+}
