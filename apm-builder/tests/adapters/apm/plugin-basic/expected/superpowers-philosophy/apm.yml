@@ -1,0 +1,5 @@
+name: "@danmestas/superpowers-philosophy"
+version: 1.0.0
+description: Philosophy skills bundle
+type: hybrid
+includes: auto

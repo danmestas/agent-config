@@ -1,0 +1,7 @@
+name: "@special/custom-name"
+version: 0.3.0
+description: Personal resume generation skill
+author: dan@example.com
+license: MIT
+type: skill
+includes: auto

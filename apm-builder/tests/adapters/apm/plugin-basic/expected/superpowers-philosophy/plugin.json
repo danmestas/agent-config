@@ -1,0 +1,8 @@
+{
+  "name": "superpowers-philosophy",
+  "version": "1.0.0",
+  "description": "Philosophy skills bundle",
+  "skills": [
+    "ousterhout"
+  ]
+}

@@ -1,0 +1,7 @@
+name: "@danmestas/tts-announcer"
+version: 1.0.0
+description: TTS announcements
+type: skill
+includes: auto
+scripts:
+  hook:Stop:announce.sh: ${APM_PACKAGE_DIR}/.apm/hooks/announce.sh

@@ -1,0 +1,15 @@
+name: "@danmestas/my-mcp"
+version: 1.0.0
+description: A custom MCP server
+type: skill
+includes: auto
+dependencies:
+  mcp:
+    - name: my-mcp
+      registry: false
+      transport: stdio
+      command: node
+      args:
+        - server.js
+      env:
+        LOG_LEVEL: debug
