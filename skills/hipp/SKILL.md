@@ -1,6 +1,21 @@
 ---
 name: hipp
-description: Use when designing libraries, modules, or data layers that must be simple, reliable, and self-contained. Use when choosing between embedded vs server-based solutions. Use when reviewing code for unnecessary complexity, dependencies, or configuration. Triggers on requests involving zero-config design, embedded systems, long-term maintainability, or first-principles thinking.
+version: 0.1.0
+description: >-
+  Use when designing libraries, modules, or data layers that must be simple,
+  reliable, and self-contained. Use when choosing between embedded vs
+  server-based solutions. Use when reviewing code for unnecessary complexity,
+  dependencies, or configuration. Triggers on requests involving zero-config
+  design, embedded systems, long-term maintainability, or first-principles
+  thinking.
+type: skill
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
 category:
   primary: backpressure
 ---

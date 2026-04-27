@@ -1,6 +1,16 @@
 ---
 name: atlassian-cli-jira
-description: "Use when working with Atlassian CLI (acli) to install, authenticate, and manage Jira Cloud work items/issues from the command line: search (JQL), view, create, edit, assign, transition, comment, link, watch, attach, archive/unarchive, bulk operations, and project/board/sprint discovery."
+version: 0.1.0
+description: >-
+  Use when working with Atlassian CLI (acli) to install, authenticate, and
+  manage Jira Cloud work items/issues from the command line: search (JQL), view,
+  create, edit, assign, transition, comment, link, watch, attach,
+  archive/unarchive, bulk operations, and project/board/sprint discovery.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: integrations
 ---
 
 # Atlassian CLI Jira

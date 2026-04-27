@@ -1,6 +1,17 @@
 ---
 name: datastar-patterns
-description: Use when implementing UI patterns with Datastar — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling, lazy loading, progress indicators, or keyboard shortcuts. Triggers on data-* attributes, @get/@post/@put/@patch helpers, SSE response formatting, or any "how do I do X in Datastar" implementation question.
+version: 0.1.0
+description: >-
+  Use when implementing UI patterns with Datastar — search, inline editing,
+  infinite scroll, file upload, validation, bulk operations, polling, lazy
+  loading, progress indicators, or keyboard shortcuts. Triggers on data-*
+  attributes, @get/@post/@put/@patch helpers, SSE response formatting, or any
+  "how do I do X in Datastar" implementation question.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: tooling
 ---
 
 # Datastar Patterns

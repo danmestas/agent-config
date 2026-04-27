@@ -1,6 +1,18 @@
 ---
 name: datastar-tao
-description: Use when building hypermedia-driven web applications, server-rendered UIs, or any frontend where the backend should own state. Use when choosing between SPA and server-driven architecture. Use when reviewing frontend code for unnecessary client-side state, optimistic updates, or client-side routing. Triggers on requests involving SSE, HTML-over-the-wire, DOM morphing, HTMX, Datastar, signals, or backend-first frontend design.
+version: 0.1.0
+description: >-
+  Use when building hypermedia-driven web applications, server-rendered UIs, or
+  any frontend where the backend should own state. Use when choosing between SPA
+  and server-driven architecture. Use when reviewing frontend code for
+  unnecessary client-side state, optimistic updates, or client-side routing.
+  Triggers on requests involving SSE, HTML-over-the-wire, DOM morphing, HTMX,
+  Datastar, signals, or backend-first frontend design.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: backpressure
 ---
 
 # The Tao of Datastar

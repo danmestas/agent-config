@@ -1,6 +1,18 @@
 ---
 name: gh-project-setup
-description: "Use when creating new GitHub projects, setting up project boards, configuring kanban/scrum/roadmap boards, or applying project templates. Provides context-aware template suggestions based on repository analysis and conversation. Supports 6 templates: kanban, bug-tracker, feature-development, roadmap, research, release-planning. Handles multi-repo and organization projects."
+version: 0.1.0
+description: >-
+  Use when creating new GitHub projects, setting up project boards, configuring
+  kanban/scrum/roadmap boards, or applying project templates. Provides
+  context-aware template suggestions based on repository analysis and
+  conversation. Supports 6 templates: kanban, bug-tracker, feature-development,
+  roadmap, research, release-planning. Handles multi-repo and organization
+  projects.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: integrations
 ---
 
 # GitHub Project Setup

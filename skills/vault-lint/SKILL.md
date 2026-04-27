@@ -1,12 +1,12 @@
 ---
 name: vault-lint
-description: >
-  Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims,
-  missing cross-references, frontmatter gaps, and empty sections. Creates or updates
-  Dataview dashboards. Generates canvas maps. Triggers on: "lint", "health check",
-  "clean up wiki", "check the wiki", "wiki maintenance", "find orphans", "wiki audit".
-allowed-tools: Read Write Edit Glob Grep
 version: 0.1.0
+description: >
+  Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks,
+  stale claims, missing cross-references, frontmatter gaps, and empty sections.
+  Creates or updates Dataview dashboards. Generates canvas maps. Triggers on:
+  "lint", "health check", "clean up wiki", "check the wiki", "wiki maintenance",
+  "find orphans", "wiki audit".
 type: skill
 targets:
   - claude-code

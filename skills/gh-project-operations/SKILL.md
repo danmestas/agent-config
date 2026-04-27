@@ -1,6 +1,14 @@
 ---
 name: gh-project-operations
-description: "Use when adding/updating/deleting issues in projects, changing item statuses, bulk operations, archiving items, or managing project boards daily"
+version: 0.1.0
+description: >-
+  Use when adding/updating/deleting issues in projects, changing item statuses,
+  bulk operations, archiving items, or managing project boards daily
+type: skill
+targets:
+  - claude-code
+category:
+  primary: integrations
 ---
 
 # gh-project-operations

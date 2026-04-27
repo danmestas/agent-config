@@ -1,6 +1,16 @@
 ---
 name: doppler
-description: Use when migrating .env files to Doppler secrets management, setting up Doppler for a project, or when asked to secure environment variables. Triggers on .env files containing API keys, tokens, or secrets that should not be in plaintext on disk.
+version: 0.1.0
+description: >-
+  Use when migrating .env files to Doppler secrets management, setting up
+  Doppler for a project, or when asked to secure environment variables. Triggers
+  on .env files containing API keys, tokens, or secrets that should not be in
+  plaintext on disk.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: integrations
 ---
 
 # Migrate .env to Doppler

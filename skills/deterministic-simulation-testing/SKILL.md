@@ -1,6 +1,17 @@
 ---
 name: deterministic-simulation-testing
-description: Use when building or testing distributed systems, consensus protocols, sync engines, replicated databases, or any system with network/disk/time non-determinism. Also use when tests are flaky due to concurrency, when debugging rare heisenbugs, or when asked about simulation testing, BUGGIFY, VOPR, or fault injection strategies.
+version: 0.1.0
+description: >-
+  Use when building or testing distributed systems, consensus protocols, sync
+  engines, replicated databases, or any system with network/disk/time
+  non-determinism. Also use when tests are flaky due to concurrency, when
+  debugging rare heisenbugs, or when asked about simulation testing, BUGGIFY,
+  VOPR, or fault injection strategies.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: tooling
 ---
 
 # Deterministic Simulation Testing (DST)

@@ -1,6 +1,14 @@
 ---
 name: linear-method
-description: Use when creating, organizing, or prioritizing issues in Linear. Use when managing backlogs, setting up cycles, scoping projects, writing issue titles/descriptions, or deciding how to structure work in Linear. Also use when asked about Linear best practices.
+version: 0.1.0
+description: >-
+  Use when creating, organizing, or prioritizing issues in Linear. Use when
+  managing backlogs, setting up cycles, scoping projects, writing issue
+  titles/descriptions, or deciding how to structure work in Linear. Also use
+  when asked about Linear best practices.
+type: skill
+targets:
+  - claude-code
 category:
   primary: integrations
 ---

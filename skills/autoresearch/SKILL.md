@@ -1,15 +1,15 @@
 ---
 name: autoresearch
-description: >
-  Autonomous iterative research loop. Takes a topic, runs web searches, fetches sources,
-  synthesizes findings, and files everything into the wiki as structured pages.
-  Based on Karpathy's autoresearch pattern: program.md configures objectives and constraints,
-  the loop runs until depth is reached, output goes directly into the knowledge base.
-  Triggers on: "/autoresearch", "autoresearch", "research [topic]", "deep dive into [topic]",
-  "investigate [topic]", "find everything about [topic]", "research and file",
-  "go research", "build a wiki on".
-allowed-tools: Read Write Edit Glob Grep WebFetch WebSearch
 version: 0.1.0
+description: >
+  Autonomous iterative research loop. Takes a topic, runs web searches, fetches
+  sources, synthesizes findings, and files everything into the wiki as
+  structured pages. Based on Karpathy's autoresearch pattern: program.md
+  configures objectives and constraints, the loop runs until depth is reached,
+  output goes directly into the knowledge base. Triggers on: "/autoresearch",
+  "autoresearch", "research [topic]", "deep dive into [topic]", "investigate
+  [topic]", "find everything about [topic]", "research and file", "go research",
+  "build a wiki on".
 type: skill
 targets:
   - claude-code

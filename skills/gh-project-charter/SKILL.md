@@ -1,6 +1,14 @@
 ---
 name: gh-project-charter
-description: "Use when creating project charters, documenting project goals/scope, defining success criteria, updating project documentation, or tracking scope changes"
+version: 0.1.0
+description: >-
+  Use when creating project charters, documenting project goals/scope, defining
+  success criteria, updating project documentation, or tracking scope changes
+type: skill
+targets:
+  - claude-code
+category:
+  primary: integrations
 ---
 
 # gh-project-charter

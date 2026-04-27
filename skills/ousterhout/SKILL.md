@@ -1,6 +1,19 @@
 ---
 name: ousterhout
-description: Use when designing modules, classes, APIs, or system architecture. Use when reviewing or refactoring code for complexity. Use when choosing between implementation approaches. Triggers on requests involving abstraction design, interface simplicity, information hiding, or reducing cognitive load.
+version: 0.1.0
+description: >-
+  Use when designing modules, classes, APIs, or system architecture. Use when
+  reviewing or refactoring code for complexity. Use when choosing between
+  implementation approaches. Triggers on requests involving abstraction design,
+  interface simplicity, information hiding, or reducing cognitive load.
+type: skill
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
 category:
   primary: backpressure
 ---

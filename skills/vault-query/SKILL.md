@@ -1,8 +1,12 @@
 ---
 name: vault-query
-description: "Answer questions using the Obsidian wiki vault. Reads hot cache first, then index, then relevant pages. Synthesizes answers with citations. Files good answers back as wiki pages. Supports quick, standard, and deep modes. Triggers on: what do you know about, query:, what is, explain, summarize, find in wiki, search the wiki, based on the wiki, wiki query quick, wiki query deep."
-allowed-tools: Read Glob Grep
 version: 0.1.0
+description: >-
+  Answer questions using the Obsidian wiki vault. Reads hot cache first, then
+  index, then relevant pages. Synthesizes answers with citations. Files good
+  answers back as wiki pages. Supports quick, standard, and deep modes. Triggers
+  on: what do you know about, query:, what is, explain, summarize, find in wiki,
+  search the wiki, based on the wiki, wiki query quick, wiki query deep.
 type: skill
 targets:
   - claude-code
