@@ -32,4 +32,21 @@ describe('claude-code adapter', () => {
     const result = await runGolden(claudeCodeAdapter, path.join(HERE, 'claude-code/agent-basic'));
     expect(result.diff).toEqual([]);
   });
+
+  it('composes rules into one CLAUDE.md ordered by before/after', async () => {
+    const root = path.join(HERE, 'claude-code/rules-compose');
+    const baseStyle = await loadComponent(path.join(root, 'component'), root);
+    const prPolicy = await loadComponent(path.join(root, 'extra/rules/pr-policy'), root);
+    const all = [baseStyle, prPolicy];
+    const results = await Promise.all(
+      all.map((c) =>
+        claudeCodeAdapter.emit(c, { config: {}, allComponents: all, repoRoot: root }),
+      ),
+    );
+    const claudeMd = results.flat().find((f) => f.path === 'CLAUDE.md');
+    const expected = await fs.readFile(path.join(root, 'expected/CLAUDE.md'), 'utf8');
+    expect(claudeMd?.content.toString()).toBe(expected);
+    const claudeMdCount = results.flat().filter((f) => f.path === 'CLAUDE.md').length;
+    expect(claudeMdCount).toBe(1);
+  });
 });
