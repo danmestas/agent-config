@@ -1,10 +1,25 @@
 import { describe, it, expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import fs from 'node:fs/promises';
+import matter from 'gray-matter';
 import { piAdapter } from '../../adapters/pi.ts';
+import { ManifestSchema } from '../../lib/schema.ts';
+import type { ComponentSource } from '../../lib/types.ts';
 import { runGolden } from './golden.ts';
 
 const HERE = path.resolve(fileURLToPath(import.meta.url), '..');
+
+async function loadComponent(dir: string, repoRoot: string): Promise<ComponentSource> {
+  const raw = await fs.readFile(path.join(dir, 'SKILL.md'), 'utf8');
+  const parsed = matter(raw);
+  return {
+    dir,
+    relativeDir: path.relative(repoRoot, dir),
+    manifest: ManifestSchema.parse(parsed.data),
+    body: parsed.content,
+  };
+}
 
 describe('pi adapter', () => {
   it('declares target = pi', () => {
@@ -31,5 +46,33 @@ describe('pi adapter', () => {
     const result = await runGolden(piAdapter, path.join(HERE, 'pi/skill-basic'));
     expect(result.diff).toEqual([]);
     expect(result.matched).toBe(true);
+  });
+
+  it('composes rules + agents + skills into .pi/AGENTS.md', async () => {
+    const root = path.join(HERE, 'pi/agents-md-compose');
+    const components = await Promise.all([
+      loadComponent(path.join(root, 'components/r-base-style'), root),
+      loadComponent(path.join(root, 'components/r-pr-policy'), root),
+      loadComponent(path.join(root, 'components/a-code-reviewer'), root),
+      loadComponent(path.join(root, 'components/s-tdd'), root),
+    ]);
+
+    const results = await Promise.all(
+      components.map((c) =>
+        piAdapter.emit(c, {
+          config: { agents_md_section_order: ['rules', 'agents', 'skills'] },
+          allComponents: components,
+          repoRoot: root,
+        }),
+      ),
+    );
+    const flat = results.flat();
+    const agentsMd = flat.find((f) => f.path === '.pi/AGENTS.md');
+    const expected = await fs.readFile(path.join(root, 'expected/.pi/AGENTS.md'), 'utf8');
+    expect(agentsMd?.content.toString()).toBe(expected);
+
+    // Idempotent: only one .pi/AGENTS.md should be emitted across all calls.
+    const count = flat.filter((f) => f.path === '.pi/AGENTS.md').length;
+    expect(count).toBe(1);
   });
 });

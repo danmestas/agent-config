@@ -1,4 +1,5 @@
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
+import { composeAgentsMd } from '../lib/agents-md.ts';
 
 export const piAdapter: Adapter = {
   target: 'pi',
@@ -9,8 +10,14 @@ export const piAdapter: Adapter = {
 
   async emit(component, ctx) {
     switch (component.manifest.type) {
-      case 'skill':
-        return emitSkill(component);
+      case 'skill': {
+        // Pi loads both .pi/skills/*/SKILL.md (canonical skill discovery) and
+        // .pi/AGENTS.md (always-on context). The AGENTS.md `# Skills` section
+        // is a listing for visibility, not the actual skill loader.
+        const skillFiles = emitSkill(component);
+        const agentsMdFiles = emitAgentsMdContribution(component, ctx);
+        return [...skillFiles, ...agentsMdFiles];
+      }
       case 'agent':
       case 'rules':
         return emitAgentsMdContribution(component, ctx);
@@ -40,10 +47,26 @@ function emitSkill(component: ComponentSource): EmittedFile[] {
   ];
 }
 function emitAgentsMdContribution(
-  _component: ComponentSource,
-  _ctx: AdapterContext,
+  component: ComponentSource,
+  ctx: AdapterContext,
 ): EmittedFile[] {
-  throw new Error('not implemented (Task 5)');
+  // Determine the alphabetically-first eligible contributor across rules+agents+skills.
+  // Only that one emits the file; others contribute via the shared composer and return [].
+  const contributors = ctx.allComponents.filter(
+    (c) =>
+      c.manifest.targets.includes('pi') &&
+      (c.manifest.type === 'rules' ||
+        c.manifest.type === 'agent' ||
+        c.manifest.type === 'skill'),
+  );
+  if (contributors.length === 0) return [];
+  const leader = [...contributors].sort((a, b) =>
+    a.manifest.name.localeCompare(b.manifest.name),
+  )[0];
+  if (!leader || leader.manifest.name !== component.manifest.name) return [];
+
+  const content = composeAgentsMd(contributors, 'pi', ctx.config as never);
+  return [{ path: '.pi/AGENTS.md', content }];
 }
 function emitPluginPackage(
   _component: ComponentSource,
