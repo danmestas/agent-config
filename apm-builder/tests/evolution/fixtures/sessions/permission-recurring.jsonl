@@ -1,0 +1,7 @@
+{"type":"user","sessionId":"sess-perm","timestamp":"2026-04-25T10:00:00Z","message":{"content":[{"type":"text","text":"deploy please"}]}}
+{"type":"assistant","sessionId":"sess-perm","timestamp":"2026-04-25T10:00:05Z","message":{"content":[{"type":"tool_use","id":"t1","name":"Bash","input":{"command":"npm test"}}]}}
+{"type":"permission-request","sessionId":"sess-perm","timestamp":"2026-04-25T10:00:06Z","tool":"Bash","input":{"command":"npm test"},"decision":"approve"}
+{"type":"permission-request","sessionId":"sess-perm","timestamp":"2026-04-25T10:01:00Z","tool":"Bash","input":{"command":"npm test"},"decision":"approve"}
+{"type":"permission-request","sessionId":"sess-perm","timestamp":"2026-04-25T10:02:00Z","tool":"Bash","input":{"command":"npm test"},"decision":"approve"}
+{"type":"permission-request","sessionId":"sess-perm","timestamp":"2026-04-25T10:03:00Z","tool":"Bash","input":{"command":"npm test"},"decision":"approve"}
+{"type":"permission-request","sessionId":"sess-perm","timestamp":"2026-04-25T10:04:00Z","tool":"Bash","input":{"command":"npm test"},"decision":"approve"}
