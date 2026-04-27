@@ -68,8 +68,35 @@ export const apmAdapter: Adapter = {
     switch (component.manifest.type) {
       case 'skill':
         return emitSkill(component, ctx);
+      case 'agent':
+        return emitAgent(component, ctx);
       default:
         throw new Error(`apm adapter: type "${component.manifest.type}" not yet implemented`);
     }
   },
 };
+
+function emitAgent(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  const dir = packageDir(component);
+  const lines = ['---', `description: ${component.manifest.description}`];
+  if (component.manifest.agent?.tools) {
+    lines.push(`tools: [${component.manifest.agent.tools.join(', ')}]`);
+  }
+  if (component.manifest.agent?.model) {
+    lines.push(`model: ${component.manifest.agent.model}`);
+  }
+  lines.push('---');
+  const agentMd = `${lines.join('\n')}\n\n${component.body.trimStart()}`;
+
+  const manifest: Record<string, unknown> = {
+    name: scopedName(component, ctx),
+    version: component.manifest.version,
+    description: component.manifest.description,
+    type: 'skill',
+    includes: 'auto',
+  };
+  return [
+    { path: `${dir}/apm.yml`, content: renderManifest(manifest) },
+    { path: `${dir}/.apm/agents/${component.manifest.name}.agent.md`, content: agentMd },
+  ];
+}

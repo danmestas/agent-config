@@ -33,4 +33,13 @@ describe('apm adapter', () => {
     expect(result.diff).toEqual([]);
     expect(result.matched).toBe(true);
   });
+
+  it('emits an agent component as <package>/.apm/agents/<name>.agent.md', async () => {
+    const result = await runGolden(
+      apmAdapter,
+      path.join(HERE, 'apm/agent-basic'),
+      SCOPED_CONFIG,
+    );
+    expect(result.diff).toEqual([]);
+  });
 });
