@@ -1,0 +1,7 @@
+{
+  "name": "code",
+  "description": "Software development tasks: writing, reviewing, refactoring, debugging code.",
+  "observation_types": ["bug", "fix", "refactor", "feature", "test", "perf", "review"],
+  "skills_priority": ["ousterhout", "tigerstyle", "idiomatic-go", "hipp", "dx-audit"],
+  "memory_topics": ["architecture", "performance", "patterns", "build-tooling"]
+}

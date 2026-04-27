@@ -5,6 +5,8 @@
 # per-project (first time → random pick, then stable) so voice + project name
 # reinforce each other.
 set -u
+# Fail-safe per CONVENTIONS.md: trap unhandled errors and exit 0 always.
+trap 'echo "[tts notify-tts] hook error at line $LINENO" >&2; exit 0' ERR
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 payload="$(cat)"

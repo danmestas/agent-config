@@ -28,6 +28,19 @@ A structured post-task critique. Inspired by the Reflexion pattern: the agent re
   - A new skill, hook, or component landed.
 - Skip for trivial single-tool tasks (one read, one edit, one shell command). Reflection on noise is noise.
 
+## Mode hint
+
+Accepts `--mode <name>` (or `mode:` in the task frontmatter) to bias the
+critique toward a specific domain. The mode value is a *hint* for the agent:
+look up `apm-builder/modes/<name>.json` and weight the critique sections
+toward that domain's `observation_types` and `memory_topics`. Examples:
+
+- `--mode code` — emphasize architecture, performance, refactor opportunities, test patterns.
+- `--mode design` — emphasize affordances, feedback, mapping, accessibility.
+- `--mode ops` — emphasize incident retrospection, alerting, runbook gaps, permission hygiene.
+
+When no mode is set, run a balanced critique across all categories.
+
 ## The structured critique
 
 Produce a markdown report with exactly these five sections, in order:

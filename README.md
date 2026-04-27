@@ -11,13 +11,22 @@ The repo's directory structure mirrors the component-type schema:
 ```
 skills/      — type: skill   (46 components — typed agent capabilities triggered by description)
 plugins/     — type: plugin  (1 component — multi-skill bundles)
-hooks/       — type: hook    (1 component — event-driven scripts)
+hooks/       — type: hook    (3 components — tts-announcer, trace, recall — event-driven scripts)
 agents/      — type: agent   (planned)
 rules/       — type: rules   (planned)
 mcp/         — type: mcp     (planned)
 ```
 
 `apm-builder/lib/discover.ts` walks all six top-level dirs.
+
+## Conventions
+
+Cross-cutting rules every component follows live in [`CONVENTIONS.md`](CONVENTIONS.md):
+
+- **Fail-safe hook scripts** — hooks never block the host session.
+- **Markdown flat-line format** — append-only changelogs use one entry per line for grep + diff friendliness.
+- **Per-project state directory** — `.agent-config/` for trace logs, recall toggles, and per-project excludes (gitignored).
+- **Cross-harness contract** — hooks read JSON from stdin and write JSON to stdout; the harness adapter library handles per-host envelope differences.
 
 ## Taxonomy
 
@@ -117,6 +126,8 @@ Bundled as the [`knowledge-base`](plugins/knowledge-base) plugin (install once f
 - [`description-linter`](skills/description-linter) — Static analyzer for SKILL.md frontmatter: trigger-phrase heuristics, length cap, kebab-case names, cross-skill conflict detection. Reports only — no auto-fix.
 - [`stuck-detector`](skills/stuck-detector) — Off-ramp when the agent (or user) hits a doom-loop. Stops retrying, writes a structured handoff, asks whether to escalate / pause / continue with reduced scope.
 - [`evolution-changelog`](skills/evolution-changelog) — Maintains `EVOLUTION.md` at repo root: append-only log of applied evolution-driven changes, one bullet per change with signal, file, and one-line rationale.
+- [`trace`](hooks/trace) — Hook that appends one JSONL record per tool call to `.agent-config/trace/<session-id>.jsonl`. Zero LLM cost; structured evidence for `reflect` and `stuck-detector` to read later.
+- [`recall`](hooks/recall) — `SessionStart` hook that injects recent feedback memories and ADRs into the session as additional context. Default ON; opt out with `.agent-config/recall.disabled`.
 
 ### Frontend frameworks (Tooling)
 
@@ -187,6 +198,8 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
  | claude-code |
 | stuck-detector | skill | 0.1.0 | Use when the user says "stuck", "I'm stuck", "this isn't working", "tool keeps failing", "give up on this", "we're going in circles", "/stuck", or when the agent itself notices it has hit N consecutive tool errors in a session window. Generates a handoff summary so progress can resume in a fresh session, escalate to a stronger model, or pause for user input. Stops the doom-loop of blind retries.
  | claude-code |
+| trace | hook | 0.1.0 | Append-only JSONL trace of every tool call in the session. Records `{ts, tool, args, status, duration_ms}` per `PostToolUse` event so later skills can audit what happened without an LLM. Use when the user types "/trace", "track tool calls", "trace this session", "audit tool history", or asks why the agent did something. The hook fires automatically on every tool call; the trigger phrases are mostly for the agent to surface the file path on demand.
+ | claude-code |
 
 ### integrations
 
@@ -208,6 +221,8 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 | Name | Type | Version | Description | Targets |
 |------|------|---------|-------------|---------|
 | knowledge-base-overview | skill | 0.1.0 | Use when building, maintaining, ingesting into, querying, or health-checking a markdown knowledge base or wiki. Use when the user wants to compile sources into structured knowledge, maintain an Obsidian wiki, ingest documents, ask questions against accumulated research, or run health checks on interlinked markdown pages. Triggers on requests involving knowledge bases, wiki maintenance, source ingestion, research compilation, Obsidian wiki workflows, or LLM-maintained documentation. | claude-code |
+| recall | hook | 0.1.0 | Auto-injects recent feedback memories and ADRs at session start so the agent has context from past learnings. Walks `~/.claude/projects/<project>/memory/` and `<repo>/docs/adr/` for the latest entries (default 5) and emits them as SessionStart additionalContext. Use when the user types "/recall", "what should I remember", "recent decisions", "load my memories", or asks about prior conclusions. Default ON; opt out by creating `.agent-config/recall.disabled` in the repo.
+ | claude-code |
 
 ### tooling
 
