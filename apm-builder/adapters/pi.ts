@@ -358,6 +358,28 @@ events like \`turn_end\`, \`post_tool_use\`, \`session_start\`, etc. — see
 function toCamelCase(s: string): string {
   return s.replace(/-([a-z0-9])/g, (_, ch) => ch.toUpperCase());
 }
-function emitMcpStub(_component: ComponentSource): EmittedFile[] {
-  throw new Error('not implemented (Task 8)');
+// EXPERIMENTAL: Pi has no native MCP support as of pi-coding-agent v0.x
+// (see README §"No MCP"). The format below is a stub for forward-compat; it
+// preserves the canonical source through the build but Pi will not read it.
+// Revise when upstream Pi defines a real MCP format.
+function emitMcpStub(component: ComponentSource): EmittedFile[] {
+  const { manifest } = component;
+  if (!manifest.mcp) return [];
+  const stub = {
+    _note:
+      'EXPERIMENTAL — Pi does not natively support MCP as of this writing (see https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent#no-mcp). This file\'s format is pending; it is emitted so the canonical source is preserved across the build, not because Pi reads it. Track upstream Pi MCP support and revise the adapter when the format is defined.',
+    mcpServers: {
+      [manifest.name]: {
+        command: manifest.mcp.command,
+        ...(manifest.mcp.args ? { args: manifest.mcp.args } : {}),
+        ...(manifest.mcp.env ? { env: manifest.mcp.env } : {}),
+      },
+    },
+  };
+  return [
+    {
+      path: '.pi/mcp.experimental.json',
+      content: `${JSON.stringify(stub, null, 2)}\n`,
+    },
+  ];
 }

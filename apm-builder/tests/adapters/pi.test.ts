@@ -88,6 +88,11 @@ describe('pi adapter', () => {
     expect(result.diff).toEqual([]);
   });
 
+  it('emits an experimental mcp stub with a pending-format note', async () => {
+    const result = await runGolden(piAdapter, path.join(HERE, 'pi/mcp-stub'));
+    expect(result.diff).toEqual([]);
+  });
+
   it('plugin package.json matches pi-powers shape', async () => {
     const snapshotPkg = JSON.parse(
       await fs.readFile(path.join(HERE, 'pi/_pi-powers-snapshot/package.json'), 'utf8'),
