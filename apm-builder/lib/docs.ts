@@ -5,22 +5,54 @@ export const COMPONENTS_BEGIN = '<!-- AUTO-GENERATED: COMPONENTS -->';
 /** Marker that closes the auto-generated component table region. */
 export const COMPONENTS_END = '<!-- /AUTO-GENERATED: COMPONENTS -->';
 
+const TABLE_HEADER = [
+  '| Name | Type | Version | Description | Targets |',
+  '|------|------|---------|-------------|---------|',
+];
+
+const UNCATEGORIZED = 'Uncategorized';
+
+function rowFor(c: ComponentSource): string {
+  const targets = [...c.manifest.targets].sort().join(', ');
+  return `| ${c.manifest.name} | ${c.manifest.type} | ${c.manifest.version} | ${c.manifest.description} | ${targets} |`;
+}
+
 /**
- * Render the components markdown table (header + rows). Excludes the surrounding
- * markers so that callers can splice it inside an existing README between
- * `COMPONENTS_BEGIN` and `COMPONENTS_END`.
+ * Render the components markdown table (header + rows), grouped by
+ * `category.primary`. Components with no category appear under "Uncategorized"
+ * (always rendered last). Within each group rows are sorted alphabetically by
+ * name. Excludes the surrounding markers so that callers can splice the result
+ * between `COMPONENTS_BEGIN` and `COMPONENTS_END`.
  */
 export function renderComponentsTable(components: ComponentSource[]): string {
-  const sorted = [...components].sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
-  const rows = sorted.map((c) => {
-    const targets = [...c.manifest.targets].sort().join(', ');
-    return `| ${c.manifest.name} | ${c.manifest.type} | ${c.manifest.version} | ${c.manifest.description} | ${targets} |`;
-  });
-  return [
-    '| Name | Type | Version | Description | Targets |',
-    '|------|------|---------|-------------|---------|',
-    ...rows,
-  ].join('\n');
+  const groups = new Map<string, ComponentSource[]>();
+  for (const c of components) {
+    const key = c.manifest.category?.primary ?? UNCATEGORIZED;
+    const list = groups.get(key) ?? [];
+    list.push(c);
+    groups.set(key, list);
+  }
+
+  const categoryKeys = [...groups.keys()]
+    .filter((k) => k !== UNCATEGORIZED)
+    .sort();
+  const orderedKeys = groups.has(UNCATEGORIZED)
+    ? [...categoryKeys, UNCATEGORIZED]
+    : categoryKeys;
+
+  const sections: string[] = [];
+  for (const key of orderedKeys) {
+    const rows = (groups.get(key) ?? [])
+      .slice()
+      .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name))
+      .map(rowFor);
+    sections.push(`### ${key}`, '', ...TABLE_HEADER, ...rows);
+    sections.push('');
+  }
+
+  // Trim a single trailing blank to avoid double newlines at the section end.
+  if (sections[sections.length - 1] === '') sections.pop();
+  return sections.join('\n');
 }
 
 /** Default README emitted when no existing README (or no markers) is found. */

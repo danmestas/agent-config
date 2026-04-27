@@ -1,6 +1,8 @@
 ---
 name: ousterhout
 description: Use when designing modules, classes, APIs, or system architecture. Use when reviewing or refactoring code for complexity. Use when choosing between implementation approaches. Triggers on requests involving abstraction design, interface simplicity, information hiding, or reducing cognitive load.
+category:
+  primary: backpressure
 ---
 
 # Ousterhout's Philosophy of Software Design

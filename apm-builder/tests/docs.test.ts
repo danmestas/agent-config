@@ -143,3 +143,73 @@ describe('updateReadme', () => {
     expect(md).toContain('| foo |');
   });
 });
+
+describe('renderComponentsTable category grouping', () => {
+  const tooling: ComponentSource = {
+    dir: '/t',
+    relativeDir: 'skills/tooly',
+    body: '',
+    manifest: {
+      name: 'tooly',
+      version: '1.0.0',
+      description: 'A tooling skill',
+      type: 'skill',
+      targets: ['claude-code'],
+      category: { primary: 'tooling' },
+    } as ComponentSource['manifest'],
+  };
+  const backpressure: ComponentSource = {
+    dir: '/b',
+    relativeDir: 'skills/backy',
+    body: '',
+    manifest: {
+      name: 'backy',
+      version: '1.0.0',
+      description: 'A backpressure skill',
+      type: 'skill',
+      targets: ['claude-code'],
+      category: { primary: 'backpressure' },
+    } as ComponentSource['manifest'],
+  };
+  const uncategorized: ComponentSource = {
+    dir: '/u',
+    relativeDir: 'skills/uncatted',
+    body: '',
+    manifest: {
+      name: 'uncatted',
+      version: '1.0.0',
+      description: 'No category',
+      type: 'skill',
+      targets: ['claude-code'],
+    } as ComponentSource['manifest'],
+  };
+
+  it('renders a category heading for each primary group', () => {
+    const md = renderComponentsTable([tooling, backpressure, uncategorized]);
+    expect(md).toMatch(/backpressure/i);
+    expect(md).toMatch(/tooling/i);
+    // Skills without category go under an "Uncategorized" group.
+    expect(md).toMatch(/Uncategorized/i);
+  });
+
+  it('groups primaries alphabetically and uncategorized last', () => {
+    const md = renderComponentsTable([uncategorized, tooling, backpressure]);
+    const idxBack = md.toLowerCase().indexOf('backpressure');
+    const idxTool = md.toLowerCase().indexOf('tooling');
+    const idxUncat = md.toLowerCase().indexOf('uncategorized');
+    expect(idxBack).toBeGreaterThan(-1);
+    expect(idxTool).toBeGreaterThan(idxBack);
+    expect(idxUncat).toBeGreaterThan(idxTool);
+  });
+
+  it('puts each component row under its own primary heading', () => {
+    const md = renderComponentsTable([tooling, backpressure]);
+    const idxBackHeading = md.toLowerCase().indexOf('backpressure');
+    const idxBackyRow = md.indexOf('| backy |');
+    const idxToolHeading = md.toLowerCase().indexOf('tooling');
+    const idxToolyRow = md.indexOf('| tooly |');
+    expect(idxBackHeading).toBeLessThan(idxBackyRow);
+    expect(idxBackyRow).toBeLessThan(idxToolHeading);
+    expect(idxToolHeading).toBeLessThan(idxToolyRow);
+  });
+});

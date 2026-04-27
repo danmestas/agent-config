@@ -20,7 +20,7 @@ function mk(overrides: Partial<ComponentSource['manifest']>): ComponentSource {
 
 describe('validateComponents', () => {
   it('passes for a single valid skill', () => {
-    const errors = validateComponents([mk({})]);
+    const errors = validateComponents([mk({ category: { primary: 'tooling' } })]);
     expect(errors).toEqual([]);
   });
 
@@ -93,6 +93,28 @@ describe('validateComponents', () => {
       mk({ name: 'pl', type: 'plugin', targets: ['claude-code'], includes: [] }),
     ]);
     expect(errors.some((e) => e.severity === 'warning' && /empty includes/i.test(e.message))).toBe(true);
+  });
+});
+
+describe('validateComponents category warnings', () => {
+  it('warns when a skill has no category field', () => {
+    const errors = validateComponents([mk({ name: 'untagged', type: 'skill' })]);
+    const warn = errors.find(
+      (e) => e.severity === 'warning' && /category/i.test(e.message),
+    );
+    expect(warn).toBeDefined();
+    expect(warn!.componentName).toBe('untagged');
+  });
+
+  it('does not warn when a skill has a category', () => {
+    const errors = validateComponents([
+      mk({
+        name: 'tagged',
+        type: 'skill',
+        category: { primary: 'tooling' },
+      }),
+    ]);
+    expect(errors.filter((e) => /category/i.test(e.message))).toEqual([]);
   });
 });
 

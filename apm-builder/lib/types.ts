@@ -4,6 +4,12 @@ export type ComponentType = typeof COMPONENT_TYPES[number];
 export const TARGETS = ['claude-code', 'apm', 'codex', 'gemini', 'copilot', 'pi'] as const;
 export type Target = typeof TARGETS[number];
 
+// Re-export the Category type so callers depending on `types.ts` get the full
+// public surface in one import. The canonical list lives in `schema.ts` to
+// keep the Zod enum and the TypeScript type derived from a single source.
+export type { Category } from './schema.ts';
+import type { Category } from './schema.ts';
+
 export interface ComponentSource {
   /** Absolute path to the component dir (contains the component's manifest file — typically `SKILL.md`). */
   dir: string;
@@ -27,6 +33,7 @@ export interface ComponentManifest {
   name: string;
   version: string;
   description: string;
+  category?: { primary: Category; secondary?: Category[] };
   type: ComponentType;
   targets: Target[];
   author?: string;

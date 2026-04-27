@@ -1,6 +1,8 @@
 ---
 name: idiomatic-go
 description: Use when writing, reviewing, or refactoring Go code. Triggers on .go files, go.mod presence, or any task involving Go programming. Also use when reviewing Go code for idiomaticity, error handling, concurrency patterns, or interface design.
+category:
+  primary: backpressure
 ---
 
 # Idiomatic Go

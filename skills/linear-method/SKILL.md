@@ -1,6 +1,8 @@
 ---
 name: linear-method
 description: Use when creating, organizing, or prioritizing issues in Linear. Use when managing backlogs, setting up cycles, scoping projects, writing issue titles/descriptions, or deciding how to structure work in Linear. Also use when asked about Linear best practices.
+category:
+  primary: integrations
 ---
 
 # Linear Method — Best Practices for AI Agents

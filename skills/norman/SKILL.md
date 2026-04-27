@@ -1,6 +1,8 @@
 ---
 name: norman
 description: Use when designing, reviewing, or auditing user interfaces and frontend interactions. Use when evaluating UI usability, accessibility, or interaction patterns. Triggers on requests involving button placement, form design, navigation, error messages, onboarding flows, modal dialogs, or when asked to review a UI for usability.
+category:
+  primary: backpressure
 ---
 
 # Norman's Principles of Interaction Design

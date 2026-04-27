@@ -131,6 +131,19 @@ export function validateComponents(components: ComponentSource[]): ValidationErr
     }
   }
 
+  // Soft nudge: skills missing a category get a warning to encourage tagging.
+  // Not an error — the field is optional during the migration to canonical SKILL.md.
+  for (const c of components) {
+    if (c.manifest.type !== 'skill') continue;
+    if (!c.manifest.category) {
+      errors.push({
+        severity: 'warning',
+        componentName: c.manifest.name,
+        message: 'skill is missing a category — add `category: { primary: <category> }` to frontmatter',
+      });
+    }
+  }
+
   return errors;
 }
 

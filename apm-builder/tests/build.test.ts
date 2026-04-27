@@ -21,7 +21,7 @@ describe('runBuild', () => {
         '---\nname: sample\nversion: 1.0.0\ndescription: d\ntype: skill\ntargets: [claude-code]\n---\n\nBody.\n',
     });
     const result = await runBuild({ repoRoot: repo, targets: ['claude-code'], outDir: 'dist' });
-    expect(result.errors).toEqual([]);
+    expect(result.errors.filter((e) => e.severity === 'error')).toEqual([]);
     const out = await fs.readFile(
       path.join(repo, 'dist/claude-code/skills/sample/SKILL.md'),
       'utf8',

@@ -4,6 +4,27 @@ import { COMPONENT_TYPES, TARGETS, type ComponentType, type Target } from './typ
 const SEMVER_RE = /^\d+\.\d+\.\d+(-[\w.]+)?(\+[\w.]+)?$/;
 const NAME_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
+export const CATEGORIES = [
+  'economy',
+  'workflow',
+  'backpressure',
+  'tooling',
+  'integrations',
+  'context-management',
+  'memory-management',
+  'evolution',
+] as const;
+export type Category = typeof CATEGORIES[number];
+
+const CategoryBlock = z
+  .object({
+    primary: z.enum(CATEGORIES as unknown as [Category, ...Category[]]),
+    secondary: z
+      .array(z.enum(CATEGORIES as unknown as [Category, ...Category[]]))
+      .optional(),
+  })
+  .strict();
+
 const HookEntry = z.object({
   command: z.string().min(1),
   matcher: z.string().optional(),
@@ -26,6 +47,7 @@ export const ManifestSchema = z
     name: z.string().regex(NAME_RE, 'name must be kebab-case lowercase'),
     version: z.string().regex(SEMVER_RE, 'version must be valid semver'),
     description: z.string().min(1),
+    category: CategoryBlock.optional(),
     type: z.enum(COMPONENT_TYPES as unknown as [ComponentType, ...ComponentType[]]),
     targets: z.array(z.enum(TARGETS as unknown as [Target, ...Target[]])).min(1),
     author: z.string().optional(),

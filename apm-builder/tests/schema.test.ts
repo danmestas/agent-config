@@ -57,4 +57,66 @@ describe('ManifestSchema', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  describe('category field', () => {
+    it('accepts manifest with category.primary only', () => {
+      const result = ManifestSchema.safeParse({
+        name: 'x',
+        version: '1.0.0',
+        description: 'd',
+        type: 'skill',
+        targets: ['claude-code'],
+        category: { primary: 'economy' },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('accepts manifest with primary and secondary[]', () => {
+      const result = ManifestSchema.safeParse({
+        name: 'x',
+        version: '1.0.0',
+        description: 'd',
+        type: 'skill',
+        targets: ['claude-code'],
+        category: { primary: 'tooling', secondary: ['economy'] },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejects unknown category value', () => {
+      const result = ManifestSchema.safeParse({
+        name: 'x',
+        version: '1.0.0',
+        description: 'd',
+        type: 'skill',
+        targets: ['claude-code'],
+        category: { primary: 'not-a-real-category' },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects category block without primary', () => {
+      const result = ManifestSchema.safeParse({
+        name: 'x',
+        version: '1.0.0',
+        description: 'd',
+        type: 'skill',
+        targets: ['claude-code'],
+        category: { secondary: ['economy'] },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects unknown value in secondary array', () => {
+      const result = ManifestSchema.safeParse({
+        name: 'x',
+        version: '1.0.0',
+        description: 'd',
+        type: 'skill',
+        targets: ['claude-code'],
+        category: { primary: 'tooling', secondary: ['nope'] },
+      });
+      expect(result.success).toBe(false);
+    });
+  });
 });

@@ -1,6 +1,8 @@
 ---
 name: tigerstyle
 description: Use when writing safety-critical code, systems programming, infrastructure, or when a project needs rigorous coding discipline. Triggers include requests for defensive coding, assertion-heavy development, performance-conscious design, zero-technical-debt policy, or NASA Power of Ten style rules. Also use when reviewing code for correctness, safety, or performance issues.
+category:
+  primary: backpressure
 ---
 
 # TigerStyle

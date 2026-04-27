@@ -5,6 +5,8 @@ description: >
   when searching or exploring codebases with more than 30 non-gitignored files and/or nested
   directory structures. It provides natural language semantic search that complements traditional
   grep/ripgrep for finding features, understanding intent, and exploring unfamiliar code.
+category:
+  primary: tooling
 ---
 
 # mgrep Code Search

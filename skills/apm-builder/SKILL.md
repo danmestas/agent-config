@@ -7,6 +7,8 @@ description: >
   "init a hook/agent/rules/plugin", "run apm-builder", or any work on the
   multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini,
   Copilot CLI, Pi targets).
+category:
+  primary: tooling
 type: skill
 targets:
   - claude-code
