@@ -8,6 +8,7 @@
     "build": "tsx apm-builder/cli.ts build",
     "watch": "tsx apm-builder/cli.ts watch",
     "docs": "tsx apm-builder/cli.ts docs",
+    "init": "tsx apm-builder/cli.ts init",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
