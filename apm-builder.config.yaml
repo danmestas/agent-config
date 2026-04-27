@@ -1,0 +1,13 @@
+# Repo-level adapter defaults. Per-component overrides live in SKILL.md frontmatter.
+apm:
+  package_scope: "@danmestas"
+claude-code:
+  marketplace: claude-plugins-official
+codex:
+  agents_md_section_order: [rules, agents, skills]
+gemini:
+  user_settings_path: "~/.gemini/settings.json"
+copilot:
+  hooks_dir: ".github/hooks"
+pi:
+  package_keyword: "pi-package"
