@@ -1,0 +1,10 @@
+{
+  "name": "sample",
+  "version": "1.0.0",
+  "description": "A sample skill for the gemini adapter",
+  "tags": [
+    "example",
+    "test"
+  ],
+  "body_path": "skill.md"
+}

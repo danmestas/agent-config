@@ -95,3 +95,24 @@ describe('validateComponents', () => {
     expect(errors.some((e) => e.severity === 'warning' && /empty includes/i.test(e.message))).toBe(true);
   });
 });
+
+describe('validateComponents — Gemini-specific rejections', () => {
+  it('rejects agent type targeting gemini', () => {
+    const errors = validateComponents([
+      mk({
+        name: 'rev',
+        type: 'agent',
+        targets: ['gemini'],
+        agent: { tools: ['Read'], model: 'gemini-2.0-flash' },
+      }),
+    ]);
+    expect(errors.some((e) => e.severity === 'error' && /agent.*gemini/i.test(e.message))).toBe(true);
+  });
+
+  it('rejects plugin type targeting gemini', () => {
+    const errors = validateComponents([
+      mk({ name: 'pl', type: 'plugin', targets: ['gemini'], includes: [] }),
+    ]);
+    expect(errors.some((e) => e.severity === 'error' && /plugin.*gemini/i.test(e.message))).toBe(true);
+  });
+});

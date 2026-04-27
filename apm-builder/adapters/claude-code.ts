@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
+import { selectRules, composeRulesBody, isOwnerOfRulesFile } from '../lib/rules.ts';
 
 function yamlValue(v: string): string {
   // Use yaml.stringify to safely encode a single scalar (with quoting if needed).
@@ -68,16 +69,10 @@ function emitAgent(component: ComponentSource): EmittedFile[] {
 }
 
 function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  if (!isOwnerOfRulesFile(component, ctx.allComponents, 'claude-code')) return [];
   const scope = component.manifest.scope ?? 'project';
-  const allRules = ctx.allComponents
-    .filter((c) => c.manifest.type === 'rules' && c.manifest.targets.includes('claude-code'))
-    .filter((c) => (c.manifest.scope ?? 'project') === scope);
-  if (allRules.length === 0) return []; // defensive: should be unreachable since the calling component is itself in allRules
-  const sorted = topoSortRules(allRules);
-  if (sorted[0]?.manifest.name !== component.manifest.name) return [];
-
-  const sections = sorted.map((r) => `## ${r.manifest.name}\n\n${r.body.trim()}\n`);
-  const content = sections.join('\n');
+  const sorted = selectRules(ctx.allComponents, 'claude-code', scope);
+  const content = composeRulesBody(sorted);
   const filename = scope === 'user' ? '.claude/CLAUDE.md' : 'CLAUDE.md';
   return [{ path: filename, content }];
 }
@@ -147,35 +142,3 @@ function emitPlugin(component: ComponentSource, ctx: AdapterContext): EmittedFil
   ];
 }
 
-function topoSortRules(rules: ComponentSource[]): ComponentSource[] {
-  const byName = new Map(rules.map((r) => [r.manifest.name, r]));
-  const edges = new Map<string, Set<string>>();
-  for (const r of rules) edges.set(r.manifest.name, new Set());
-  for (const r of rules) {
-    for (const before of r.manifest.before ?? []) {
-      if (byName.has(before)) edges.get(r.manifest.name)?.add(before);
-    }
-    for (const after of r.manifest.after ?? []) {
-      if (byName.has(after)) edges.get(after)?.add(r.manifest.name);
-    }
-  }
-  const inDegree = new Map<string, number>(rules.map((r) => [r.manifest.name, 0]));
-  for (const targets of edges.values()) {
-    for (const t of targets) inDegree.set(t, (inDegree.get(t) ?? 0) + 1);
-  }
-  const queue = [...rules.map((r) => r.manifest.name)]
-    .filter((n) => inDegree.get(n) === 0)
-    .sort();
-  const result: ComponentSource[] = [];
-  while (queue.length > 0) {
-    queue.sort();
-    const next = queue.shift()!;
-    const r = byName.get(next);
-    if (r) result.push(r);
-    for (const dep of edges.get(next) ?? []) {
-      inDegree.set(dep, (inDegree.get(dep) ?? 0) - 1);
-      if (inDegree.get(dep) === 0) queue.push(dep);
-    }
-  }
-  return result;
-}
