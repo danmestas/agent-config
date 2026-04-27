@@ -1,0 +1,54 @@
+/* Pikchr neutral palette — default. Blue/green/amber/red accents.
+   Targets .pikchr-wrapper > .pikchr containers.
+   All colors meet 3:1+ contrast on both #ffffff and #0d1117. */
+
+:root {
+  --pikchr-fg: #1a1a1a;
+  --pikchr-bg: #ffffff;
+  --pikchr-muted: #6b7280;
+  --pikchr-accent-1: #2563eb;  /* blue */
+  --pikchr-accent-2: #059669;  /* green */
+  --pikchr-accent-3: #d97706;  /* amber */
+  --pikchr-accent-4: #dc2626;  /* red */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pikchr-fg: #e5e7eb;
+    --pikchr-bg: #0d1117;
+    --pikchr-muted: #9ca3af;
+    --pikchr-accent-1: #60a5fa;
+    --pikchr-accent-2: #34d399;
+    --pikchr-accent-3: #fbbf24;
+    --pikchr-accent-4: #f87171;
+  }
+}
+
+[data-theme="dark"] {
+  --pikchr-fg: #e5e7eb;
+  --pikchr-bg: #0d1117;
+  --pikchr-muted: #9ca3af;
+  --pikchr-accent-1: #60a5fa;
+  --pikchr-accent-2: #34d399;
+  --pikchr-accent-3: #fbbf24;
+  --pikchr-accent-4: #f87171;
+}
+
+[data-theme="light"] {
+  --pikchr-fg: #1a1a1a;
+  --pikchr-bg: #ffffff;
+  --pikchr-muted: #6b7280;
+  --pikchr-accent-1: #2563eb;
+  --pikchr-accent-2: #059669;
+  --pikchr-accent-3: #d97706;
+  --pikchr-accent-4: #dc2626;
+}
+
+.pikchr {
+  color: var(--pikchr-fg);
+  background: var(--pikchr-bg);
+  padding: 1rem;
+  border-radius: 6px;
+}
+.pikchr svg { display: block; max-width: 100%; height: auto; }
+.pikchr svg text { font-family: ui-sans-serif, system-ui, sans-serif; }

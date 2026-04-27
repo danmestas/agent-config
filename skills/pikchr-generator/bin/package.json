@@ -1,0 +1,11 @@
+{
+  "name": "pikchr-generator-mermaid-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Runtime deps for the mermaid engine of pikchr-generator. Installed via bin/install-mermaid.sh; NOT packaged into apm bundle.",
+  "dependencies": {
+    "beautiful-mermaid": "1.1.3",
+    "elkjs": "^0.11.0",
+    "entities": "^7.0.1"
+  }
+}

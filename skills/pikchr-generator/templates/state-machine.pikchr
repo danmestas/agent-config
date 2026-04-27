@@ -1,0 +1,13 @@
+# State machine template — states + labelled transitions.
+right
+Idle: circle "Idle" fit
+arrow "request" above
+Loading: circle "Loading" fit
+arrow "ok" above
+Ready: circle "Ready" fit
+arrow "close" above
+Done: circle "Done" fit
+
+# Error transition from Loading
+arrow from Loading.s down 0.5 then right then up to Done.s "error" below
+arrow from Ready.s down 0.4 then left to Idle.s "reset" below

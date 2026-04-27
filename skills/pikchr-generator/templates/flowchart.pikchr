@@ -1,0 +1,18 @@
+# Flowchart template — top-down decision flow.
+down
+Start: oval "Start" fit
+arrow
+Validate: box "Validate input" fit
+arrow
+Check: diamond "Valid?" fit
+arrow "yes" rjust
+Process: box "Process" fit
+arrow
+Save: cylinder "Save to DB" fit
+arrow
+End: oval "Done" fit
+
+# "no" branch from Check
+arrow from Check.e right then up to (Check.e + (1.5, 0)) "no" above
+ErrBox: box "Show error" fit at (Check.e + (1.8, 0))
+arrow from ErrBox.n up then left to End.e

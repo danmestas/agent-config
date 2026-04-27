@@ -1,0 +1,13 @@
+# Data pipeline template — source → transform → sink chain with stdlib.
+# Compile with: compile.sh --with-stdlib
+
+right
+Src: db("Source DB"); arrow "extract" above
+Tx1: lambda("Clean"); arrow "transform" above
+Tx2: lambda("Aggregate"); arrow "transform" above
+Sink: datastore("Warehouse")
+
+# Side branch: monitoring
+Mon: cloud("Datadog") at Tx1.s + (0, -1.2)
+arrow from Tx1.s down dashed to Mon.n "metrics" rjust
+arrow from Tx2.s down dashed to Mon.e + (0.2, 0)

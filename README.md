@@ -59,6 +59,11 @@ Adapters emit native artifacts for each harness when a skill declares it in `tar
 - [`mgrep-code-search`](skills/mgrep-code-search) — Semantic code search for large codebases. Natural-language queries across code, text, PDFs, and images.
 - [`apm-builder`](skills/apm-builder) — This repo's build tool itself. Validate, build, watch, scaffold, regenerate docs, run `evolve`.
 - [`cloudflare-email`](skills/cloudflare-email) — Send outbound email from Cloudflare-hosted domains via REST API or Workers binding.
+- [`pikchr-generator`](skills/pikchr-generator) — Generate, theme, and render technical diagrams across four engines (Pikchr, GraphViz, D2, Mermaid) with a shared 16-theme palette.
+
+### Workflow
+
+- [`tts-announcer`](skills/tts-announcer) — Local, offline voice announcements via Kokoro-82M. Wires `Notification` + `SubagentStop` hooks so the terminal whispers progress instead of going *bing*. Targets Claude Code and Pi.
 
 ### Project & process (Integrations)
 
@@ -149,6 +154,13 @@ category:
 Per-harness emission honors a compatibility matrix (see [`apm-builder/lib/validate.ts`](apm-builder/lib/validate.ts)) — not every component type works on every harness. The validator rejects incompatible combinations and warns on best-effort ones.
 
 Component types: `skill`, `plugin`, `hook`, `agent`, `rules`, `mcp`. See [`apm-builder/lib/types.ts`](apm-builder/lib/types.ts) for the full manifest shape.
+
+## Companion repos
+
+Repos that aren't skill bundles but pair naturally with `agent-skills`:
+
+- [`claude-hud-combo`](https://github.com/danmestas/claude-hud-combo) — Self-contained Deno statusline for Claude Code. Doesn't fit any of the six component types (it's a runtime artifact, not authored content), so it lives separately. Install with its own `install.sh`.
+- [`meta-scout`](https://github.com/danmestas/meta-scout) — Library that powers the [`evolution-engine`](skills/evolution-engine) skill's deeper detection (12 behavioral signals, struggle-then-success arcs). The skill currently uses two inline detectors; once `meta-scout` publishes to npm or commits a built `dist/`, a follow-up PR wires its full signal catalog into the orchestrator.
 
 ## Contributing
 

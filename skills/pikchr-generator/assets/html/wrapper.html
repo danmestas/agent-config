@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+{{CSS}}
+  /* Toggle button */
+  .pikchr-toggle {
+    position: fixed; top: 0.75rem; right: 0.75rem;
+    padding: 0.4rem 0.7rem; font: 12px/1 ui-sans-serif, system-ui;
+    background: var(--pikchr-muted); color: var(--pikchr-bg);
+    border: 0; border-radius: 4px; cursor: pointer; opacity: 0.85;
+  }
+  .pikchr-toggle:hover { opacity: 1; }
+  body { margin: 0; padding: 2rem; background: var(--pikchr-bg); }
+  </style>
+</head>
+<body>
+  <button class="pikchr-toggle" onclick="
+    var r = document.documentElement;
+    var cur = r.getAttribute('data-theme');
+    var next = cur === 'dark' ? 'light' : 'dark';
+    r.setAttribute('data-theme', next);
+    this.textContent = next === 'dark' ? '\u2600 light' : '\u263E dark';
+  ">&#9790; dark</button>
+  <div class="pikchr">
+{{SVG}}
+  </div>
+</body>
+</html>

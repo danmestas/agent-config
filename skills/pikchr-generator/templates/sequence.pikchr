@@ -1,0 +1,23 @@
+# Sequence-ish template — actors with vertical lifelines + horizontal messages.
+# Pikchr has no native sequence diagram; this is the idiomatic approximation.
+
+actorBox = 0.6
+lifeline = 2.5
+
+right
+A: box "Client" wid actorBox fit
+move 1.5
+B: box "API" wid actorBox fit
+move 1.5
+C: box "DB" wid actorBox fit
+
+# Lifelines (dashed verticals)
+line dashed from A.s down lifeline
+line dashed from B.s down lifeline
+line dashed from C.s down lifeline
+
+# Messages
+arrow from A.s + (0,-0.4) to B.s + (0,-0.4) "POST /login" above
+arrow from B.s + (0,-0.9) to C.s + (0,-0.9) "SELECT user" above
+arrow from C.s + (0,-1.4) to B.s + (0,-1.4) "row" above dashed
+arrow from B.s + (0,-1.9) to A.s + (0,-1.9) "200 OK" above dashed
