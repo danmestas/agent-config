@@ -227,8 +227,136 @@ Or add to \`.pi/settings.json\`:
 ${rows.join('\n')}
 `;
 }
-function emitHookExtension(_component: ComponentSource): EmittedFile[] {
-  throw new Error('not implemented (Task 7)');
+// Map Plan-1 hook event names (Claude Code style) to Pi ExtensionAPI event
+// names. Best-effort mapping; revise as Pi's event surface evolves.
+const HOOK_EVENT_MAP: Record<string, string> = {
+  Stop: 'turn_end',
+  SubagentStop: 'agent_end',
+  PreToolUse: 'pre_tool_use',
+  PostToolUse: 'post_tool_use',
+  SessionStart: 'session_start',
+  SessionEnd: 'session_shutdown',
+  UserPromptSubmit: 'message_start',
+  Notification: 'notification',
+};
+
+function emitHookExtension(component: ComponentSource): EmittedFile[] {
+  const { manifest } = component;
+  if (!manifest.hooks) return [];
+  const extDir = `.pi/extensions/${manifest.name}`;
+
+  const files: EmittedFile[] = [];
+
+  files.push({
+    path: `${extDir}/package.json`,
+    content: `${JSON.stringify(
+      {
+        name: manifest.name,
+        version: manifest.version,
+        description: manifest.description,
+        main: 'index.ts',
+        type: 'module',
+        peerDependencies: { '@mariozechner/pi-coding-agent': '*' },
+      },
+      null,
+      2,
+    )}\n`,
+  });
+
+  files.push({
+    path: `${extDir}/index.ts`,
+    content: renderHookExtensionTs(manifest),
+  });
+
+  files.push({
+    path: `${extDir}/README.md`,
+    content: renderHookReadme(manifest),
+  });
+
+  return files;
+}
+
+function renderHookExtensionTs(
+  manifest: ComponentSource['manifest'],
+): string {
+  const fnIdent = toCamelCase(manifest.name) + 'Extension';
+  const handlers: string[] = [];
+
+  for (const [event, def] of Object.entries(manifest.hooks ?? {})) {
+    const piEvent = HOOK_EVENT_MAP[event] ?? event.toLowerCase();
+    const matcherCheck = def.matcher
+      ? `    if (event.tool !== ${JSON.stringify(def.matcher)}) return;\n`
+      : '';
+    handlers.push(
+      `  pi.on(${JSON.stringify(piEvent)}, async (event, _ctx) => {\n` +
+        `    // Mirrors source hook: ${event} → ${def.command}` +
+        (def.matcher ? ` (matcher: "${def.matcher}")` : '') +
+        '\n' +
+        matcherCheck +
+        `    const script = resolve(__dirname, ${JSON.stringify(def.command)});\n` +
+        `    spawn(script, [], { stdio: "inherit" });\n` +
+        `  });\n`,
+    );
+  }
+
+  return `import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { spawn } from "node:child_process";
+import { resolve } from "node:path";
+
+// Auto-generated from skill component "${manifest.name}".
+// Source: see README.md for the canonical SKILL.md path.
+//
+// Pi has no JSON-config hooks; this scaffold registers each declared event
+// programmatically via the ExtensionAPI. Customize the body of each handler
+// or replace the script invocation as needed.
+
+export default function ${fnIdent}(pi: ExtensionAPI) {
+${handlers.join('\n')}}
+`;
+}
+
+function renderHookReadme(manifest: ComponentSource['manifest']): string {
+  return `# ${manifest.name} (Pi extension scaffold)
+
+${manifest.description}
+
+This is an **auto-generated TypeScript extension** for the Pi coding agent.
+Source: \`${manifest.name}\` (type: hook) from the agent-skills monorepo.
+
+## Manual install step required
+
+Pi extensions need a runtime. After this scaffold is emitted, you must run:
+
+\`\`\`bash
+cd .pi/extensions/${manifest.name}
+npm install
+\`\`\`
+
+Then register the extension in \`.pi/settings.json\`:
+
+\`\`\`json
+{
+  "extensions": [".pi/extensions/${manifest.name}/index.ts"]
+}
+\`\`\`
+
+## Customizing
+
+The scaffold registers each Pi event from the source SKILL.md's \`hooks:\` block.
+Edit \`index.ts\` to change the behavior. The original shell scripts (if any)
+should be placed under \`hooks/\` next to \`index.ts\` and will be invoked via
+\`spawn\`.
+
+## Why TypeScript?
+
+Pi hooks are programmatic, not JSON-configured. The Pi \`ExtensionAPI\` exposes
+events like \`turn_end\`, \`post_tool_use\`, \`session_start\`, etc. — see
+[pi-coding-agent docs](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent#extensions).
+`;
+}
+
+function toCamelCase(s: string): string {
+  return s.replace(/-([a-z0-9])/g, (_, ch) => ch.toUpperCase());
 }
 function emitMcpStub(_component: ComponentSource): EmittedFile[] {
   throw new Error('not implemented (Task 8)');

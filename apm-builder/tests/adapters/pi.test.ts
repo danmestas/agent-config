@@ -83,6 +83,11 @@ describe('pi adapter', () => {
     expect(readme).toContain('| ousterhout |');
   });
 
+  it('emits a TS extension scaffold for hook components', async () => {
+    const result = await runGolden(piAdapter, path.join(HERE, 'pi/hook-extension'));
+    expect(result.diff).toEqual([]);
+  });
+
   it('plugin package.json matches pi-powers shape', async () => {
     const snapshotPkg = JSON.parse(
       await fs.readFile(path.join(HERE, 'pi/_pi-powers-snapshot/package.json'), 'utf8'),
