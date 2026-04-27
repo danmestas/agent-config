@@ -86,4 +86,9 @@ describe('codex adapter', () => {
     });
     expect(emitted).toEqual([]);
   });
+
+  it('emits a hook component as hooks.json + bundled scripts', async () => {
+    const result = await runGolden(codexAdapter, path.join(HERE, 'codex/hook-basic'));
+    expect(result.diff).toEqual([]);
+  });
 });

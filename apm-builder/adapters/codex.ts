@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import type {
   Adapter,
   AdapterContext,
@@ -25,7 +27,9 @@ export const codexAdapter: Adapter = {
       case 'agent':
       case 'rules':
         return emitAgentsMd(component, ctx);
-      // hook + mcp added in Tasks 8 + 9.
+      case 'hook':
+        return emitHook(component);
+      // mcp added in Task 9.
       // plugin is schema-rejected for codex (see Plan 1's validate.ts).
       default:
         throw new Error(
@@ -34,6 +38,45 @@ export const codexAdapter: Adapter = {
     }
   },
 };
+
+interface CodexHookEntry {
+  command: string;
+  matcher?: string;
+}
+
+async function emitHook(component: ComponentSource): Promise<EmittedFile[]> {
+  const { manifest, dir } = component;
+  if (!manifest.hooks) return [];
+
+  // Group entries by event, alphabetize events for determinism.
+  const events: Record<string, CodexHookEntry[]> = {};
+  const sortedEvents = Object.keys(manifest.hooks).sort();
+  for (const event of sortedEvents) {
+    const def = manifest.hooks[event]!;
+    const entry: CodexHookEntry = { command: def.command };
+    if (def.matcher !== undefined) entry.matcher = def.matcher;
+    events[event] = [entry];
+  }
+  const fragment = { hooks: events };
+
+  const files: EmittedFile[] = [
+    {
+      path: 'hooks.json',
+      content: `${JSON.stringify(fragment, null, 2)}\n`,
+    },
+  ];
+
+  // Bundle any scripts that exist inside the component dir.
+  for (const def of Object.values(manifest.hooks)) {
+    const scriptPath = path.join(dir, def.command);
+    const exists = await fs.stat(scriptPath).then(() => true).catch(() => false);
+    if (exists) {
+      const content = await fs.readFile(scriptPath);
+      files.push({ path: def.command, content, mode: 0o755 });
+    }
+  }
+  return files;
+}
 
 /**
  * Emit `AGENTS.md` exactly once across all content-bearing component invocations.
