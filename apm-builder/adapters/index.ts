@@ -4,6 +4,7 @@ import { claudeCodeAdapter } from './claude-code.ts';
 import { codexAdapter } from './codex.ts';
 import { copilotAdapter } from './copilot.ts';
 import { geminiAdapter } from './gemini.ts';
+import { piAdapter } from './pi.ts';
 
 const REGISTRY: Partial<Record<Target, Adapter>> = {
   'claude-code': claudeCodeAdapter,
@@ -11,7 +12,7 @@ const REGISTRY: Partial<Record<Target, Adapter>> = {
   codex: codexAdapter,
   copilot: copilotAdapter,
   gemini: geminiAdapter,
-  // pi adapter lands in its own plan.
+  pi: piAdapter,
 };
 
 export function getAdapter(target: Target): Adapter | undefined {
