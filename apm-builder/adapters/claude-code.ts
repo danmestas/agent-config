@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
 
 export const claudeCodeAdapter: Adapter = {
@@ -15,7 +17,9 @@ export const claudeCodeAdapter: Adapter = {
         return emitAgent(component);
       case 'rules':
         return emitRules(component, ctx);
-      // Other types added in Tasks 11-13.
+      case 'hook':
+        return emitHook(component);
+      // Other types added in Tasks 12-13.
       default:
         throw new Error(`claude-code adapter: type "${component.manifest.type}" not yet implemented`);
     }
@@ -60,6 +64,32 @@ function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile
   const content = sections.join('\n');
   const filename = scope === 'user' ? '.claude/CLAUDE.md' : 'CLAUDE.md';
   return [{ path: filename, content }];
+}
+
+async function emitHook(component: ComponentSource): Promise<EmittedFile[]> {
+  const { manifest, dir } = component;
+  if (!manifest.hooks) return [];
+  const fragment: { hooks: Record<string, unknown[]> } = { hooks: {} };
+  const files: EmittedFile[] = [];
+
+  for (const [event, def] of Object.entries(manifest.hooks)) {
+    fragment.hooks[event] ??= [];
+    (fragment.hooks[event] as unknown[]).push({
+      matcher: def.matcher ?? '*',
+      hooks: [{ type: 'command', command: `\${CLAUDE_PROJECT_DIR}/${def.command}` }],
+    });
+    const scriptPath = path.join(dir, def.command);
+    const scriptExists = await fs.stat(scriptPath).then(() => true).catch(() => false);
+    if (scriptExists) {
+      const content = await fs.readFile(scriptPath);
+      files.push({ path: def.command, content, mode: 0o755 });
+    }
+  }
+  files.push({
+    path: '.claude/settings.fragment.json',
+    content: `${JSON.stringify(fragment, null, 2)}\n`,
+  });
+  return files;
 }
 
 function topoSortRules(rules: ComponentSource[]): ComponentSource[] {

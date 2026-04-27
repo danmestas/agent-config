@@ -49,4 +49,9 @@ describe('claude-code adapter', () => {
     const claudeMdCount = results.flat().filter((f) => f.path === 'CLAUDE.md').length;
     expect(claudeMdCount).toBe(1);
   });
+
+  it('emits a hook component with settings fragment + script', async () => {
+    const result = await runGolden(claudeCodeAdapter, path.join(HERE, 'claude-code/hook-basic'));
+    expect(result.diff).toEqual([]);
+  });
 });
