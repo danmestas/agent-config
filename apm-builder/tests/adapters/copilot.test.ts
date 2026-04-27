@@ -108,4 +108,28 @@ describe('copilot adapter', () => {
     );
     expect(file!.content.toString()).toBe(expected);
   });
+
+  it.each(['plugin', 'agent', 'mcp'] as const)(
+    'throws a clear error when asked to emit unsupported type %s',
+    async (type) => {
+      const stub: ComponentSource = {
+        dir: '/tmp/x',
+        relativeDir: 'x',
+        body: '',
+        manifest: {
+          name: 'x',
+          version: '1.0.0',
+          description: 'd',
+          type,
+          targets: ['copilot'],
+          // Minimal type-specific fields so the schema-bypassed manifest is structurally complete:
+          ...(type === 'plugin' ? { includes: [] } : {}),
+          ...(type === 'mcp' ? { mcp: { command: 'noop' } } : {}),
+        } as ComponentSource['manifest'],
+      };
+      await expect(
+        copilotAdapter.emit(stub, { config: {}, allComponents: [stub], repoRoot: '/tmp' }),
+      ).rejects.toThrow(/copilot.*not supported/i);
+    },
+  );
 });

@@ -15,9 +15,16 @@ export const copilotAdapter: Adapter = {
         return emitInstructions(component, ctx);
       case 'hook':
         return emitHook(component, ctx);
+      case 'plugin':
+      case 'agent':
+      case 'mcp':
+        throw new Error(
+          `copilot adapter: type "${component.manifest.type}" not supported by Copilot CLI ` +
+            `(see compatibility matrix in spec). Remove "copilot" from the component's targets.`,
+        );
       default:
         throw new Error(
-          `copilot adapter: type "${component.manifest.type}" not yet implemented`,
+          `copilot adapter: unknown component type "${component.manifest.type}"`,
         );
     }
   },
