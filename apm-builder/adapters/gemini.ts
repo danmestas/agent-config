@@ -2,7 +2,13 @@ import type {
   Adapter,
   ComponentSource,
   EmittedFile,
+  AdapterContext,
 } from '../lib/types.ts';
+import {
+  selectRules,
+  composeRulesBody,
+  isOwnerOfRulesFile,
+} from '../lib/rules.ts';
 
 export const geminiAdapter: Adapter = {
   target: 'gemini',
@@ -11,11 +17,13 @@ export const geminiAdapter: Adapter = {
     return component.manifest.targets.includes('gemini');
   },
 
-  async emit(component, _ctx) {
+  async emit(component, ctx) {
     switch (component.manifest.type) {
       case 'skill':
         return emitSkill(component);
-      // Tasks 3-5 add: rules, hook, mcp.
+      case 'rules':
+        return emitRules(component, ctx);
+      // Tasks 4-5 add: hook, mcp.
       // agent and plugin are schema-rejected by validate.ts (compatibility matrix).
       default:
         throw new Error(
@@ -55,4 +63,16 @@ function emitSkill(component: ComponentSource): EmittedFile[] {
       content: `${bodyFrontmatter}\n\n${body.trimStart()}`,
     },
   ];
+}
+
+function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  if (!isOwnerOfRulesFile(component, ctx.allComponents, 'gemini')) return [];
+  const scope = component.manifest.scope ?? 'project';
+  const sorted = selectRules(ctx.allComponents, 'gemini', scope);
+  const content = composeRulesBody(sorted);
+  // Project scope: GEMINI.md at repo root. User scope: ~/.gemini/GEMINI.md
+  // (path here is relative to dist/gemini/; the user-scope path is the
+  // installer's responsibility to relocate).
+  const filename = scope === 'user' ? '.gemini/GEMINI.md' : 'GEMINI.md';
+  return [{ path: filename, content }];
 }
