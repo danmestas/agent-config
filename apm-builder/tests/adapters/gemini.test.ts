@@ -77,4 +77,9 @@ describe('gemini adapter', () => {
       runGolden(geminiAdapter, path.join(HERE, 'gemini/hook-bad-stdout')),
     ).rejects.toThrow(/JSON-on-stdout/);
   });
+
+  it('emits an mcp component as .gemini/settings fragment with mcpServers', async () => {
+    const result = await runGolden(geminiAdapter, path.join(HERE, 'gemini/mcp-basic'));
+    expect(result.diff).toEqual([]);
+  });
 });

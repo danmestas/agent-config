@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "my-mcp": {
+      "command": "node",
+      "args": [
+        "server.js"
+      ],
+      "env": {
+        "LOG_LEVEL": "debug"
+      }
+    }
+  }
+}

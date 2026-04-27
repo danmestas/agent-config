@@ -46,7 +46,8 @@ export const geminiAdapter: Adapter = {
         return emitRules(component, ctx);
       case 'hook':
         return emitHook(component);
-      // Task 5 adds: mcp.
+      case 'mcp':
+        return emitMcp(component);
       // agent and plugin are schema-rejected by validate.ts (compatibility matrix).
       default:
         throw new Error(
@@ -155,4 +156,24 @@ async function emitHook(component: ComponentSource): Promise<EmittedFile[]> {
     content: `${JSON.stringify(fragment, null, 2)}\n`,
   });
   return files;
+}
+
+function emitMcp(component: ComponentSource): EmittedFile[] {
+  const { manifest } = component;
+  if (!manifest.mcp) return [];
+  const fragment = {
+    mcpServers: {
+      [manifest.name]: {
+        command: manifest.mcp.command,
+        ...(manifest.mcp.args ? { args: manifest.mcp.args } : {}),
+        ...(manifest.mcp.env ? { env: manifest.mcp.env } : {}),
+      },
+    },
+  };
+  return [
+    {
+      path: '.gemini/settings.fragment.json',
+      content: `${JSON.stringify(fragment, null, 2)}\n`,
+    },
+  ];
 }
