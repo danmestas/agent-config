@@ -2,10 +2,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
 import {
-  composeRulesSections,
-  filterRulesForTarget,
-  isPrimaryRuleForScope,
-  topoSortRules,
+  composeRulesBody,
+  isOwnerOfRulesFile,
+  selectRules,
 } from '../lib/rules.ts';
 import type {
   Adapter,
@@ -126,11 +125,10 @@ function emitPlugin(component: ComponentSource, ctx: AdapterContext): EmittedFil
 
 function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
   const scope = component.manifest.scope ?? 'project';
-  const scoped = filterRulesForTarget(ctx.allComponents, 'apm', scope);
-  const sorted = topoSortRules(scoped);
-  if (!isPrimaryRuleForScope(component, sorted)) return [];
+  if (!isOwnerOfRulesFile(component, ctx.allComponents, 'apm')) return [];
+  const sorted = selectRules(ctx.allComponents, 'apm', scope);
 
-  const content = composeRulesSections(sorted);
+  const content = composeRulesBody(sorted);
   const dir = scope === 'user' ? 'rules-bundle-user' : 'rules-bundle';
   const description =
     scope === 'user'
