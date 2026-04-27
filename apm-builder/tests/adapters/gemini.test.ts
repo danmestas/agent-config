@@ -82,4 +82,42 @@ describe('gemini adapter', () => {
     const result = await runGolden(geminiAdapter, path.join(HERE, 'gemini/mcp-basic'));
     expect(result.diff).toEqual([]);
   });
+
+  it('throws a clear error when emitting an agent (validator should have caught it)', async () => {
+    const fake: ComponentSource = {
+      dir: '/tmp/fake',
+      relativeDir: 'agents/fake',
+      body: 'body',
+      manifest: {
+        name: 'fake',
+        version: '1.0.0',
+        description: 'd',
+        type: 'agent',
+        targets: ['gemini'],
+        agent: { tools: ['Read'] },
+      } as ComponentSource['manifest'],
+    };
+    await expect(
+      geminiAdapter.emit(fake, { config: {}, allComponents: [fake], repoRoot: '/tmp/fake' }),
+    ).rejects.toThrow(/not supported on Gemini/);
+  });
+
+  it('throws a clear error when emitting a plugin', async () => {
+    const fake: ComponentSource = {
+      dir: '/tmp/fake',
+      relativeDir: 'plugins/fake',
+      body: 'body',
+      manifest: {
+        name: 'fake',
+        version: '1.0.0',
+        description: 'd',
+        type: 'plugin',
+        targets: ['gemini'],
+        includes: [],
+      } as ComponentSource['manifest'],
+    };
+    await expect(
+      geminiAdapter.emit(fake, { config: {}, allComponents: [fake], repoRoot: '/tmp/fake' }),
+    ).rejects.toThrow(/not supported on Gemini/);
+  });
 });
