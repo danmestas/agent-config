@@ -7,7 +7,7 @@ import { discoverComponents } from './lib/discover.ts';
 import { validateComponents } from './lib/validate.ts';
 import { runBuild } from './lib/build.ts';
 import { matchesGlob } from './lib/glob.ts';
-import { renderReadme } from './lib/docs.ts';
+import { updateReadme } from './lib/docs.ts';
 import { TARGETS, type Target } from './lib/types.ts';
 import { listImplementedTargets } from './adapters/index.ts';
 
@@ -117,12 +117,14 @@ const watchCmd = defineCommand({
 });
 
 const docsCmd = defineCommand({
-  meta: { name: 'docs', description: 'Regenerate top-level README.md' },
+  meta: { name: 'docs', description: 'Regenerate the components table in README.md (preserves hand-written sections)' },
   async run() {
     const repoRoot = process.cwd();
+    const readmePath = path.join(repoRoot, 'README.md');
     const components = await discoverComponents(repoRoot);
-    const md = renderReadme(components);
-    await fs.writeFile(`${repoRoot}/README.md`, md);
+    const existing = await fs.readFile(readmePath, 'utf8').catch(() => null);
+    const md = updateReadme(existing, components);
+    await fs.writeFile(readmePath, md);
     console.log(pc.green(`wrote README.md (${components.length} components).`));
   },
 });
