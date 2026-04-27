@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import path from 'node:path';
 import { defineCommand, runMain } from 'citty';
 import pc from 'picocolors';
 import chokidar from 'chokidar';
@@ -125,9 +126,52 @@ const docsCmd = defineCommand({
   },
 });
 
+const initCmd = defineCommand({
+  meta: { name: 'init', description: 'Scaffold a new component' },
+  args: {
+    name: { type: 'positional', required: true, description: 'Component name (kebab-case)' },
+    type: { type: 'string', default: 'skill', description: 'skill | plugin | hook | agent | rules | mcp' },
+  },
+  async run({ args }) {
+    const validTypes = ['skill', 'plugin', 'hook', 'agent', 'rules', 'mcp'];
+    if (!validTypes.includes(args.type)) {
+      console.log(pc.red(`unknown type: ${args.type}. Valid: ${validTypes.join(', ')}`));
+      process.exit(1);
+    }
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(args.name)) {
+      console.log(pc.red(`name must be kebab-case lowercase: ${args.name}`));
+      process.exit(1);
+    }
+    const topDir = args.type === 'rules' ? 'rules' : args.type === 'plugin' ? 'plugins' : 'skills';
+    const dir = path.join(process.cwd(), topDir, args.name);
+    await fs.mkdir(dir, { recursive: true });
+    const skillPath = path.join(dir, 'SKILL.md');
+    const exists = await fs.stat(skillPath).then(() => true).catch(() => false);
+    if (exists) {
+      console.log(pc.red(`already exists: ${skillPath}`));
+      process.exit(1);
+    }
+    const body = `---
+name: ${args.name}
+version: 0.1.0
+description: Use when [describe triggering conditions in one sentence]
+type: ${args.type}
+targets:
+  - claude-code
+---
+
+# ${args.name}
+
+Describe what this ${args.type} does and how to use it.
+`;
+    await fs.writeFile(skillPath, body);
+    console.log(pc.green(`created ${path.relative(process.cwd(), skillPath)}`));
+  },
+});
+
 const main = defineCommand({
   meta: { name: 'apm-builder', description: 'Multi-harness skills build tool' },
-  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd, docs: docsCmd },
+  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd, docs: docsCmd, init: initCmd },
 });
 
 runMain(main);
