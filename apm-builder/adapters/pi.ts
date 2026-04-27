@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
 import { composeAgentsMd } from '../lib/agents-md.ts';
 
@@ -69,10 +70,162 @@ function emitAgentsMdContribution(
   return [{ path: '.pi/AGENTS.md', content }];
 }
 function emitPluginPackage(
-  _component: ComponentSource,
-  _ctx: AdapterContext,
+  component: ComponentSource,
+  ctx: AdapterContext,
 ): EmittedFile[] {
-  throw new Error('not implemented (Task 6)');
+  const { manifest } = component;
+  const pkgDir = manifest.name; // emitted at dist/pi/<pkgDir>/
+  const keyword = (ctx.config?.package_keyword as string | undefined) ?? 'pi-package';
+
+  // Resolve included skills (we only bundle skills; non-skill includes are
+  // flagged by the validator at Plan 1 Task 5, but we tolerate them here by skipping).
+  const includedSkills: ComponentSource[] = [];
+  for (const inc of manifest.includes ?? []) {
+    const resolvedDir = path.normalize(path.join(component.relativeDir, inc));
+    const targetComponent = ctx.allComponents.find((c) => c.relativeDir === resolvedDir);
+    if (targetComponent && targetComponent.manifest.type === 'skill') {
+      includedSkills.push(targetComponent);
+    }
+  }
+
+  const files: EmittedFile[] = [];
+
+  // package.json
+  const pkgJson: Record<string, unknown> = {
+    name: manifest.name,
+    version: manifest.version,
+    description: manifest.description,
+    main: 'src/index.ts',
+    type: 'module',
+  };
+  if (manifest.author) pkgJson.author = manifest.author;
+  if (manifest.license) pkgJson.license = manifest.license;
+  pkgJson.keywords = ['pi', keyword];
+  pkgJson.peerDependencies = { '@mariozechner/pi-coding-agent': '*' };
+  files.push({
+    path: `${pkgDir}/package.json`,
+    content: `${JSON.stringify(pkgJson, null, 2)}\n`,
+  });
+
+  // src/index.ts (extension entrypoint)
+  files.push({
+    path: `${pkgDir}/src/index.ts`,
+    content: renderExtensionEntrypoint(),
+  });
+
+  // README
+  files.push({
+    path: `${pkgDir}/README.md`,
+    content: renderPackageReadme(manifest.name, manifest.description, includedSkills),
+  });
+
+  // Each included skill: re-emit at <pkg>/skills/<skill>/SKILL.md with stripped frontmatter
+  for (const sk of includedSkills) {
+    const fm = ['---', `name: ${sk.manifest.name}`, `description: ${sk.manifest.description}`, '---'].join('\n');
+    files.push({
+      path: `${pkgDir}/skills/${sk.manifest.name}/SKILL.md`,
+      content: `${fm}\n\n${sk.body.trimStart()}`,
+    });
+  }
+
+  return files;
+}
+
+function renderExtensionEntrypoint(): string {
+  return `import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { readFileSync, readdirSync, existsSync } from "fs";
+import { join, resolve } from "path";
+
+interface SkillMeta {
+  name: string;
+  description: string;
+  content: string;
+}
+
+function loadSkills(skillsDir: string): SkillMeta[] {
+  if (!existsSync(skillsDir)) return [];
+  const skills: SkillMeta[] = [];
+  for (const dir of readdirSync(skillsDir, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+    const skillFile = join(skillsDir, dir.name, "SKILL.md");
+    if (!existsSync(skillFile)) continue;
+    const raw = readFileSync(skillFile, "utf-8");
+    const match = raw.match(/^---\\n([\\s\\S]*?)\\n---\\n([\\s\\S]*)$/);
+    if (!match) continue;
+    const frontmatter = match[1];
+    const content = match[2].trim();
+    const name = frontmatter.match(/name:\\s*(.+)/)?.[1]?.trim() || dir.name;
+    const description = frontmatter.match(/description:\\s*(.+)/)?.[1]?.trim() || "";
+    skills.push({ name, description, content });
+  }
+  return skills;
+}
+
+export default function plugin(pi: ExtensionAPI) {
+  const extensionRoot = resolve(__dirname, "..");
+  const skillsDir = join(extensionRoot, "skills");
+  const skills = loadSkills(skillsDir);
+
+  pi.registerCommand("skill", {
+    description: "Invoke a bundled skill by name",
+    getArgumentCompletions: (prefix) =>
+      skills
+        .filter((s) => s.name.startsWith(prefix))
+        .map((s) => ({ value: s.name, label: \`\${s.name} — \${s.description}\` })),
+    handler: async (args, ctx) => {
+      const skillName = args.trim();
+      const skill = skills.find((s) => s.name === skillName);
+      if (!skill) {
+        ctx.ui.notify(\`Skill not found: \${skillName}\`, "error");
+        return;
+      }
+      pi.sendUserMessage(\`Using skill: \${skill.name}\\n\\n\${skill.content}\`, { deliverAs: "steer" });
+    },
+  });
+
+  pi.registerCommand("skills", {
+    description: "List bundled skills",
+    handler: async (_args, ctx) => {
+      const list = skills.map((s) => \`  \${s.name} — \${s.description}\`).join("\\n");
+      ctx.ui.notify(\`Available skills:\\n\${list}\`, "info");
+    },
+  });
+}
+`;
+}
+
+function renderPackageReadme(
+  name: string,
+  description: string,
+  skills: ComponentSource[],
+): string {
+  const rows = skills.map(
+    (s) => `| ${s.manifest.name} | ${s.manifest.description} |`,
+  );
+  return `# ${name}
+
+${description}
+
+## Install
+
+\`\`\`bash
+pi install <git-url>
+\`\`\`
+
+Or add to \`.pi/settings.json\`:
+
+\`\`\`json
+{
+  "extensions": ["<absolute-path>/src/index.ts"]
+}
+\`\`\`
+
+## Skills
+
+| Name | Description |
+|------|-------------|
+${rows.join('\n')}
+`;
 }
 function emitHookExtension(_component: ComponentSource): EmittedFile[] {
   throw new Error('not implemented (Task 7)');

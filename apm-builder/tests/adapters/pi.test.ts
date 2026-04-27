@@ -48,6 +48,51 @@ describe('pi adapter', () => {
     expect(result.matched).toBe(true);
   });
 
+  it('emits a Pi-package directory for plugin components', async () => {
+    const root = path.join(HERE, 'pi/plugin-package');
+    const plugin = await loadComponent(path.join(root, 'component'), root);
+    const skill = await loadComponent(path.join(root, 'sibling-skill'), root);
+    const all = [plugin, skill];
+
+    const emitted = await piAdapter.emit(plugin, {
+      config: { package_keyword: 'pi-package' },
+      allComponents: all,
+      repoRoot: root,
+    });
+    const byPath = new Map(emitted.map((f) => [f.path, f.content.toString()]));
+
+    // package.json
+    const pkg = JSON.parse(byPath.get('superpowers-philosophy/package.json')!);
+    expect(pkg.name).toBe('superpowers-philosophy');
+    expect(pkg.keywords).toEqual(['pi', 'pi-package']);
+    expect(pkg.main).toBe('src/index.ts');
+    expect(pkg.peerDependencies['@mariozechner/pi-coding-agent']).toBe('*');
+
+    // src/index.ts uses ExtensionAPI
+    const idx = byPath.get('superpowers-philosophy/src/index.ts');
+    expect(idx).toContain('@mariozechner/pi-coding-agent');
+    expect(idx).toContain('pi.registerCommand("skill"');
+
+    // included skill copied with stripped frontmatter
+    const skillMd = byPath.get('superpowers-philosophy/skills/ousterhout/SKILL.md');
+    expect(skillMd).toMatch(/^---\nname: ousterhout\ndescription: /);
+    expect(skillMd).toContain('# Ousterhout');
+
+    // README
+    const readme = byPath.get('superpowers-philosophy/README.md');
+    expect(readme).toContain('| ousterhout |');
+  });
+
+  it('plugin package.json matches pi-powers shape', async () => {
+    const snapshotPkg = JSON.parse(
+      await fs.readFile(path.join(HERE, 'pi/_pi-powers-snapshot/package.json'), 'utf8'),
+    );
+    for (const key of ['name', 'version', 'description', 'main', 'type', 'keywords', 'peerDependencies']) {
+      expect(snapshotPkg).toHaveProperty(key);
+    }
+    expect(snapshotPkg.keywords).toContain('pi');
+  });
+
   it('composes rules + agents + skills into .pi/AGENTS.md', async () => {
     const root = path.join(HERE, 'pi/agents-md-compose');
     const components = await Promise.all([
