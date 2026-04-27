@@ -1,5 +1,5 @@
 import type { ComponentSource, Target } from './types.ts';
-import { topoSortRules, filterRulesForTarget } from './rules.ts';
+import { selectRules } from './rules.ts';
 
 export type AgentsMdSection = 'rules' | 'agents' | 'skills';
 export const DEFAULT_SECTION_ORDER: AgentsMdSection[] = ['rules', 'agents', 'skills'];
@@ -31,8 +31,8 @@ export function composeAgentsMd(opts: ComposeOptions): string {
   const { target, components, sectionOrder } = opts;
   const sections = new Map<AgentsMdSection, ComponentSource[]>();
 
-  // Rules: topo-sorted per the shared helper.
-  const rules = topoSortRules(filterRulesForTarget(components, target, 'project'));
+  // Rules: filtered + topo-sorted per the shared helper.
+  const rules = selectRules(components, target, 'project');
   sections.set('rules', rules);
 
   // Agents and skills: alphabetical by name, filtered to ones targeting this harness.
