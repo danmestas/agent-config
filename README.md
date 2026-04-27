@@ -75,6 +75,7 @@ Adapters emit native artifacts for each harness when a skill declares it in `tar
 - [`apm-builder`](skills/apm-builder) — This repo's build tool itself. Validate, build, watch, scaffold, regenerate docs, run `evolve`.
 - [`cloudflare-email`](skills/cloudflare-email) — Send outbound email from Cloudflare-hosted domains via REST API or Workers binding.
 - [`pikchr-generator`](skills/pikchr-generator) — Generate, theme, and render technical diagrams across four engines (Pikchr, GraphViz, D2, Mermaid) with a shared 16-theme palette.
+- [`career-interview`](skills/career-interview) — Conducts deep conversational career interviews to build structured profiles for technical professionals. Triggers on "interview me", "build my career profile", "/career-interview".
 
 ### Workflow
 
@@ -193,6 +194,7 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 |------|------|---------|-------------|---------|
 | apm-builder | skill | 0.1.0 | Use when building, validating, or scaffolding skills in this monorepo. Triggers: "validate skills", "build apm-builder", "scaffold a new skill", "init a hook/agent/rules/plugin", "run apm-builder", or any work on the multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini, Copilot CLI, Pi targets).
  | claude-code |
+| career-interview | skill | 0.1.0 | This skill should be used when the user asks to "interview me", "build my career profile", "let's work on my resume background", "career interview", "start a career session", "update my profile", "let's talk about my experience", or invokes /career-interview. Conducts deep conversational interviews to build structured career profiles for technical professionals. | claude-code |
 | datastar | skill | 0.1.0 | Use when building web applications with Datastar — the hypermedia framework that drives frontend reactivity from the backend using HTML data-* attributes and Server-Sent Events. Triggers on Datastar, data-star, SSE-driven UI, hypermedia framework, backend-driven frontend, data-signals, data-on, PatchElements, or any Go/Python web app using Datastar SDKs. | claude-code |
 | datastar-patterns | skill | 0.1.0 | Use when implementing UI patterns with Datastar — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling, lazy loading, progress indicators, or keyboard shortcuts. Triggers on data-* attributes, @get/@post/@put/@patch helpers, SSE response formatting, or any "how do I do X in Datastar" implementation question. | claude-code |
 | defuddle | skill | 0.1.0 | Strip clutter from web pages before ingesting into the wiki. Removes ads, navigation, headers, footers, and boilerplate: leaving clean readable markdown that saves 40-60% tokens. Triggers on: defuddle, clean this page, strip this url, fetch and clean, clean web content before ingesting, strip ads, remove clutter, clean URL content, readable markdown from URL. | claude-code |
