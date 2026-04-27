@@ -56,4 +56,22 @@ describe('copilot adapter', () => {
     // Idempotency: emitted exactly once.
     expect(flat.filter((f) => f.path === 'copilot-instructions.md').length).toBe(1);
   });
+
+  it('emits rules first, then skills, in a single copilot-instructions.md', async () => {
+    const root = path.join(HERE, 'copilot/rules-and-skills');
+    const style = await loadComponent(path.join(root, 'rules/style'), root);
+    const foo = await loadComponent(path.join(root, 'skills/foo'), root);
+    const all = [style, foo];
+    const results = await Promise.all(
+      all.map((c) =>
+        copilotAdapter.emit(c, { config: {}, allComponents: all, repoRoot: root }),
+      ),
+    );
+    const flat = results.flat();
+    const file = flat.find((f) => f.path === 'copilot-instructions.md');
+    const expected = await fs.readFile(path.join(root, 'expected/copilot-instructions.md'), 'utf8');
+    expect(file?.content.toString()).toBe(expected);
+    // Owner is the rule (alphabetically-first rule beats alphabetically-first skill).
+    expect(flat.filter((f) => f.path === 'copilot-instructions.md').length).toBe(1);
+  });
 });
