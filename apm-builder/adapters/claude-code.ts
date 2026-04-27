@@ -11,7 +11,9 @@ export const claudeCodeAdapter: Adapter = {
     switch (component.manifest.type) {
       case 'skill':
         return emitSkill(component);
-      // Other types added in Tasks 9-13.
+      case 'agent':
+        return emitAgent(component);
+      // Other types added in Tasks 10-13.
       default:
         throw new Error(`claude-code adapter: type "${component.manifest.type}" not yet implemented`);
     }
@@ -25,6 +27,21 @@ function emitSkill(component: ComponentSource): EmittedFile[] {
     {
       path: `skills/${manifest.name}/SKILL.md`,
       content: `${frontmatter}\n\n${body.trimStart()}`,
+    },
+  ];
+}
+
+function emitAgent(component: ComponentSource): EmittedFile[] {
+  const { manifest, body } = component;
+  const lines = ['---', `name: ${manifest.name}`, `description: ${manifest.description}`];
+  if (manifest.agent?.tools) lines.push(`tools: [${manifest.agent.tools.join(', ')}]`);
+  if (manifest.agent?.model) lines.push(`model: ${manifest.agent.model}`);
+  if (manifest.agent?.color) lines.push(`color: ${manifest.agent.color}`);
+  lines.push('---');
+  return [
+    {
+      path: `agents/${manifest.name}.md`,
+      content: `${lines.join('\n')}\n\n${body.trimStart()}`,
     },
   ];
 }
