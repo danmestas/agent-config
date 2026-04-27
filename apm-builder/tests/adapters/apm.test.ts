@@ -61,6 +61,30 @@ describe('apm adapter', () => {
     expect(result.diff).toEqual([]);
   });
 
+  it('emits a plugin as a hybrid package with apm.yml + plugin.json', async () => {
+    const root = path.join(HERE, 'apm/plugin-basic');
+    const plugin = await loadComponent(path.join(root, 'component'), root);
+    const skill = await loadComponent(path.join(root, 'sibling-skill'), root);
+    const ctx: AdapterContext = {
+      config: SCOPED_CONFIG,
+      allComponents: [plugin, skill],
+      repoRoot: root,
+    };
+    const emitted = await apmAdapter.emit(plugin, ctx);
+    const apmYml = emitted.find((f) => f.path === 'superpowers-philosophy/apm.yml');
+    const pluginJson = emitted.find((f) => f.path === 'superpowers-philosophy/plugin.json');
+    const expectedYml = await fs.readFile(
+      path.join(root, 'expected/superpowers-philosophy/apm.yml'),
+      'utf8',
+    );
+    const expectedJson = await fs.readFile(
+      path.join(root, 'expected/superpowers-philosophy/plugin.json'),
+      'utf8',
+    );
+    expect(apmYml?.content.toString()).toBe(expectedYml);
+    expect(pluginJson?.content.toString()).toBe(expectedJson);
+  });
+
   it('composes project-scope rules into a single memory/constitution.md package', async () => {
     const root = path.join(HERE, 'apm/rules-compose');
     const baseStyle = await loadComponent(path.join(root, 'component'), root);

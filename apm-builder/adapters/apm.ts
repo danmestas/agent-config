@@ -84,11 +84,45 @@ export const apmAdapter: Adapter = {
         return emitMcp(component, ctx);
       case 'rules':
         return emitRules(component, ctx);
+      case 'plugin':
+        return emitPlugin(component, ctx);
       default:
         throw new Error(`apm adapter: type "${component.manifest.type}" not yet implemented`);
     }
   },
 };
+
+function emitPlugin(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  const dir = packageDir(component);
+  const includedSkillNames: string[] = [];
+  for (const inc of component.manifest.includes ?? []) {
+    const resolvedDir = path.normalize(path.join(component.relativeDir, inc));
+    const target = ctx.allComponents.find((c) => c.relativeDir === resolvedDir);
+    if (target && target.manifest.type === 'skill') {
+      includedSkillNames.push(target.manifest.name);
+    }
+  }
+
+  const manifest: Record<string, unknown> = {
+    name: scopedName(component, ctx),
+    version: component.manifest.version,
+    description: component.manifest.description,
+    type: 'hybrid',
+    includes: 'auto',
+  };
+
+  const pluginJson = {
+    name: component.manifest.name,
+    version: component.manifest.version,
+    description: component.manifest.description,
+    skills: includedSkillNames,
+  };
+
+  return [
+    { path: `${dir}/apm.yml`, content: renderManifest(manifest) },
+    { path: `${dir}/plugin.json`, content: `${JSON.stringify(pluginJson, null, 2)}\n` },
+  ];
+}
 
 function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
   const scope = component.manifest.scope ?? 'project';
