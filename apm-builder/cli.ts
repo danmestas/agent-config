@@ -76,7 +76,7 @@ const watchCmd = defineCommand({
     const target = args.target as Target;
     const watcher = chokidar.watch(['skills/**/SKILL.md', 'plugins/**/SKILL.md', 'rules/**/SKILL.md', 'apm-builder.config.yaml'], {
       cwd: repoRoot,
-      ignoreInitial: false,
+      ignoreInitial: true,
     });
     let inProgress = false;
     let queued = false;
@@ -101,6 +101,13 @@ const watchCmd = defineCommand({
           await rebuild();
         }
       }
+    }
+    const initial = await runBuild({ repoRoot, targets: [target], outDir: args.out });
+    const initTs = new Date().toISOString();
+    if (initial.errors.some((e) => e.severity === 'error')) {
+      console.log(pc.red(`[${initTs}] initial build failed (${initial.errors.length} issues)`));
+    } else {
+      console.log(pc.green(`[${initTs}] initial build: ${initial.written.length} file(s) emitted`));
     }
     watcher.on('all', () => void rebuild());
     console.log(pc.cyan(`watching for changes; building target=${target}`));
