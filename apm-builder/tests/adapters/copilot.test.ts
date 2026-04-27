@@ -74,4 +74,21 @@ describe('copilot adapter', () => {
     // Owner is the rule (alphabetically-first rule beats alphabetically-first skill).
     expect(flat.filter((f) => f.path === 'copilot-instructions.md').length).toBe(1);
   });
+
+  it('emits one JSON file per hook event under .github/hooks/', async () => {
+    const root = path.join(HERE, 'copilot/hook-basic');
+    const hook = await loadComponent(path.join(root, 'component'), root);
+    const emitted = await copilotAdapter.emit(hook, {
+      config: {},
+      allComponents: [hook],
+      repoRoot: root,
+    });
+    const file = emitted.find((f) => f.path === '.github/hooks/Stop-tts-announcer.json');
+    expect(file).toBeDefined();
+    const expected = await fs.readFile(
+      path.join(root, 'expected/.github/hooks/Stop-tts-announcer.json'),
+      'utf8',
+    );
+    expect(file!.content.toString()).toBe(expected);
+  });
 });

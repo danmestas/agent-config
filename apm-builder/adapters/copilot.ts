@@ -13,7 +13,8 @@ export const copilotAdapter: Adapter = {
       case 'rules':
       case 'skill':
         return emitInstructions(component, ctx);
-      // hook implementation lands in Task 6.
+      case 'hook':
+        return emitHook(component, ctx);
       default:
         throw new Error(
           `copilot adapter: type "${component.manifest.type}" not yet implemented`,
@@ -53,4 +54,27 @@ function emitInstructions(component: ComponentSource, ctx: AdapterContext): Emit
   if (sections.length === 0) return [];
   const content = sections.join('\n');
   return [{ path: 'copilot-instructions.md', content }];
+}
+
+function emitHook(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  const { manifest } = component;
+  if (!manifest.hooks) return [];
+  const hooksDir =
+    typeof ctx.config['hooks_dir'] === 'string'
+      ? (ctx.config['hooks_dir'] as string)
+      : '.github/hooks';
+  const files: EmittedFile[] = [];
+  for (const [event, def] of Object.entries(manifest.hooks)) {
+    const payload = {
+      event,
+      matcher: def.matcher ?? '*',
+      command: def.command,
+      type: 'command',
+    };
+    files.push({
+      path: `${hooksDir}/${event}-${manifest.name}.json`,
+      content: `${JSON.stringify(payload, null, 2)}\n`,
+    });
+  }
+  return files;
 }

@@ -1,0 +1,6 @@
+{
+  "event": "Stop",
+  "matcher": "*",
+  "command": "hooks/announce.sh",
+  "type": "command"
+}
