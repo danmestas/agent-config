@@ -1,0 +1,22 @@
+{
+  "name": "knowledge-base",
+  "version": "0.1.0",
+  "description": "Persistent, compounding knowledge base for Claude Code. Drop sources into a vault, let an autoresearch agent synthesize a living wiki, query across sessions, and keep the structure healthy. Use when the user wants persistent notes, a knowledge graph, vault management, or mentions Obsidian, \"second brain\", or \"persistent memory\".\n",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-skills/tree/main/plugins/knowledge-base",
+  "release": "https://github.com/danmestas/agent-skills/releases/tag/knowledge-base@v0.1.0",
+  "categories": [],
+  "includes": [
+    "knowledge-base-overview",
+    "vault-overview",
+    "vault-ingest",
+    "vault-query",
+    "vault-lint",
+    "vault-save",
+    "autoresearch",
+    "defuddle",
+    "obsidian-canvas",
+    "obsidian-bases",
+    "obsidian-markdown"
+  ]
+}

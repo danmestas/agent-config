@@ -11,6 +11,7 @@ import { renderReleaseNotes } from './notes.ts';
 import { publishClaudeCode } from './publish/claude-code.ts';
 import { publishAPM } from './publish/apm.ts';
 import { publishGitUrl } from './publish/git-url.ts';
+import { renderMarketplaceEntry, marketplaceFilePath } from './marketplace.ts';
 import type { Target } from '../types.ts';
 
 export interface ReleaseOptions {
@@ -64,14 +65,27 @@ export async function runRelease(opts: ReleaseOptions): Promise<ReleaseResult> {
     throw new Error(`validation failed: ${fatal.map((e) => e.message).join('; ')}`);
   }
   const config = await loadRepoConfig(opts.repoRoot);
+  // Build the full repo (no filter) so plugin.includes references resolve
+  // through the validator. Passing `filter: opts.skill` would only validate
+  // the released component, breaking includes resolution for plugin types.
   const buildResult = await runBuild({
     repoRoot: opts.repoRoot,
     targets: target.manifest.targets,
     outDir: 'dist',
-    filter: opts.skill,
   });
   if (buildResult.errors.some((e) => e.severity === 'error')) {
     throw new Error(`build failed: ${buildResult.errors.map((e) => e.message).join('; ')}`);
+  }
+  // Generate marketplace listing for plugin components going to Claude Code.
+  // Done before tagging so the listing change is included in the release commit.
+  if (
+    target.manifest.type === 'plugin' &&
+    target.manifest.targets.includes('claude-code')
+  ) {
+    const entry = renderMarketplaceEntry(target, { gitRepo: opts.gitRepo });
+    const dest = path.join(opts.repoRoot, marketplaceFilePath(target.manifest.name));
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    await fs.writeFile(dest, entry, 'utf8');
   }
   const tag = await tagRelease({
     repoRoot: opts.repoRoot,
@@ -92,12 +106,16 @@ export async function runRelease(opts: ReleaseOptions): Promise<ReleaseResult> {
     gitUrlTargets: [],
   };
   if (target.manifest.targets.includes('claude-code')) {
+    // Plugin releases ship the whole dist/claude-code/ tree (manifest at root +
+    // included skills); skill releases ship only their per-skill subdir.
+    const distSubpath = target.manifest.type === 'plugin' ? '.' : path.join('skills', opts.skill);
     await publishClaudeCode({
       repoRoot: opts.repoRoot,
       tag,
       skill: opts.skill,
       version: opts.version,
       releaseNotes,
+      distSubpath,
       runGh: opts.runGh,
     });
     published.claudeCode = true;

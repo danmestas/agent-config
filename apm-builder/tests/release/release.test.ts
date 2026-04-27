@@ -108,4 +108,43 @@ describe('runRelease', () => {
     const tags = await g.tags();
     expect(tags.all).toHaveLength(0);
   });
+
+  it('generates a marketplace entry for plugin components', async () => {
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'rel-mkt-'));
+    const remote = await fs.mkdtemp(path.join(os.tmpdir(), 'rel-mkt-remote-'));
+    await simpleGit(remote).init(['--bare']);
+    const g = simpleGit(repo);
+    await g.init();
+    await g.addConfig('user.email', 't@e.com');
+    await g.addConfig('user.name', 't');
+    await fs.mkdir(path.join(repo, 'skills/foo'), { recursive: true });
+    await fs.writeFile(
+      path.join(repo, 'skills/foo/SKILL.md'),
+      '---\nname: foo\nversion: 0.1.0\ndescription: f\ntype: skill\ntargets: [claude-code]\n---\n\nbody\n',
+    );
+    await fs.mkdir(path.join(repo, 'plugins/bundle'), { recursive: true });
+    await fs.writeFile(
+      path.join(repo, 'plugins/bundle/SKILL.md'),
+      '---\nname: bundle\nversion: 0.2.0\ndescription: b\ntype: plugin\ntargets: [claude-code]\nincludes: [../../skills/foo]\n---\n\nbody\n',
+    );
+    await fs.writeFile(path.join(repo, 'apm-builder.config.yaml'), 'apm: {}\n');
+    await g.add('.').commit('init');
+    await g.addRemote('origin', remote);
+    await g.push('origin', 'HEAD:main');
+    await runRelease({
+      repoRoot: repo,
+      skill: 'bundle',
+      version: '0.2.0',
+      summary: 'plugin first release',
+      apmToken: undefined,
+      gitRepo: 'github.com/test/repo',
+      runGh: async () => ({ stdout: '', exitCode: 0 }),
+      runApm: async () => ({ stdout: '', exitCode: 0 }),
+    });
+    const json = JSON.parse(
+      await fs.readFile(path.join(repo, 'marketplace/plugins/bundle.json'), 'utf8'),
+    );
+    expect(json.name).toBe('bundle');
+    expect(json.version).toBe('0.2.0');
+  });
 });

@@ -10,6 +10,12 @@ export interface ClaudeCodeReleaseOptions {
   version: string;
   releaseNotes: string;
   /**
+   * Subpath under dist/claude-code/ to zip into the release asset. Defaults to
+   * `skills/<skill>` (for skill-type components). Plugin-type releases pass
+   * an alternate path (e.g. `.` to ship the entire plugin output).
+   */
+  distSubpath?: string;
+  /**
    * Override for tests. Defaults to spawning real `gh`. Tests MUST inject a
    * stub — the real binary creates a public GitHub release.
    */
@@ -17,8 +23,13 @@ export interface ClaudeCodeReleaseOptions {
 }
 
 /**
- * Zip dist/claude-code/skills/<name>/ into release-artifacts/<name>-v<version>.zip
- * and call `gh release create <tag> <zip> --title ... --notes-file ...`.
+ * Zip `dist/claude-code/<distSubpath>/` into
+ * `release-artifacts/<skill>-v<version>.zip` and call
+ * `gh release create <tag> <zip> --title ... --notes-file ...`.
+ *
+ * Default subpath is `skills/<skill>`. Plugin releases override this with
+ * `.` (whole dist/claude-code) so the bundle's `.claude-plugin/plugin.json`
+ * + included skills ship together.
  *
  * The `runGh` injection point exists because we can't safely run `gh release
  * create` from tests — it would publish a real release. Production callers
@@ -27,14 +38,15 @@ export interface ClaudeCodeReleaseOptions {
 export async function publishClaudeCode(
   opts: ClaudeCodeReleaseOptions,
 ): Promise<{ zipPath: string }> {
-  const skillDir = path.join(opts.repoRoot, 'dist/claude-code/skills', opts.skill);
+  const subpath = opts.distSubpath ?? path.join('skills', opts.skill);
+  const srcDir = path.join(opts.repoRoot, 'dist/claude-code', subpath);
   const exists = await fs
-    .stat(skillDir)
+    .stat(srcDir)
     .then((s) => s.isDirectory())
     .catch(() => false);
   if (!exists) {
     throw new Error(
-      `expected build output at dist/claude-code/skills/${opts.skill} but it is missing`,
+      `expected build output at dist/claude-code/${subpath} but it is missing`,
     );
   }
   const zipPath = path.join(
@@ -42,7 +54,7 @@ export async function publishClaudeCode(
     'release-artifacts',
     `${opts.skill}-v${opts.version}.zip`,
   );
-  await zipDirectory(skillDir, zipPath);
+  await zipDirectory(srcDir, zipPath);
   const notesPath = path.join(
     opts.repoRoot,
     'release-artifacts',
