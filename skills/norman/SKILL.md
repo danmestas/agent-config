@@ -1,6 +1,20 @@
 ---
 name: norman
-description: Use when designing, reviewing, or auditing user interfaces and frontend interactions. Use when evaluating UI usability, accessibility, or interaction patterns. Triggers on requests involving button placement, form design, navigation, error messages, onboarding flows, modal dialogs, or when asked to review a UI for usability.
+version: 0.1.0
+description: >-
+  Use when designing, reviewing, or auditing user interfaces and frontend
+  interactions. Use when evaluating UI usability, accessibility, or interaction
+  patterns. Triggers on requests involving button placement, form design,
+  navigation, error messages, onboarding flows, modal dialogs, or when asked to
+  review a UI for usability.
+type: skill
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
 category:
   primary: backpressure
 ---

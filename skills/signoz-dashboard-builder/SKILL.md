@@ -1,6 +1,16 @@
 ---
 name: signoz-dashboard-builder
-description: Use when creating or updating SigNoz dashboards via the MCP API. Triggers on requests to build dashboards, add panels, visualize metrics/logs/traces in SigNoz, or debug dashboard queries that show "No Data" or "Something went wrong". Also use when working with Claude Code telemetry in SigNoz.
+version: 0.1.0
+description: >-
+  Use when creating or updating SigNoz dashboards via the MCP API. Triggers on
+  requests to build dashboards, add panels, visualize metrics/logs/traces in
+  SigNoz, or debug dashboard queries that show "No Data" or "Something went
+  wrong". Also use when working with Claude Code telemetry in SigNoz.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: integrations
 ---
 
 # SigNoz Dashboard Builder

@@ -1,6 +1,19 @@
 ---
 name: idiomatic-go
-description: Use when writing, reviewing, or refactoring Go code. Triggers on .go files, go.mod presence, or any task involving Go programming. Also use when reviewing Go code for idiomaticity, error handling, concurrency patterns, or interface design.
+version: 0.1.0
+description: >-
+  Use when writing, reviewing, or refactoring Go code. Triggers on .go files,
+  go.mod presence, or any task involving Go programming. Also use when reviewing
+  Go code for idiomaticity, error handling, concurrency patterns, or interface
+  design.
+type: skill
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
 category:
   primary: backpressure
 ---

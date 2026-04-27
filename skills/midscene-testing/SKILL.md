@@ -1,6 +1,16 @@
 ---
 name: midscene-testing
-description: Use when performing ad-hoc browser testing, smoke testing workflows, validating UI after frontend changes, or testing Datastar/HTMX/SSE reactive features that unit tests cannot cover. Also use when consolidating Midscene HTML reports into a single navigable document.
+version: 0.1.0
+description: >-
+  Use when performing ad-hoc browser testing, smoke testing workflows,
+  validating UI after frontend changes, or testing Datastar/HTMX/SSE reactive
+  features that unit tests cannot cover. Also use when consolidating Midscene
+  HTML reports into a single navigable document.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: tooling
 ---
 
 # Midscene Ad-Hoc Browser Testing

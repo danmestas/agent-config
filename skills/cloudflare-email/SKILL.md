@@ -1,6 +1,16 @@
 ---
 name: cloudflare-email
-description: Use when sending outbound transactional or one-off emails from a Cloudflare-managed domain without running a mail server or paying for a mailbox provider. Triggers on needs to send email programmatically from a custom domain, send-from-my-domain requests, or replacing SMTP relays. Cloudflare Email Service is REST API + Workers only — no SMTP, so it is NOT compatible with Gmail "Send mail as", Outlook, or any SMTP client.
+version: 0.1.0
+description: >-
+  Use when sending outbound transactional or one-off emails from a
+  Cloudflare-managed domain without running a mail server or paying for a
+  mailbox provider. Triggers on needs to send email programmatically from a
+  custom domain, send-from-my-domain requests, or replacing SMTP relays.
+  Cloudflare Email Service is REST API + Workers only — no SMTP, so it is NOT
+  compatible with Gmail "Send mail as", Outlook, or any SMTP client.
+type: skill
+targets:
+  - claude-code
 category:
   primary: integrations
 ---

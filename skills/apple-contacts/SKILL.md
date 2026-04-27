@@ -1,8 +1,15 @@
 ---
 name: apple-contacts
-description: Search, list, create, update, and delete Apple Contacts via the `contactbook` CLI on macOS. Look up contacts by name, phone, email, or organization. Manage contact groups.
-homepage: https://github.com/RyanLisse/Contactbook
-metadata: {"clawdbot":{"emoji":"📇","os":["darwin"],"requires":{"bins":["contactbook"]},"install":[{"id":"source","kind":"script","script":"cd /tmp && git clone https://github.com/RyanLisse/Contactbook && cd Contactbook && swift build -c release && cp .build/release/contactbook /opt/homebrew/bin/contactbook","label":"Build contactbook from source (requires Swift 6.0+, macOS 13+)"}]}}
+version: 0.1.0
+description: >-
+  Search, list, create, update, and delete Apple Contacts via the `contactbook`
+  CLI on macOS. Look up contacts by name, phone, email, or organization. Manage
+  contact groups.
+type: skill
+targets:
+  - claude-code
+category:
+  primary: integrations
 ---
 
 # Apple Contacts CLI (contactbook)

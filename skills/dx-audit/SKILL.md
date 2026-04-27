@@ -1,6 +1,15 @@
 ---
 name: dx-audit
-description: Use when evaluating developer experience or user experience, assessing usability of a CLI/SDK/API/UI, scoring project ergonomics, identifying friction in workflows, or when asked to audit DX or UX. Triggers on "DX score", "UX audit", "developer experience", "user experience", "workflow friction", "usability audit", "how hard is it to use this".
+version: 0.1.0
+description: >-
+  Use when evaluating developer experience or user experience, assessing
+  usability of a CLI/SDK/API/UI, scoring project ergonomics, identifying
+  friction in workflows, or when asked to audit DX or UX. Triggers on "DX
+  score", "UX audit", "developer experience", "user experience", "workflow
+  friction", "usability audit", "how hard is it to use this".
+type: skill
+targets:
+  - claude-code
 category:
   primary: backpressure
 ---

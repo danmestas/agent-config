@@ -1,8 +1,13 @@
 ---
 name: obsidian-canvas
-description: "Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to Obsidian canvas files with auto-positioning inside zones. Integrates with /banana for image capture. Triggers on: /canvas, canvas new, canvas add image, canvas add text, canvas add pdf, canvas add note, canvas zone, canvas list, canvas from banana, add to canvas, put this on the canvas, open canvas, create canvas."
-allowed-tools: Read Write Edit Glob Grep
 version: 0.1.0
+description: >-
+  Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to
+  Obsidian canvas files with auto-positioning inside zones. Integrates with
+  /banana for image capture. Triggers on: /canvas, canvas new, canvas add image,
+  canvas add text, canvas add pdf, canvas add note, canvas zone, canvas list,
+  canvas from banana, add to canvas, put this on the canvas, open canvas, create
+  canvas.
 type: skill
 targets:
   - claude-code

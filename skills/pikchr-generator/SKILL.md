@@ -1,5 +1,6 @@
 ---
 name: pikchr-generator
+version: 0.2.0
 description: |
   Generate, theme, and render technical diagrams across four engines (Pikchr,
   GraphViz, D2, Mermaid) with a shared 16-theme palette. Use whenever the user
@@ -13,11 +14,6 @@ description: |
   are suited for. Outputs themed SVG (any of 16 themes via --theme NAME).
   Do NOT use for freeform sketches that need curves and pen strokes (use
   excalidraw), real Gantt/pie charts (use a chart library), or rich data viz.
-allowed-tools:
-  - Bash
-  - Read
-  - Write
-version: 0.2.0
 type: skill
 targets:
   - claude-code

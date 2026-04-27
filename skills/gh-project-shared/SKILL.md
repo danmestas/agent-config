@@ -1,6 +1,14 @@
 ---
 name: gh-project-shared
-description: "Shared utilities for GitHub project management. Not directly invoked by agents. Provides: gh CLI validation, authentication checking, config file management (.github/project-config.json), context detection for template suggestions, and error handling with logging."
+version: 0.1.0
+description: >-
+  Shared utilities for GitHub project management. Not directly invoked by
+  agents. Provides: gh CLI validation, authentication checking, config file
+  management (.github/project-config.json), context detection for template
+  suggestions, and error handling with logging.
+type: skill
+targets:
+  - claude-code
 category:
   primary: integrations
 ---
