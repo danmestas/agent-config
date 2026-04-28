@@ -1,0 +1,15 @@
+---
+name: taxes
+version: 1.0.0
+type: persona
+description: Tax preparation / non-code document work
+targets: [claude-code, codex, gemini, copilot]
+categories: [memory-management]
+skill_include: []
+skill_exclude: []
+---
+
+# Taxes Persona
+
+Strips out all engineering skills. Keeps memory primitives only. Optimized for
+document-handling tasks like tax preparation, bookkeeping, and administrative work.
