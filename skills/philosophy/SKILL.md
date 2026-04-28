@@ -1,5 +1,5 @@
 ---
-name: knowledge-base-overview
+name: philosophy
 version: 0.1.0
 description: >-
   Use when building, maintaining, ingesting into, querying, or health-checking a

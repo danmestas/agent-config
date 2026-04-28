@@ -1,5 +1,5 @@
 ---
-name: memorize
+name: capture
 version: 0.1.0
 description: >
   Use when the user types "/memorize", "save this learning", "make this an ADR",
