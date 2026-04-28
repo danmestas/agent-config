@@ -12,7 +12,7 @@ interface HarnessLayout {
 
 const LAYOUTS: Record<Target, HarnessLayout | null> = {
   'claude-code': { skillsDir: '.claude/skills', manifestFile: 'SKILL.md' },
-  apm: null, // APM uses its own per-package layout — handled separately
+  apm: { skillsDir: '.apm/skills', manifestFile: 'SKILL.md' },
   codex: null, // Codex doesn't have user-scope skills (uses AGENTS.md)
   gemini: { skillsDir: '.gemini/skills', manifestFile: 'skill.md' },
   copilot: null, // Copilot inlines into copilot-instructions.md

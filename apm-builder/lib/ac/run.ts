@@ -7,7 +7,7 @@ import { findMode } from '../mode.ts';
 import { resolve, writeResolutionArtifact } from '../resolution.ts';
 import { discoverComponents } from '../discover.ts';
 import type { Target } from '../types.ts';
-import { prelaunchComposeClaudeCode, prelaunchComposeGemini, prelaunchComposePi, prelaunchComposeCodex, prelaunchComposeCopilot } from './prelaunch.ts';
+import { prelaunchComposeClaudeCode, prelaunchComposeGemini, prelaunchComposePi, prelaunchComposeCodex, prelaunchComposeCopilot, prelaunchComposeApm } from './prelaunch.ts';
 
 export interface ParsedAcArgs {
   harness: string;
@@ -181,6 +181,19 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
       modeBody: found?.body,
     });
     env.HOME = result.tempHome;
+    cleanup = result.cleanup;
+  } else if (!args.noFilter && target === 'apm' && (args.persona || args.mode)) {
+    const personaManifest = args.persona
+      ? (await findPersona(args.persona, dirs)).manifest
+      : undefined;
+    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
+    const result = await prelaunchComposeApm({
+      packageDir: deps.homeDir ?? process.cwd(),
+      persona: personaManifest,
+      mode: found?.manifest,
+      modeBody: found?.body,
+    });
+    env.APM_PACKAGE_DIR = result.tempPackageDir;
     cleanup = result.cleanup;
   } else if (target === 'codex' && env.AC_RESOLUTION_PATH) {
     const r = await prelaunchComposeCodex({ resolutionPath: env.AC_RESOLUTION_PATH, originalCwd: cwd });
