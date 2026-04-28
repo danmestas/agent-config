@@ -115,8 +115,11 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
 
   const projectDir = deps.projectDir ?? process.cwd();
   const userDir = deps.userDir ?? path.join(os.homedir(), '.config', 'agent-config');
+  // run.ts lives at <repo>/apm-builder/lib/ac/run.ts — walk up 3 dirs to the repo
+  // root where personas/ and modes/ live.
   const builtinDir =
-    deps.builtinDir ?? path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+    deps.builtinDir ??
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
   const dirs = { projectDir, userDir, builtinDir };
 
   const env: NodeJS.ProcessEnv = { ...process.env, AC_WRAPPED: '1', AC_HARNESS: target };
