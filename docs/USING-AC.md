@@ -5,20 +5,11 @@ based on a named **persona** (long-lived role) and **mode** (ephemeral
 intent). Today's behavior is preserved — invoke harnesses without `ac`
 and nothing changes.
 
-## What's shipped today (Plan 9)
+## What's shipped today (Plan 9 + 9b Phase 2)
 
-`ac` ships **Path B (additionalContext-only)** for all 4 runtime-hook
-harnesses (Claude Code, APM, Gemini, Pi). Skill descriptions still load
-into the system prompt, but the model is instructed via injected context
-to ignore out-of-scope skills. This delivers **false-activation prevention**
-but does **not** reduce token cost.
-
-For Codex and Copilot, `ac` does **pre-launch compose** — writes a filtered
-`AGENTS.md` / `copilot-instructions.md` to a per-session tempdir before
-exec'ing the harness. This DOES achieve token reduction for those two.
-
-A future Plan 9b will extend pre-launch compose (or equivalent skill
-catalog mutation) to the other 4 harnesses for full token reduction.
+- **Claude Code:** Pre-launch HOME-override. `ac` mirrors `~/.claude/` into a tempdir via symlinks, with `skills/` filtered to only the skills allowed by the active persona+mode. Claude sees a curated catalog. **Achieves token reduction.**
+- **Codex + Copilot:** Pre-launch cwd-override. `ac` writes a filtered `AGENTS.md` / `copilot-instructions.md` into a per-session tempdir; harness reads it from cwd.
+- **APM, Gemini, Pi:** Still on Path B (additionalContext-only). The hook injects "do not invoke X" instructions; skill descriptions still load. False-activation prevention works; token reduction is pending Plan 9b Phases 3-5.
 
 ## Quick start
 
