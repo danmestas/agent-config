@@ -5,20 +5,15 @@ based on a named **persona** (long-lived role) and **mode** (ephemeral
 intent). Today's behavior is preserved — invoke harnesses without `ac`
 and nothing changes.
 
-## What's shipped today (Plan 9)
+## What's shipped today (Plan 9 + 9b complete)
 
-`ac` ships **Path B (additionalContext-only)** for all 4 runtime-hook
-harnesses (Claude Code, APM, Gemini, Pi). Skill descriptions still load
-into the system prompt, but the model is instructed via injected context
-to ignore out-of-scope skills. This delivers **false-activation prevention**
-but does **not** reduce token cost.
+All 6 harnesses use pre-launch compose. The `ac` wrapper builds a per-session tempdir mirror of the relevant config dir, with skills/instructions filtered to the persona+mode in effect, then exec's the harness against that tempdir.
 
-For Codex and Copilot, `ac` does **pre-launch compose** — writes a filtered
-`AGENTS.md` / `copilot-instructions.md` to a per-session tempdir before
-exec'ing the harness. This DOES achieve token reduction for those two.
+- **Claude Code, Gemini, Pi:** HOME-override. `~/.{harness}/` is mirrored into a tempdir via symlinks, with `skills/` curated.
+- **APM:** APM_PACKAGE_DIR override. The APM package is mirrored into a tempdir, `.apm/skills/` curated.
+- **Codex, Copilot:** cwd-override. Filtered AGENTS.md / copilot-instructions.md written into a tempdir; harness reads from cwd.
 
-A future Plan 9b will extend pre-launch compose (or equivalent skill
-catalog mutation) to the other 4 harnesses for full token reduction.
+Token reduction is achieved across all 6.
 
 ## Quick start
 
@@ -116,9 +111,10 @@ Modes follow the same shape under `modes/<name>/mode.md`. The body of a mode is 
 
 ## Troubleshooting
 
-- `ac claude` runs but skills aren't filtered → run `ac doctor`. Likely
-  the per-harness filter hook isn't installed in `~/.claude/hooks/`.
-  Reinstall with `apm-builder install --target claude-code`.
+- `ac claude` runs but skills aren't filtered → run `ac doctor`. Verify
+  the harness binary is on PATH. If the binary is present but filtering
+  seems off, check `ac show persona <name>` to confirm the persona
+  resolves the expected skill lists.
 
 - "persona not found" → `ac list personas` to see what's discoverable.
 
@@ -140,10 +136,10 @@ USER CONFIG  (~/.claude/, ~/.codex/, etc.)  ← user owns
 AC WRAPPER  (ac <harness> [--persona X] [--mode Y] -- ...)
        │   1. Resolve persona+mode → JSON resolution artifact
        │   2. Export AC_WRAPPED + AC_HARNESS + AC_RESOLUTION_PATH
-       │   3. (Codex/Copilot) compose tempdir; (others) hook reads env
-       │   4. exec harness
+       │   3. Compose tempdir with filtered config (all harnesses)
+       │   4. exec harness against tempdir
        ▼
-HARNESS reads filtered config / hook injects additionalContext
+HARNESS reads filtered config from tempdir
 ```
 
 Resolution artifact at `$AC_RESOLUTION_PATH`:

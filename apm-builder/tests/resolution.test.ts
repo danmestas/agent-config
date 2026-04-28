@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { resolve, writeResolutionArtifact } from '../lib/resolution.ts';
+import { resolve, writeResolutionArtifact, resolveAgainstHarness, skillsKeepFromResolution } from '../lib/resolution.ts';
 import type { ComponentSource } from '../lib/types.ts';
 
 const skill = (name: string, category: string | undefined): ComponentSource => ({
@@ -166,5 +166,60 @@ describe('writeResolutionArtifact', () => {
     const filepath = await writeResolutionArtifact(r);
     expect(filepath.startsWith(os.tmpdir())).toBe(true);
     expect(path.basename(path.dirname(filepath))).toMatch(/^ac-sess-/);
+  });
+});
+
+describe('resolveAgainstHarness', () => {
+  it('reads claude-code catalog from fake home and applies filter', async () => {
+    const home = await fs.mkdtemp(path.join(os.tmpdir(), 'rh-'));
+    await fs.mkdir(path.join(home, '.claude', 'skills', 'a'), { recursive: true });
+    await fs.writeFile(
+      path.join(home, '.claude', 'skills', 'a', 'SKILL.md'),
+      `---
+name: a
+description: a
+category:
+  primary: tooling
+---
+`,
+    );
+    await fs.mkdir(path.join(home, '.claude', 'skills', 'b'), { recursive: true });
+    await fs.writeFile(
+      path.join(home, '.claude', 'skills', 'b', 'SKILL.md'),
+      `---
+name: b
+description: b
+category:
+  primary: workflow
+---
+`,
+    );
+    const persona = {
+      name: 'p',
+      type: 'persona',
+      categories: ['tooling'],
+      skill_include: [],
+      skill_exclude: [],
+    } as any;
+    const r = await resolveAgainstHarness({
+      target: 'claude-code',
+      harnessHome: home,
+      persona,
+    });
+    expect(r.skillsDrop).toContain('b');
+    expect(r.skillsDrop).not.toContain('a');
+  });
+});
+
+describe('skillsKeepFromResolution', () => {
+  it('returns catalog skill names that are NOT in drop list', () => {
+    const catalog = [
+      { manifest: { type: 'skill', name: 'a' } } as any,
+      { manifest: { type: 'skill', name: 'b' } } as any,
+      { manifest: { type: 'skill', name: 'c' } } as any,
+      { manifest: { type: 'rules', name: 'r' } } as any, // ignored — not a skill
+    ];
+    const keep = skillsKeepFromResolution(catalog, ['b']);
+    expect(keep).toEqual(['a', 'c']);
   });
 });

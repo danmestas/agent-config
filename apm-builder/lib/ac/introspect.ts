@@ -1,5 +1,4 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { listAllPersonas, findPersona, type DiscoveryDirs } from '../persona.ts';
 import { listAllModes, findMode } from '../mode.ts';
 
@@ -82,27 +81,36 @@ export async function showCommand(
 }
 
 export interface DoctorDeps {
-  /** Map from target name → expected install root (the dir where the filter hook should live). */
-  harnessConfigRoots: Record<string, string>;
+  /** List of harnesses to check */
+  harnesses: string[];
   print: (line: string) => void;
 }
 
+const HARNESS_BINS: Record<string, string> = {
+  'claude-code': 'claude',
+  apm: 'apm',
+  codex: 'codex',
+  gemini: 'gemini',
+  copilot: 'copilot',
+  pi: 'pi',
+};
+
 export async function doctorCommand(deps: DoctorDeps): Promise<number> {
   let problems = 0;
-  for (const [target, root] of Object.entries(deps.harnessConfigRoots)) {
-    const expected = path.join(root, 'hooks', `ac-filter-${target}`);
+  for (const target of deps.harnesses) {
+    const bin = HARNESS_BINS[target];
+    if (!bin) continue;
     try {
-      await fs.access(expected);
-      deps.print(`[ok]  ${target}: ${expected}`);
+      execSync(`which ${bin}`, { stdio: 'ignore' });
+      deps.print(`[ok]  ${target}: ${bin} found on PATH`);
     } catch {
-      deps.print(`[!!]  ${target}: missing ${expected}`);
+      deps.print(`[!!]  ${target}: ${bin} not on PATH`);
       problems += 1;
     }
   }
   if (problems > 0) {
     deps.print('');
-    deps.print(`${problems} harness(es) missing filter hooks. Install with:`);
-    deps.print('  apm-builder install --target <harness>');
+    deps.print(`${problems} harness binary(ies) missing from PATH.`);
   }
   return problems === 0 ? 0 : 1;
 }

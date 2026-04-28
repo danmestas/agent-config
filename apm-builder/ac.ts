@@ -36,14 +36,8 @@ async function main(): Promise<number> {
     return 0;
   }
   if (argv[0] === 'doctor') {
-    const harnessConfigRoots = {
-      'claude-code': path.join(os.homedir(), '.claude'),
-      apm: path.join(os.homedir(), '.apm'),
-      gemini: path.join(os.homedir(), '.gemini'),
-      pi: path.join(os.homedir(), '.pi'),
-    };
     return doctorCommand({
-      harnessConfigRoots,
+      harnesses: ['claude-code', 'apm', 'codex', 'gemini', 'copilot', 'pi'],
       print: (l) => process.stdout.write(l + '\n'),
     });
   }

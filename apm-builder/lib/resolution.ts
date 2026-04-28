@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import type { ComponentSource, Target } from './types.ts';
 import type { PersonaManifest, ModeManifest } from './schema.ts';
+import { loadHarnessCatalog } from './ac/harness-catalog.ts';
 
 export interface Resolution {
   schemaVersion: 1;
@@ -100,4 +101,36 @@ export async function writeResolutionArtifact(r: Resolution): Promise<string> {
   const filepath = path.join(dir, 'resolution.json');
   await fs.writeFile(filepath, JSON.stringify(r, null, 2) + '\n');
   return filepath;
+}
+
+export interface ResolveAgainstHarnessOptions {
+  target: Target;
+  harnessHome: string;
+  persona?: PersonaManifest;
+  mode?: ModeManifest;
+  modeBody?: string;
+}
+
+export async function resolveAgainstHarness(
+  opts: ResolveAgainstHarnessOptions,
+): Promise<Resolution> {
+  const catalog = await loadHarnessCatalog(opts.target, opts.harnessHome);
+  return resolve({
+    catalog,
+    persona: opts.persona,
+    mode: opts.mode,
+    modeBody: opts.modeBody,
+    harness: opts.target,
+  });
+}
+
+export function skillsKeepFromResolution(
+  catalog: ComponentSource[],
+  drop: string[],
+): string[] {
+  const dropSet = new Set(drop);
+  return catalog
+    .filter((c) => c.manifest.type === 'skill')
+    .map((c) => c.manifest.name)
+    .filter((n) => !dropSet.has(n));
 }
