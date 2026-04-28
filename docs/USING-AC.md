@@ -109,6 +109,36 @@ Modes follow the same shape under `modes/<name>/mode.md`. The body of a mode is 
 | ops | Infra / observability emphasis |
 | focused | Single-task focus, no scope creep |
 
+## Running integration tests with real harnesses (docker)
+
+To run the full test matrix against actual harness binaries:
+
+```bash
+docker run --rm \
+  -v ~/.claude:/root/.claude \
+  -v ~/.claude.json:/root/.claude.json:ro \
+  -v ~/.codex:/root/.codex \
+  -v ~/.gemini:/root/.gemini \
+  agent-config-test --real
+```
+
+Key points about these mounts:
+- `~/.claude/` and `~/.codex/` and `~/.gemini/` are mounted **read-write** — the harnesses need RW access to write session state, model caches, and system skill installs at runtime. Mounting them `:ro` causes all three to fail.
+- `~/.claude.json` is mounted separately **read-only** — Claude Code looks for this file at home root in addition to the `~/.claude/` directory. Without it, Claude fails auth with a 401.
+- These mounts give the harnesses read-write access to a copy of your auth state. Tests run inside an ephemeral container; the mounts are released when the container exits. No state on your host changes (you'll see new cache files appear in `~/.codex/` etc., which is normal — the harness wrote them at runtime).
+
+In CI, harnesses authenticate via environment variables instead of mounted OAuth dirs:
+
+```bash
+docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -e OPENAI_API_KEY \
+  -e GEMINI_API_KEY \
+  agent-config-test --real
+```
+
+Note: OAuth-only flows (harnesses that do not support API key env vars) will SKIP in CI real-mode unless OAuth state is made available some other way.
+
 ## Troubleshooting
 
 - `ac claude` runs but skills aren't filtered → run `ac doctor`. Verify

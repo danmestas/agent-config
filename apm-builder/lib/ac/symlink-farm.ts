@@ -60,6 +60,27 @@ export async function composeHarnessHome(opts: ComposeOptions): Promise<ComposeR
     await fs.symlink(src, dest);
   }
 
+  // Symlink home-root files/dirs that start with the harness prefix (e.g. .claude.json for claude-code)
+  // These are not inside ~/.<harness>/ but sit directly at home root and are required for auth.
+  const harnessPrefix = subdir; // e.g. '.claude'
+  let homeEntries: string[] = [];
+  try {
+    homeEntries = await fs.readdir(opts.realHome);
+  } catch {
+    // realHome unreadable — skip
+  }
+  for (const entry of homeEntries) {
+    if (entry === harnessPrefix) continue; // already handled above
+    if (!entry.startsWith(harnessPrefix)) continue;
+    const src = path.join(opts.realHome, entry);
+    const dest = path.join(tempHome, entry);
+    try {
+      await fs.symlink(src, dest);
+    } catch {
+      // symlink may already exist (race) or src missing — best-effort
+    }
+  }
+
   // Build filtered skills/ dir as a curated symlink subset
   const tempSkillsDir = path.join(tempHarnessDir, skillsSub);
   await fs.mkdir(tempSkillsDir);
