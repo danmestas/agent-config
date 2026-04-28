@@ -7,7 +7,7 @@ import { findMode } from '../mode.ts';
 import { resolve, writeResolutionArtifact } from '../resolution.ts';
 import { discoverComponents } from '../discover.ts';
 import type { Target } from '../types.ts';
-import { prelaunchComposeCodex, prelaunchComposeCopilot } from './prelaunch.ts';
+import { prelaunchComposeClaudeCode, prelaunchComposeCodex, prelaunchComposeCopilot } from './prelaunch.ts';
 
 export interface ParsedAcArgs {
   harness: string;
@@ -138,7 +138,23 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
 
   let cwd = process.cwd();
   let cleanup: (() => Promise<void>) | undefined;
-  if (target === 'codex' && env.AC_RESOLUTION_PATH) {
+
+  // Claude Code: HOME-override pre-launch — physically filter ~/.claude/skills/
+  // before claude reads it. Path C achieves real token reduction.
+  if (!args.noFilter && target === 'claude-code' && (args.persona || args.mode)) {
+    const personaManifest = args.persona
+      ? (await findPersona(args.persona, dirs)).manifest
+      : undefined;
+    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
+    const result = await prelaunchComposeClaudeCode({
+      realHome: os.homedir(),
+      persona: personaManifest,
+      mode: found?.manifest,
+      modeBody: found?.body,
+    });
+    env.HOME = result.tempHome;
+    cleanup = result.cleanup;
+  } else if (target === 'codex' && env.AC_RESOLUTION_PATH) {
     const r = await prelaunchComposeCodex({ resolutionPath: env.AC_RESOLUTION_PATH, originalCwd: cwd });
     cwd = r.tempdir;
     env.AC_ORIGINAL_CWD = process.cwd();
