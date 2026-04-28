@@ -1,5 +1,9 @@
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { ModeSchema } from '../lib/schema.ts';
+import { findMode } from '../lib/mode.ts';
 
 describe('ModeSchema', () => {
   it('accepts a minimal valid mode', () => {
@@ -37,5 +41,32 @@ describe('ModeSchema', () => {
       categories: ['tooling'],
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('findMode', () => {
+  it('finds a mode in user-scope dir and parses the body', async () => {
+    const userDir = await fs.mkdtemp(path.join(os.tmpdir(), 'ac-user-'));
+    await fs.mkdir(path.join(userDir, 'modes'));
+    await fs.writeFile(
+      path.join(userDir, 'modes', 'focused.md'),
+      `---
+name: focused
+version: 1.0.0
+type: mode
+description: focus
+targets: [claude-code]
+categories: [tooling]
+---
+
+You are in focused mode.
+`,
+    );
+    const result = await findMode('focused', {
+      projectDir: '/nonexistent',
+      userDir,
+      builtinDir: '/nonexistent',
+    });
+    expect(result.body.trim()).toBe('You are in focused mode.');
   });
 });
