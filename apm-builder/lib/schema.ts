@@ -59,7 +59,7 @@ const ManifestBaseSchema = z
     version: z.string().regex(SEMVER_RE, 'version must be valid semver'),
     description: z.string().min(1),
     category: CategoryBlock.optional(),
-    type: z.enum(['skill', 'plugin', 'hook', 'agent', 'rules', 'mcp', 'mode'] as const),
+    type: z.enum(['skill', 'plugin', 'hook', 'agent', 'rules', 'mcp'] as const),
     targets: z.array(z.enum(TARGETS as unknown as [Target, ...Target[]])).min(1),
     author: z.string().optional(),
     license: LicenseField.optional(),
