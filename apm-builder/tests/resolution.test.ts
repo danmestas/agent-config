@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { resolve } from '../lib/resolution.ts';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { resolve, writeResolutionArtifact } from '../lib/resolution.ts';
 import type { ComponentSource } from '../lib/types.ts';
 
 const skill = (name: string, category: string | undefined): ComponentSource => ({
@@ -130,5 +133,38 @@ describe('resolve', () => {
     const r = resolve({ catalog, persona, harness: 'claude-code' });
     expect(r.metadata.persona).toBe('p');
     expect(r.metadata.categories).toContain('tooling');
+  });
+});
+
+describe('writeResolutionArtifact', () => {
+  it('writes JSON to a tempfile and returns the path', async () => {
+    const r: any = {
+      schemaVersion: 1,
+      harness: 'claude-code',
+      skillsDrop: ['a'],
+      skillsKeep: null,
+      modePrompt: '',
+      metadata: { persona: null, mode: null, categories: [] },
+    };
+    const filepath = await writeResolutionArtifact(r);
+    expect(filepath).toMatch(/resolution\.json$/);
+    const content = await fs.readFile(filepath, 'utf8');
+    const parsed = JSON.parse(content);
+    expect(parsed.harness).toBe('claude-code');
+    expect(parsed.skillsDrop).toEqual(['a']);
+  });
+
+  it('uses a session-scoped tempdir under os.tmpdir', async () => {
+    const r: any = {
+      schemaVersion: 1,
+      harness: 'claude-code',
+      skillsDrop: [],
+      skillsKeep: null,
+      modePrompt: '',
+      metadata: { persona: null, mode: null, categories: [] },
+    };
+    const filepath = await writeResolutionArtifact(r);
+    expect(filepath.startsWith(os.tmpdir())).toBe(true);
+    expect(path.basename(path.dirname(filepath))).toMatch(/^ac-sess-/);
   });
 });

@@ -1,3 +1,6 @@
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import type { ComponentSource, Target } from './types.ts';
 import type { PersonaManifest, ModeManifest } from './schema.ts';
 
@@ -90,4 +93,11 @@ export function resolve(opts: ResolveOptions): Resolution {
       categories: effectiveCategories ? Array.from(effectiveCategories) : [],
     },
   };
+}
+
+export async function writeResolutionArtifact(r: Resolution): Promise<string> {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ac-sess-'));
+  const filepath = path.join(dir, 'resolution.json');
+  await fs.writeFile(filepath, JSON.stringify(r, null, 2) + '\n');
+  return filepath;
 }
