@@ -83,6 +83,8 @@ export interface RunDeps {
   projectDir?: string;
   userDir?: string;
   builtinDir?: string;
+  /** Override real HOME dir used as source for prelaunch composition (test injection). */
+  homeDir?: string;
   /** Override harness binary lookup (test injection). */
   resolveHarnessBin?: (harness: string) => string;
   /** Catalog provider (test injection). */
@@ -147,7 +149,7 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
       : undefined;
     const found = args.mode ? await findMode(args.mode, dirs) : undefined;
     const result = await prelaunchComposeClaudeCode({
-      realHome: os.homedir(),
+      realHome: deps.homeDir ?? os.homedir(),
       persona: personaManifest,
       mode: found?.manifest,
       modeBody: found?.body,
