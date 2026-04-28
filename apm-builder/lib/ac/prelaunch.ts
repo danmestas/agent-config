@@ -80,3 +80,36 @@ export async function prelaunchComposeCopilot(opts: PrelaunchOptions): Promise<P
     },
   };
 }
+
+import { resolveAgainstHarness, skillsKeepFromResolution } from '../resolution.ts';
+import { composeHarnessHome } from './symlink-farm.ts';
+import { loadHarnessCatalog } from './harness-catalog.ts';
+import type { PersonaManifest, ModeManifest } from '../schema.ts';
+
+export interface ClaudePrelaunchOptions {
+  realHome: string;
+  persona?: PersonaManifest;
+  mode?: ModeManifest;
+  modeBody?: string;
+}
+
+export async function prelaunchComposeClaudeCode(
+  opts: ClaudePrelaunchOptions,
+): Promise<{ tempHome: string; cleanup: () => Promise<void> }> {
+  const catalog = await loadHarnessCatalog('claude-code', opts.realHome);
+  const resolution = await resolveAgainstHarness({
+    target: 'claude-code',
+    harnessHome: opts.realHome,
+    persona: opts.persona,
+    mode: opts.mode,
+    modeBody: opts.modeBody,
+  });
+  const skillsKeep = opts.persona || opts.mode
+    ? skillsKeepFromResolution(catalog, resolution.skillsDrop)
+    : catalog.filter((c) => c.manifest.type === 'skill').map((c) => c.manifest.name); // no filter → keep all
+  return composeHarnessHome({
+    target: 'claude-code',
+    realHome: opts.realHome,
+    skillsKeep,
+  });
+}
