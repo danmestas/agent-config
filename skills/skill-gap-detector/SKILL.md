@@ -24,6 +24,19 @@ Surfaces *missing* skills, not edits to existing ones. Pairs with `evolution-eng
 - Weekly maintenance loop (e.g., a `/loop 7d /skill-gap` cron).
 - After `evolution-engine` runs and finds repeated-instruction clusters with no matching existing skill.
 
+## Mode hint
+
+Pass `--mode <name>` (or set `mode:` in task frontmatter) to bias the
+detector toward a specific domain. The mode value is a *hint*: when set, the
+agent should narrow its pattern matching to the domain's `observation_types`
+(see `apm-builder/modes/<name>.json`) and prefer drafting skills aligned with
+the mode's `skills_priority` and `memory_topics`.
+
+Example: `--mode code` favors development-leaning gap proposals (test patterns,
+build-tooling, refactor workflows); `--mode design` favors UX-leaning ones
+(interaction patterns, accessibility checks). When no mode is set, run on the
+full pattern surface.
+
 ## How it works
 
 1. Run the existing detector pipeline:

@@ -5,6 +5,8 @@
 # reads `cwd` from the parent for the project name, and uses a per-project
 # voice (first time → random pick, then stable).
 set -u
+# Fail-safe per CONVENTIONS.md: trap unhandled errors and exit 0 always.
+trap 'echo "[tts subagent-stop] hook error at line $LINENO" >&2; exit 0' ERR
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 payload="$(cat)"

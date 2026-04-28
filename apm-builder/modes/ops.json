@@ -1,0 +1,7 @@
+{
+  "name": "ops",
+  "description": "Operations, infrastructure, deployment, observability, and on-call work.",
+  "observation_types": ["incident", "deploy", "rollback", "alert", "permission", "config-drift"],
+  "skills_priority": ["tigerstyle", "signoz-dashboard-builder", "hipp"],
+  "memory_topics": ["runbooks", "alerting", "permissions", "infrastructure", "incident-history"]
+}

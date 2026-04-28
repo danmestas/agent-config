@@ -1,0 +1,7 @@
+{
+  "name": "design",
+  "description": "UI, UX, interaction, and visual design tasks.",
+  "observation_types": ["affordance", "feedback", "mapping", "error-prevention", "accessibility", "density"],
+  "skills_priority": ["norman", "dx-audit", "frontend-design"],
+  "memory_topics": ["interaction-patterns", "density", "accessibility", "visual-language"]
+}

@@ -33,24 +33,36 @@ If it doesn't exist, create it with the header from the format example below.
 
 ## Format
 
+EVOLUTION.md uses the **markdown flat-line format** documented in
+[`CONVENTIONS.md`](../../CONVENTIONS.md). One entry per line; sortable IDs;
+date-sectioned; greppable.
+
 ```markdown
 # Evolution Changelog
 
-A log of applied evolution-driven changes to this repo. Each entry: date, signal that
-fired, file changed, one-line description.
+A log of applied evolution-driven changes to this repo. Each entry: finding ID,
+time, signal, file changed, one-line description.
 
 ## 2026-04-27
-
-- **stale-memory** | `~/.claude/projects/agent-config/memory/feedback_old.md` deleted | dead branch reference cleaned
-- **permission-recurring** | `.claude/settings.json` allowlist | added `npm test` (approved 7×)
-- **trigger-mismatch** | `skills/reflect/SKILL.md` description | added `"retro this"` after eval failure
+**F-001** 09:23 [stale-memory] | `feedback_old.md` deleted | dead branch reference cleaned
+**F-002** 14:55 [permission] | `settings.json` | added `npm test` (×7)
+**F-003** 17:02 [trigger-mismatch] | `skills/reflect/SKILL.md` | added "retro this" after eval failure
 
 ## 2026-04-20
-
-- **edit-thrashing** | `skills/orchestrator-mode/SKILL.md` body | clarified §7 loop after 4 reverts
+**F-004** 11:18 [edit-thrashing] | `skills/orchestrator-mode/SKILL.md` | clarified §7 loop after 4 reverts
 ```
 
-The format is deliberately simple: `**<signal>** | <file> | <one-line description>`. No prose; no nesting; one bullet per applied change.
+The fields per line:
+1. `**F-NNN**` — bold finding ID (3-digit, monotonically increasing across the file).
+2. `HH:MM` — local time (optional but recommended).
+3. `[signal]` — bracketed signal type. The icon-prefixed variant
+   (`🔧 [stale-memory]`, etc.) is allowed but not required.
+4. `` `<artifact>` `` — single backtick-wrapped path or settings key.
+5. One-line description, ≤80 chars.
+
+Why flat-line vs the older table form: each entry is a single line, so `grep`,
+`tail -n 20`, and `head` all work cleanly; new fields can be appended without
+rewriting history; LLMs read each line as a complete record.
 
 ## Workflow
 
@@ -76,16 +88,18 @@ Cross-check against `git log` since the report's date. For each finding, check w
 - If not, create a new section *above* the previous one (most recent on top).
 - Keep entries chronologically descending: today first, then earlier dates.
 
-### 4. Format each bullet
+### 4. Format each line
 
 ```
-- **<signal-name>** | <path-relative-to-repo-root-or-~/.claude> | <one-line-description-of-change>
+**F-NNN** HH:MM [signal] | `path` | description
 ```
 
 Rules:
-- `<signal-name>` is the exact signal from the evolution report (kebab-case).
+- `F-NNN` is the next monotonically increasing ID across the whole file (find the highest existing ID, add 1, zero-pad to 3 digits).
+- `[signal]` is the exact signal from the evolution report, in brackets.
 - `<path>` is a single file or settings key, not a directory.
 - `<description>` is one sentence, ≤80 chars. Imperative or past tense, consistent within a section.
+- The icon variant (`🔧 [signal]`, `🔒 [permission]`) is allowed but optional. The bracketed text is the source of truth.
 
 ### 5. Commit (if asked)
 
