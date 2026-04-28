@@ -7,6 +7,7 @@ import { findMode } from '../mode.ts';
 import { resolve, writeResolutionArtifact } from '../resolution.ts';
 import { discoverComponents } from '../discover.ts';
 import type { Target } from '../types.ts';
+import { prelaunchComposeCodex, prelaunchComposeCopilot } from './prelaunch.ts';
 
 export interface ParsedAcArgs {
   harness: string;
@@ -132,6 +133,20 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
     env.AC_RESOLUTION_PATH = artifactPath;
   }
 
+  let cwd = process.cwd();
+  let cleanup: (() => Promise<void>) | undefined;
+  if (target === 'codex' && env.AC_RESOLUTION_PATH) {
+    const r = await prelaunchComposeCodex({ resolutionPath: env.AC_RESOLUTION_PATH, originalCwd: cwd });
+    cwd = r.tempdir;
+    env.AC_ORIGINAL_CWD = process.cwd();
+    cleanup = r.cleanup;
+  } else if (target === 'copilot' && env.AC_RESOLUTION_PATH) {
+    const r = await prelaunchComposeCopilot({ resolutionPath: env.AC_RESOLUTION_PATH, originalCwd: cwd });
+    cwd = r.tempdir;
+    env.AC_ORIGINAL_CWD = process.cwd();
+    cleanup = r.cleanup;
+  }
+
   const bin = (deps.resolveHarnessBin ?? defaultResolveHarnessBin)(args.harness);
   if (deps.exec) {
     return deps.exec(bin, args.harnessArgs, env);
@@ -140,8 +155,11 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
   // directly without an extra dep; spawning + forwarding signals + exiting
   // on close achieves the same outcome from the user's perspective.
   return new Promise<number>((resolveCb, reject) => {
-    const child = spawn(bin, args.harnessArgs, { stdio: 'inherit', env });
+    const child = spawn(bin, args.harnessArgs, { stdio: 'inherit', env, cwd });
     child.on('error', reject);
-    child.on('close', (code) => resolveCb(code ?? 0));
+    child.on('close', async (code) => {
+      if (cleanup) await cleanup();
+      resolveCb(code ?? 0);
+    });
   });
 }
