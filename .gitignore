@@ -8,3 +8,5 @@ dist/
 release-artifacts/
 *.tsbuildinfo
 .vitest-cache/
+docs/superpowers/specs/
+docs/superpowers/plans/
