@@ -32,6 +32,10 @@ jobs:
         run: docker run --rm agent-config-test
 
       - name: Run real-mode matrix (requires API keys)
+        # CI authenticates via API key env vars only — no OAuth dirs are mounted.
+        # Harnesses that require OAuth (no API key support) will SKIP automatically.
+        # For local OAuth-based testing see docs/USING-AC.md "Running integration tests
+        # with real harnesses (docker)" for the full volume-mount pattern.
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'real'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

@@ -51,12 +51,18 @@ if $DRY_RUN; then
 fi
 
 # Auth presence — accept either an API key env var OR mounted OAuth credentials.
-# (Mount with: docker run -v $HOME/.claude:/root/.claude:ro ...)
+# Local mount example (RW required for codex/gemini cache writes; claude.json file is read-only):
+#   docker run --rm \
+#     -v ~/.claude:/root/.claude \
+#     -v ~/.claude.json:/root/.claude.json:ro \
+#     -v ~/.codex:/root/.codex \
+#     -v ~/.gemini:/root/.gemini \
+#     agent-config-test --real
 declare -A HARNESS_AUTH
-[[ -n "${ANTHROPIC_API_KEY:-}" || -f "$HOME/.claude/.credentials.json" ]] && HARNESS_AUTH[claude]=ok || HARNESS_AUTH[claude]=
+[[ -n "${ANTHROPIC_API_KEY:-}" || -f "$HOME/.claude.json" || -f "$HOME/.claude/.credentials.json" ]] && HARNESS_AUTH[claude]=ok || HARNESS_AUTH[claude]=
 [[ -n "${OPENAI_API_KEY:-}" || -f "$HOME/.codex/auth.json" || -d "$HOME/.codex" ]] && HARNESS_AUTH[codex]=ok || HARNESS_AUTH[codex]=
 [[ -n "${GEMINI_API_KEY:-}" || -d "$HOME/.gemini" ]] && HARNESS_AUTH[gemini]=ok || HARNESS_AUTH[gemini]=
-[[ -n "${ANTHROPIC_API_KEY:-}" || -f "$HOME/.claude/.credentials.json" ]] && HARNESS_AUTH[pi]=ok || HARNESS_AUTH[pi]=
+[[ -n "${ANTHROPIC_API_KEY:-}" || -f "$HOME/.claude.json" || -f "$HOME/.claude/.credentials.json" ]] && HARNESS_AUTH[pi]=ok || HARNESS_AUTH[pi]=
 declare -A HARNESS_KEY
 for h in claude codex gemini pi; do HARNESS_KEY[$h]="${HARNESS_AUTH[$h]}"; done
 
