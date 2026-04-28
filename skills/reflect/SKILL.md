@@ -104,6 +104,6 @@ If the user agrees with proposals from this reflection, the `memorize` skill (au
 
 ## See also
 
-- `skills/memorize/SKILL.md` — converts agreed proposals into durable ADRs/memory.
+- `plugins/wiki/capture/SKILL.md` — converts agreed proposals into durable ADRs/memory.
 - `skills/evolution-engine/SKILL.md` — does pattern-detection across sessions; reflection is per-task.
 - `skills/skill-gap-detector/SKILL.md` — finds missing skills; reflection finds tactical fixes.

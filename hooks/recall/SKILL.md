@@ -85,5 +85,5 @@ enough for the prior-art-from-yesterday case that drives 80% of the value.
 ## See also
 
 - [`hooks/trace/SKILL.md`](../trace/SKILL.md) — the writer counterpart.
-- [`skills/memorize/SKILL.md`](../../skills/memorize/SKILL.md) — how memories get written.
+- [`plugins/wiki/capture/SKILL.md`](../../plugins/wiki/capture/SKILL.md) — how memories get written.
 - [`CONVENTIONS.md`](../../CONVENTIONS.md) — flat-line format + fail-safe rule.

@@ -5,7 +5,7 @@ type: persona
 description: Personal projects, journaling, knowledge-base maintenance
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [memory-management, context-management]
-skill_include: [knowledge-base-overview, memorize]
+skill_include: [philosophy, capture]
 skill_exclude: []
 ---
 

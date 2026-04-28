@@ -115,5 +115,5 @@ This skill writes the file. It does NOT auto-commit. The user runs `git add EVOL
 ## See also
 
 - `skills/evolution-engine/SKILL.md` — the upstream that produces the per-day reports.
-- `skills/reflect/SKILL.md` + `skills/memorize/SKILL.md` — those produce ADRs/memory; EVOLUTION.md is the third artifact and tracks file-level changes.
+- `skills/reflect/SKILL.md` + `plugins/wiki/capture/SKILL.md` — those produce ADRs/memory; EVOLUTION.md is the third artifact and tracks file-level changes.
 - `EVOLUTION.md` (this repo's root) — the file maintained by this skill.

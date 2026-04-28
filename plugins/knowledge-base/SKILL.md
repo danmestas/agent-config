@@ -14,7 +14,7 @@ category:
   secondary:
     - memory-management
 includes:
-  - ../../skills/knowledge-base-overview
+  - ../../skills/philosophy
   - ../../skills/vault-overview
   - ../../skills/vault-ingest
   - ../../skills/vault-query
