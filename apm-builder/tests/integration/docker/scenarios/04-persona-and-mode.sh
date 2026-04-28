@@ -38,6 +38,31 @@ trap cleanup EXIT
 
 export PATH="$SHIM_DIR:$PATH"
 
+# Real mode: skip shim, invoke actual harness binary with a minimal prompt
+if [[ "${REAL_MODE:-false}" == "true" ]]; then
+  case "$harness" in
+    claude|claude-code) REAL_CMD=(claude --print "respond with: PING") ;;
+    codex)              REAL_CMD=(codex exec "respond with: PING") ;;
+    gemini)             REAL_CMD=(gemini -p "respond with: PING") ;;
+    pi)                 REAL_CMD=(pi --print "respond with: PING") ;;
+    *) echo "FAIL: unknown harness $harness"; exit 1 ;;
+  esac
+  output=$(node "$TSX" "$AC" "$harness" --persona backend --mode focused -- "${REAL_CMD[@]:1}" 2>&1)
+  exit_code=$?
+  if [[ $exit_code -ne 0 ]]; then
+    echo "FAIL: ac+real exited $exit_code"
+    echo "$output" | head -10
+    exit 1
+  fi
+  if ! echo "$output" | grep -qi 'ping'; then
+    echo "FAIL: real harness output missing 'PING'"
+    echo "$output" | head -10
+    exit 1
+  fi
+  echo "PASS"
+  exit 0
+fi
+
 node "$TSX" "$AC" "$harness" --persona backend --mode focused -- ping 2>/dev/null
 stub_exit=$?
 
