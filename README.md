@@ -67,6 +67,19 @@ dependencies:
 
 Adapters emit native artifacts for each harness when a skill declares it in `targets:`. Run `npm run build -- --target <harness>` to generate the per-harness output under `dist/<harness>/`. Install paths follow each harness's convention.
 
+## Configuring with `ac`
+
+`ac` is a wrapper around your harness binary that activates a persona and/or
+mode for a single session, filtering skills and injecting prompt scaffolding.
+Today's full-load behavior is preserved when you don't use it.
+
+```bash
+ac claude --persona backend --mode focused
+```
+
+See [docs/USING-AC.md](docs/USING-AC.md) for installation, authoring personas,
+and troubleshooting.
+
 ## Categories
 
 ### Software design philosophy (BackPressure)

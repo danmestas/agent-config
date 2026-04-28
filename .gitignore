@@ -3,7 +3,6 @@
 .agents/
 .codex/
 .worktrees/
-docs/
 node_modules/
 dist/
 release-artifacts/
