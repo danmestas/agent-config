@@ -53,4 +53,27 @@ describe('composeHarnessHome', () => {
       composeHarnessHome({ target: 'codex', realHome, skillsKeep: [] }),
     ).rejects.toThrow(/codex.*no user-scope/i);
   });
+
+  it('symlinks home-root files matching the harness prefix', async () => {
+    const realHome = await fs.mkdtemp(path.join(os.tmpdir(), 'real-home-'));
+    await fs.mkdir(path.join(realHome, '.claude'), { recursive: true });
+    await fs.writeFile(path.join(realHome, '.claude', '.credentials.json'), '{}');
+    await fs.writeFile(path.join(realHome, '.claude.json'), '{"x":1}');
+    await fs.writeFile(path.join(realHome, '.claude-extra.txt'), 'extra');
+    await fs.writeFile(path.join(realHome, '.bashrc'), 'unrelated');
+
+    const result = await composeHarnessHome({
+      target: 'claude-code',
+      realHome,
+      skillsKeep: [],
+    });
+
+    // .claude.json should be symlinked at home root
+    const stat = await fs.lstat(path.join(result.tempHome, '.claude.json'));
+    expect(stat.isSymbolicLink()).toBe(true);
+    // .claude-extra.txt should also be symlinked (matches prefix)
+    expect((await fs.lstat(path.join(result.tempHome, '.claude-extra.txt'))).isSymbolicLink()).toBe(true);
+    // .bashrc should NOT be symlinked
+    await expect(fs.access(path.join(result.tempHome, '.bashrc'))).rejects.toThrow();
+  });
 });

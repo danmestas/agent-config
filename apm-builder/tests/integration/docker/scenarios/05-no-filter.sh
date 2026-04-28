@@ -37,8 +37,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-export PATH="$SHIM_DIR:$PATH"
-
 # Real mode: skip shim, invoke actual harness binary with a minimal prompt
 if [[ "${REAL_MODE:-false}" == "true" ]]; then
   case "$harness" in
@@ -62,6 +60,9 @@ if [[ "${REAL_MODE:-false}" == "true" ]]; then
   echo "PASS"
   exit 0
 fi
+
+# Install stub on PATH only for the non-real stub test
+export PATH="$SHIM_DIR:$PATH"
 
 # Run with --no-filter AND persona/mode flags — resolution should still be skipped
 node "$TSX" "$AC" "$harness" --no-filter --persona backend --mode focused -- ping 2>/dev/null
