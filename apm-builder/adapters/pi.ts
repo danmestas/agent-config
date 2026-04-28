@@ -28,6 +28,11 @@ export const piAdapter: Adapter = {
         return emitHookExtension(component);
       case 'mcp':
         return emitMcpStub(component);
+      case 'persona':
+      case 'mode':
+        // Personas and modes are harness-agnostic, consumed by `ac` at resolution
+        // time. Not emitted per-target. See spec §5.2.
+        return [];
       default:
         throw new Error(`pi adapter: type "${component.manifest.type}" not supported`);
     }

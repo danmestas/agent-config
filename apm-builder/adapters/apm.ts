@@ -85,6 +85,11 @@ export const apmAdapter: Adapter = {
         return emitRules(component, ctx);
       case 'plugin':
         return emitPlugin(component, ctx);
+      case 'persona':
+      case 'mode':
+        // Personas and modes are harness-agnostic, consumed by `ac` at resolution
+        // time. Not emitted per-target. See spec §5.2.
+        return [];
       default:
         throw new Error(`apm adapter: type "${component.manifest.type}" not yet implemented`);
     }

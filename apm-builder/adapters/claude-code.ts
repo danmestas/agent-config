@@ -31,6 +31,11 @@ export const claudeCodeAdapter: Adapter = {
         return emitMcp(component);
       case 'plugin':
         return emitPlugin(component, ctx);
+      case 'persona':
+      case 'mode':
+        // Personas and modes are harness-agnostic, consumed by `ac` at resolution
+        // time. Not emitted per-target. See spec §5.2.
+        return [];
       default:
         throw new Error(`claude-code adapter: type "${component.manifest.type}" not yet implemented`);
     }
