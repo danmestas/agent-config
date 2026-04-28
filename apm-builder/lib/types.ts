@@ -10,6 +10,18 @@ export type Target = typeof TARGETS[number];
 export type { Category } from './schema.ts';
 import type { Category } from './schema.ts';
 
+/**
+ * Attribution metadata for components vendored from an upstream source.
+ * Used in the `license:` frontmatter field as an alternative to a plain
+ * SPDX-style string. Captures upstream license, source repo + pinned SHA, and
+ * the original path within that repo.
+ */
+export interface LicenseAttribution {
+  upstream: string;
+  source: string;
+  path: string;
+}
+
 export interface ComponentSource {
   /** Absolute path to the component dir (contains the component's manifest file — typically `SKILL.md`). */
   dir: string;
@@ -37,7 +49,11 @@ export interface ComponentManifest {
   type: ComponentType;
   targets: Target[];
   author?: string;
-  license?: string;
+  /**
+   * Either a SPDX-style string ("MIT", "Apache-2.0") or an attribution block
+   * carrying upstream-source provenance for vendored components.
+   */
+  license?: string | LicenseAttribution;
   tags?: string[];
   // Type-specific blocks (validated by Zod schema, not all required):
   hooks?: Record<string, { command: string; matcher?: string }>;

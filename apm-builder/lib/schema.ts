@@ -42,6 +42,17 @@ const MCPBlock = z.object({
   env: z.record(z.string()).optional(),
 });
 
+// License is either a SPDX-style string (e.g., "MIT") or an attribution block
+// for upstream-sourced components carrying provenance metadata.
+const LicenseAttribution = z
+  .object({
+    upstream: z.string().min(1),
+    source: z.string().min(1),
+    path: z.string().min(1),
+  })
+  .strict();
+const LicenseField = z.union([z.string(), LicenseAttribution]);
+
 export const ManifestSchema = z
   .object({
     name: z.string().regex(NAME_RE, 'name must be kebab-case lowercase'),
@@ -51,7 +62,7 @@ export const ManifestSchema = z
     type: z.enum(COMPONENT_TYPES as unknown as [ComponentType, ...ComponentType[]]),
     targets: z.array(z.enum(TARGETS as unknown as [Target, ...Target[]])).min(1),
     author: z.string().optional(),
-    license: z.string().optional(),
+    license: LicenseField.optional(),
     tags: z.array(z.string()).optional(),
     hooks: z.record(HookEntry).optional(),
     agent: AgentBlock.optional(),

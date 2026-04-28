@@ -12,7 +12,7 @@ The repo's directory structure mirrors the component-type schema:
 skills/      — type: skill   (46 components — typed agent capabilities triggered by description)
 plugins/     — type: plugin  (1 component — multi-skill bundles)
 hooks/       — type: hook    (3 components — tts-announcer, trace, recall — event-driven scripts)
-agents/      — type: agent   (planned)
+agents/      — type: agent   (5 components — wshobson-sourced subagents)
 rules/       — type: rules   (planned)
 mcp/         — type: mcp     (planned)
 ```
@@ -144,6 +144,16 @@ Bundled as the [`knowledge-base`](plugins/knowledge-base) plugin (install once f
 - [`doppler`](skills/doppler) — Migrate `.env` files to Doppler secrets management; multi-environment configs.
 - [`midscene-testing`](skills/midscene-testing) — Screenshot-driven browser smoke testing via Midscene's headless Puppeteer mode.
 
+## Agents (wshobson-sourced)
+
+Subagents vendored from [`wshobson/agents`](https://github.com/wshobson/agents) (MIT, see [`LICENSES/wshobson-agents.LICENSE`](LICENSES/wshobson-agents.LICENSE)). These are the first components under `agents/` and live as `type: agent` in the canonical schema; the upstream `model:` field is dropped at vendor time so the adapter layer picks model per harness at install. Bodies are kept verbatim from upstream.
+
+- [`code-reviewer`](agents/code-reviewer) — *backpressure*. Elite code review expert focused on AI-assisted analysis, security, performance, and production reliability. Pairs with `dx-audit` and `description-linter` for content/quality feedback (this one is for source code).
+- [`debugger`](agents/debugger) — *backpressure*. Root-cause debugging specialist for errors, test failures, and unexpected behavior. Use proactively. Distinct from `stuck-detector`, which is the off-ramp when retries don't converge.
+- [`golang-pro`](agents/golang-pro) — *workflow*. Go 1.21+ expert for concurrency patterns, generics, and production microservices. Sister to the `idiomatic-go` skill (style-and-idioms) — this one drives architecture and implementation.
+- [`architect-review`](agents/architect-review) — *backpressure*. Master software architect for clean architecture, DDD, microservices, and event-driven design reviews. Higher altitude than `ousterhout` and `hipp`, which review at the module level.
+- [`observability-engineer`](agents/observability-engineer) — *tooling*. Production-grade monitoring, tracing, SLI/SLO, and incident response. Complements `signoz-dashboard-builder`, which is the SigNoz-specific implementation skill.
+
 ## Components
 
 The table below is regenerated from canonical `SKILL.md` frontmatter via `npm run docs`. Every skill, plugin, and hook in the repo conforms to the canonical schema and appears in this table.
@@ -153,7 +163,10 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 
 | Name | Type | Version | Description | Targets |
 |------|------|---------|-------------|---------|
+| architect-review | agent | 0.1.0 | Master software architect specializing in modern architecture patterns, clean architecture, microservices, event-driven systems, and DDD. Reviews system designs and code changes for architectural integrity, scalability, and maintainability. Use PROACTIVELY for architectural decisions. | claude-code |
+| code-reviewer | agent | 0.1.0 | Elite code review expert specializing in modern AI-powered code analysis, security vulnerabilities, performance optimization, and production reliability. Masters static analysis tools, security scanning, and configuration review with 2024/2025 best practices. Use PROACTIVELY for code quality assurance. | claude-code |
 | datastar-tao | skill | 0.1.0 | Use when building hypermedia-driven web applications, server-rendered UIs, or any frontend where the backend should own state. Use when choosing between SPA and server-driven architecture. Use when reviewing frontend code for unnecessary client-side state, optimistic updates, or client-side routing. Triggers on requests involving SSE, HTML-over-the-wire, DOM morphing, HTMX, Datastar, signals, or backend-first frontend design. | claude-code |
+| debugger | agent | 0.1.0 | Debugging specialist for errors, test failures, and unexpected behavior. Use proactively when encountering any issues. | claude-code |
 | dx-audit | skill | 0.1.0 | Use when evaluating developer experience or user experience, assessing usability of a CLI/SDK/API/UI, scoring project ergonomics, identifying friction in workflows, or when asked to audit DX or UX. Triggers on "DX score", "UX audit", "developer experience", "user experience", "workflow friction", "usability audit", "how hard is it to use this". | claude-code |
 | hipp | skill | 0.1.0 | Use when designing libraries, modules, or data layers that must be simple, reliable, and self-contained. Use when choosing between embedded vs server-based solutions. Use when reviewing code for unnecessary complexity, dependencies, or configuration. Triggers on requests involving zero-config design, embedded systems, long-term maintainability, or first-principles thinking. | apm, claude-code, codex, copilot, gemini, pi |
 | idiomatic-go | skill | 0.1.0 | Use when writing, reviewing, or refactoring Go code. Triggers on .go files, go.mod presence, or any task involving Go programming. Also use when reviewing Go code for idiomaticity, error handling, concurrency patterns, or interface design. | apm, claude-code, codex, copilot, gemini, pi |
@@ -238,6 +251,7 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 | mgrep-code-search | skill | 0.1.0 | Semantic code search using mgrep for efficient codebase exploration. This skill should be used when searching or exploring codebases with more than 30 non-gitignored files and/or nested directory structures. It provides natural language semantic search that complements traditional grep/ripgrep for finding features, understanding intent, and exploring unfamiliar code.
  | claude-code |
 | midscene-testing | skill | 0.1.0 | Use when performing ad-hoc browser testing, smoke testing workflows, validating UI after frontend changes, or testing Datastar/HTMX/SSE reactive features that unit tests cannot cover. Also use when consolidating Midscene HTML reports into a single navigable document. | claude-code |
+| observability-engineer | agent | 0.1.0 | Build production-ready monitoring, logging, and tracing systems. Implements comprehensive observability strategies, SLI/SLO management, and incident response workflows. Use PROACTIVELY for monitoring infrastructure, performance optimization, or production reliability. | claude-code |
 | obsidian-bases | skill | 0.1.0 | Create and edit Obsidian Bases (.base files): Obsidian's native database layer for dynamic tables, card views, list views, filters, formulas, and summaries over vault notes. Triggers on: create a base, add a base file, obsidian bases, base view, filter notes, formula, database view, dynamic table, task tracker base, reading list base. | claude-code |
 | obsidian-canvas | skill | 0.1.0 | Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to Obsidian canvas files with auto-positioning inside zones. Integrates with /banana for image capture. Triggers on: /canvas, canvas new, canvas add image, canvas add text, canvas add pdf, canvas add note, canvas zone, canvas list, canvas from banana, add to canvas, put this on the canvas, open canvas, create canvas. | claude-code |
 | obsidian-markdown | skill | 0.1.0 | Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, highlights, math, and canvas syntax. Reference this when creating or editing any wiki page. Triggers on: write obsidian note, obsidian syntax, wikilink, callout, embed, obsidian markdown, wikilink format, callout syntax, embed syntax, obsidian formatting, how to write obsidian markdown. | claude-code |
@@ -259,6 +273,7 @@ excalidraw), real Gantt/pie charts (use a chart library), or rich data viz.
 
 | Name | Type | Version | Description | Targets |
 |------|------|---------|-------------|---------|
+| golang-pro | agent | 0.1.0 | Master Go 1.21+ with modern patterns, advanced concurrency, performance optimization, and production-ready microservices. Expert in the latest Go ecosystem including generics, workspaces, and cutting-edge frameworks. Use PROACTIVELY for Go development, architecture design, or performance optimization. | claude-code |
 | orchestrator-mode | skill | 0.1.0 | Use at session start in the Darkish Factory repo to prime as the pipeline orchestrator (host mode). Loads the §7 loop, the 13-role roster, the escalation classifier, and the rules for converting subagent muscle memory into subharness dispatch. Invoke whenever the operator types a task and you're in this repo. | claude-code |
 | subagent-to-subharness | skill | 0.1.0 | Use when you would normally dispatch a subagent via the Agent tool but you're operating as the Darkish Factory orchestrator. Translates the muscle memory into subharness dispatch. Maps task shapes to the right harness role, frames the task in caveman-standard, reads worker output back, decides next step. | claude-code |
 | tts-announcer | hook | 0.1.0 | Local, offline voice announcements for Claude Code and Pi via Kokoro-82M TTS. Wires Notification + SubagentStop hooks so the terminal whispers progress instead of going *bing*. Useful when subagents run for minutes and you've wandered off. Use when the user wants TTS announcements, voice notifications, audible subagent feedback, or mentions "/tts", "speak", "announce", or "Kokoro". Audio never leaves the machine; no API keys.
