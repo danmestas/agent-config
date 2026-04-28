@@ -47,12 +47,15 @@ if $DRY_RUN; then
   exit 0
 fi
 
-# API key presence map
+# Auth presence — accept either an API key env var OR mounted OAuth credentials.
+# (Mount with: docker run -v $HOME/.claude:/root/.claude:ro ...)
+declare -A HARNESS_AUTH
+[[ -n "${ANTHROPIC_API_KEY:-}" || -f "$HOME/.claude/.credentials.json" ]] && HARNESS_AUTH[claude]=ok || HARNESS_AUTH[claude]=
+[[ -n "${OPENAI_API_KEY:-}" || -f "$HOME/.codex/auth.json" || -d "$HOME/.codex" ]] && HARNESS_AUTH[codex]=ok || HARNESS_AUTH[codex]=
+[[ -n "${GEMINI_API_KEY:-}" || -d "$HOME/.gemini" ]] && HARNESS_AUTH[gemini]=ok || HARNESS_AUTH[gemini]=
+[[ -n "${ANTHROPIC_API_KEY:-}" || -f "$HOME/.claude/.credentials.json" ]] && HARNESS_AUTH[pi]=ok || HARNESS_AUTH[pi]=
 declare -A HARNESS_KEY
-HARNESS_KEY[claude]="${ANTHROPIC_API_KEY:-}"
-HARNESS_KEY[codex]="${OPENAI_API_KEY:-}"
-HARNESS_KEY[gemini]="${GEMINI_API_KEY:-}"
-HARNESS_KEY[pi]="${ANTHROPIC_API_KEY:-}"
+for h in claude codex gemini pi; do HARNESS_KEY[$h]="${HARNESS_AUTH[$h]}"; done
 
 PASS_COUNT=0
 FAIL_COUNT=0
@@ -66,7 +69,7 @@ for harness in "${HARNESSES[@]}"; do
 
   api_key="${HARNESS_KEY[$harness]}"
   if [[ -z "$api_key" ]]; then
-    echo "[SKIP] $harness: API key not set — skipping all scenarios"
+    echo "[SKIP] $harness: no auth (no API key env var, no OAuth credentials mounted) — skipping all scenarios"
     SKIP_COUNT=$(( SKIP_COUNT + ${#SCENARIOS[@]} ))
     echo ""
     continue
