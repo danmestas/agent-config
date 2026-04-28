@@ -1,3 +1,4 @@
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { ComponentSource, ComponentType, Target } from './types.ts';
 
@@ -9,12 +10,14 @@ export interface ValidationError {
 
 type Cell = 'ok' | 'warn' | 'error';
 const MATRIX: Record<ComponentType, Record<Target, Cell>> = {
-  skill:  { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'warn',  pi: 'ok' },
-  plugin: { 'claude-code': 'ok',    apm: 'ok', codex: 'error', gemini: 'error', copilot: 'error', pi: 'ok' },
-  hook:   { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'ok',    pi: 'warn' },
-  agent:  { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'error', copilot: 'error', pi: 'ok' },
-  rules:  { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'ok',    pi: 'ok' },
-  mcp:    { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'error', pi: 'warn' },
+  skill:   { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'warn',  pi: 'ok' },
+  plugin:  { 'claude-code': 'ok',    apm: 'ok', codex: 'error', gemini: 'error', copilot: 'error', pi: 'ok' },
+  hook:    { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'ok',    pi: 'warn' },
+  agent:   { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'error', copilot: 'error', pi: 'ok' },
+  rules:   { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'ok',    pi: 'ok' },
+  mcp:     { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'error', pi: 'warn' },
+  persona: { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'ok',    pi: 'ok' },
+  mode:    { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'ok',    pi: 'ok' },
 };
 
 function validTypesForTarget(target: Target): ComponentType[] {
@@ -141,6 +144,104 @@ export function validateComponents(components: ComponentSource[]): ValidationErr
         componentName: c.manifest.name,
         message: 'skill is missing a category — add `category: { primary: <category> }` to frontmatter',
       });
+    }
+  }
+
+  return errors;
+}
+
+// ---------------------------------------------------------------------------
+// Async validation layer: TAXONOMY cross-ref + mode body-size limits
+// ---------------------------------------------------------------------------
+
+async function loadValidCategories(repoRoot: string): Promise<Set<string>> {
+  const taxonomyPath = path.join(repoRoot, 'TAXONOMY.md');
+  const text = await fs.readFile(taxonomyPath, 'utf8');
+  // Categories appear as ### headings: "### 1. Economy", "### 2. Workflow", ...
+  const matches = text.matchAll(/^### \d+\.\s+(\w[\w-]*)/gm);
+  return new Set(Array.from(matches, (m) => m[1].toLowerCase()));
+}
+
+/**
+ * Async extension of validateComponents.
+ * Runs the synchronous checks first, then adds:
+ *   1. persona/mode categories cross-ref against TAXONOMY.md
+ *   2. persona/mode skill_include/skill_exclude cross-ref against known skills
+ *   3. mode body size limit (error >4096 bytes, warning >1024 bytes)
+ *
+ * @param components  Discovered component sources.
+ * @param repoRoot    Absolute path to the repository root (where TAXONOMY.md lives).
+ *                    Defaults to cwd so tests can omit it when they don't need taxonomy checks.
+ */
+export async function validateAll(
+  components: ComponentSource[],
+  repoRoot: string = process.cwd(),
+): Promise<ValidationError[]> {
+  const errors = validateComponents(components);
+
+  const allSkillNames = new Set(
+    components
+      .filter((c) => c.manifest.type === 'skill')
+      .map((c) => c.manifest.name),
+  );
+
+  let validCats: Set<string> | null = null;
+  async function getValidCats(): Promise<Set<string>> {
+    if (!validCats) validCats = await loadValidCategories(repoRoot);
+    return validCats;
+  }
+
+  for (const component of components) {
+    const { manifest } = component;
+    if (manifest.type !== 'persona' && manifest.type !== 'mode') continue;
+
+    const cats: Set<string> = await getValidCats();
+
+    for (const cat of manifest.categories ?? []) {
+      if (!cats.has(cat.toLowerCase())) {
+        errors.push({
+          severity: 'error',
+          componentName: manifest.name,
+          message: `category "${cat}" not in TAXONOMY.md (valid: ${Array.from(cats).join(', ')})`,
+        });
+      }
+    }
+
+    for (const inc of manifest.skill_include ?? []) {
+      if (!allSkillNames.has(inc)) {
+        errors.push({
+          severity: 'error',
+          componentName: manifest.name,
+          message: `skill_include references unknown skill: ${inc}`,
+        });
+      }
+    }
+
+    for (const exc of manifest.skill_exclude ?? []) {
+      if (!allSkillNames.has(exc)) {
+        errors.push({
+          severity: 'error',
+          componentName: manifest.name,
+          message: `skill_exclude references unknown skill: ${exc}`,
+        });
+      }
+    }
+
+    if (manifest.type === 'mode') {
+      const len = Buffer.byteLength(component.body, 'utf8');
+      if (len > 4096) {
+        errors.push({
+          severity: 'error',
+          componentName: manifest.name,
+          message: `mode body too long: ${len} bytes (max 4096)`,
+        });
+      } else if (len > 1024) {
+        errors.push({
+          severity: 'warning',
+          componentName: manifest.name,
+          message: `mode body is ${len} bytes (>1024 warns; long prompts cost real tokens every session)`,
+        });
+      }
     }
   }
 

@@ -64,6 +64,10 @@ export interface ComponentManifest {
   before?: string[];
   after?: string[];
   overrides?: Partial<Record<Target, Record<string, unknown>>>;
+  // persona / mode specific
+  categories?: string[];
+  skill_include?: string[];
+  skill_exclude?: string[];
 }
 
 export interface EmittedFile {

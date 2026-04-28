@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateComponents } from '../lib/validate.ts';
+import { validateComponents, validateAll } from '../lib/validate.ts';
 import type { ComponentSource } from '../lib/types.ts';
 
 function mk(overrides: Partial<ComponentSource['manifest']>): ComponentSource {
@@ -136,5 +136,85 @@ describe('validateComponents — Gemini-specific rejections', () => {
       mk({ name: 'pl', type: 'plugin', targets: ['gemini'], includes: [] }),
     ]);
     expect(errors.some((e) => e.severity === 'error' && /plugin.*gemini/i.test(e.message))).toBe(true);
+  });
+});
+
+describe('persona/mode validation', () => {
+  // repoRoot points at the actual TAXONOMY.md in the worktree
+  const REPO_ROOT = new URL('../..', import.meta.url).pathname;
+
+  it('rejects persona with category not in TAXONOMY', async () => {
+    const errors = await validateAll(
+      [
+        {
+          relativeDir: 'personas/bad',
+          manifest: {
+            name: 'bad',
+            version: '1.0.0',
+            type: 'persona',
+            description: 'bad',
+            targets: ['claude-code'],
+            categories: ['notARealCategory'],
+            skill_include: [],
+            skill_exclude: [],
+          },
+          body: '',
+          dir: '/tmp/bad',
+        } as any,
+      ],
+      REPO_ROOT,
+    );
+    expect(errors.some((e) => e.message.includes('notARealCategory'))).toBe(true);
+  });
+
+  it('rejects persona referencing nonexistent skill in skill_include', async () => {
+    const errors = await validateAll(
+      [
+        {
+          relativeDir: 'personas/bad',
+          manifest: {
+            name: 'bad',
+            version: '1.0.0',
+            type: 'persona',
+            description: 'bad',
+            targets: ['claude-code'],
+            categories: ['tooling'],
+            skill_include: ['definitelyNotARealSkill'],
+            skill_exclude: [],
+          },
+          body: '',
+          dir: '/tmp/bad',
+        } as any,
+      ],
+      REPO_ROOT,
+    );
+    expect(errors.some((e) => e.message.includes('definitelyNotARealSkill'))).toBe(true);
+  });
+
+  it('rejects mode body > 4096 bytes', async () => {
+    const longBody = 'x'.repeat(4097);
+    const errors = await validateAll(
+      [
+        {
+          relativeDir: 'modes/long',
+          manifest: {
+            name: 'long',
+            version: '1.0.0',
+            type: 'mode',
+            description: 't',
+            targets: ['claude-code'],
+            categories: ['tooling'],
+            skill_include: [],
+            skill_exclude: [],
+          },
+          body: longBody,
+          dir: '/tmp/long',
+        } as any,
+      ],
+      REPO_ROOT,
+    );
+    expect(
+      errors.some((e) => e.message.toLowerCase().includes('too long') || e.message.includes('4096')),
+    ).toBe(true);
   });
 });
