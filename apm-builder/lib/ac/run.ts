@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
@@ -16,6 +17,18 @@ export interface ParsedAcArgs {
   noFilter: boolean;
   verbose: boolean;
   harnessArgs: string[];
+}
+
+/** Walk upward from `start` and return the directory containing the topmost `marker` file. */
+function findRepoRoot(start: string, marker = 'package.json'): string {
+  let dir = path.resolve(start);
+  let lastFound: string | null = null;
+  while (dir !== path.dirname(dir)) {
+    if (existsSync(path.join(dir, marker))) lastFound = dir;
+    dir = path.dirname(dir);
+  }
+  if (!lastFound) throw new Error(`findRepoRoot: no ${marker} found from ${start}`);
+  return lastFound;
 }
 
 const HARNESS_ALIASES: Record<string, Target> = {
@@ -119,9 +132,7 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
   const userDir = deps.userDir ?? path.join(os.homedir(), '.config', 'agent-config');
   // run.ts lives at <repo>/apm-builder/lib/ac/run.ts — walk up 3 dirs to the repo
   // root where personas/ and modes/ live.
-  const builtinDir =
-    deps.builtinDir ??
-    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+  const builtinDir = deps.builtinDir ?? findRepoRoot(path.dirname(fileURLToPath(import.meta.url)));
   const dirs = { projectDir, userDir, builtinDir };
 
   const env: NodeJS.ProcessEnv = { ...process.env, AC_WRAPPED: '1', AC_HARNESS: target };

@@ -1,0 +1,45 @@
+name: Docker test matrix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Test mode'
+        required: true
+        default: 'shim'
+        type: choice
+        options:
+          - shim
+          - real
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: docker build -f apm-builder/tests/integration/docker/Dockerfile -t agent-config-test .
+
+      - name: Run shim-mode matrix (no auth, no API cost)
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.mode == 'shim'
+        run: docker run --rm agent-config-test
+
+      - name: Run real-mode matrix (requires API keys)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'real'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          docker run --rm \
+            -e ANTHROPIC_API_KEY \
+            -e OPENAI_API_KEY \
+            -e GEMINI_API_KEY \
+            agent-config-test --real

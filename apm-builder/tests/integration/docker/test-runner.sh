@@ -13,14 +13,17 @@ SCENARIOS=(01-no-flags 02-persona-only 03-mode-only 04-persona-and-mode 05-no-fi
 
 HARNESS_FILTER=""
 DRY_RUN=false
+REAL_MODE=false
 
 for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY_RUN=true ;;
+    --real) REAL_MODE=true ;;
     --help|-h)
-      echo "Usage: test-runner.sh [harness] [--dry-run]"
+      echo "Usage: test-runner.sh [harness] [--dry-run] [--real]"
       echo "  harness   claude | codex | gemini | pi  (default: all)"
       echo "  --dry-run print plan without running"
+      echo "  --real    invoke actual harness binaries (requires auth)"
       exit 0
       ;;
     -*) echo "Unknown flag: $arg" >&2; exit 1 ;;
@@ -84,7 +87,7 @@ for harness in "${HARNESSES[@]}"; do
     fi
 
     set +e
-    output=$(bash "$script" "$harness" 2>&1)
+    output=$(REAL_MODE=$REAL_MODE bash "$script" "$harness" 2>&1)
     exit_code=$?
     set -e
 
