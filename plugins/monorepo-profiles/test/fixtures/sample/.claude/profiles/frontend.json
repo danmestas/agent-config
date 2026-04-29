@@ -1,0 +1,16 @@
+{
+  "name": "frontend",
+  "description": "Web app stack",
+  "mcp_servers": {
+    "playwright": { "command": "npx", "args": ["@playwright/mcp"] }
+  },
+  "permissions": {
+    "allow": ["Bash(npm *)", "Bash(pnpm *)"],
+    "deny":  ["Bash(rm -rf *)"]
+  },
+  "plugins": [
+    "frontend-design@claude-plugins-official",
+    "agent-browser@claude-plugins-official"
+  ],
+  "local_skills": "apps/web/.claude/skills"
+}

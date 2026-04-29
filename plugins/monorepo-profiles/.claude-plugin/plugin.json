@@ -1,0 +1,6 @@
+{
+  "name": "monorepo-profiles",
+  "version": "0.1.0",
+  "description": "Atomic per-monorepo profile switching: MCP servers, permissions, plugins, skills, agents, AGENTS.md fragments.",
+  "author": { "name": "dmestas" }
+}

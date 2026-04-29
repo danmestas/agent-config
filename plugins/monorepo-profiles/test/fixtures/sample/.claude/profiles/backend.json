@@ -1,0 +1,18 @@
+{
+  "name": "backend",
+  "description": "Go API services",
+  "mcp_servers": {
+    "github": { "command": "npx", "args": ["@modelcontextprotocol/server-github"] }
+  },
+  "permissions": {
+    "allow": ["Bash(go *)", "Bash(docker *)"],
+    "deny":  ["Bash(rm -rf *)", "Bash(kubectl delete *)"]
+  },
+  "plugins": [
+    "gopls-lsp@claude-plugins-official",
+    "code-review@claude-plugins-official"
+  ],
+  "local_skills": "services/api/.claude/skills",
+  "local_agents": "services/api/.claude/agents",
+  "instruction_fragments": [".claude/profiles/backend.preamble.md"]
+}
