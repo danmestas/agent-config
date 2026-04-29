@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# test_e2e.sh — end-to-end check that render.sh produces distinct themed SVGs
-# across different themes, with --with-stdlib plumbed through to the compile
-# wrapper. HTML wrapping was dropped from render.sh in the Phase C unification
-# (deferred to a follow-up); this test now asserts SVG output directly.
+# test_e2e.sh — end-to-end check that compile.sh produces distinct themed SVGs
+# across different themes, with --with-stdlib plumbed through.
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 cd "$(dirname "$0")/.."
@@ -15,7 +13,7 @@ assert_file_exists "$template"
 
 for theme in default tokyo-night dracula; do
   out="$WORK/$theme.svg"
-  bin/render.sh --with-stdlib --theme "$theme" "$template" > "$out"
+  bin/compile.sh --with-stdlib --theme "$theme" "$template" > "$out"
   content="$(cat "$out")"
   assert_contains "$content" "<svg" "$theme: SVG emitted"
   assert_contains "$content" "</svg>" "$theme: SVG closed"

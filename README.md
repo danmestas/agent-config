@@ -231,19 +231,24 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 | obsidian-bases | skill | 0.1.0 | Create and edit Obsidian Bases (.base files): Obsidian's native database layer for dynamic tables, card views, list views, filters, formulas, and summaries over vault notes. Triggers on: create a base, add a base file, obsidian bases, base view, filter notes, formula, database view, dynamic table, task tracker base, reading list base. | claude-code |
 | obsidian-canvas | skill | 0.1.0 | Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to Obsidian canvas files with auto-positioning inside zones. Integrates with /banana for image capture. Triggers on: /canvas, canvas new, canvas add image, canvas add text, canvas add pdf, canvas add note, canvas zone, canvas list, canvas from banana, add to canvas, put this on the canvas, open canvas, create canvas. | claude-code |
 | obsidian-markdown | skill | 0.1.0 | Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, highlights, math, and canvas syntax. Reference this when creating or editing any wiki page. Triggers on: write obsidian note, obsidian syntax, wikilink, callout, embed, obsidian markdown, wikilink format, callout syntax, embed syntax, obsidian formatting, how to write obsidian markdown. | claude-code |
-| pikchr-generator | skill | 0.2.0 | Generate, theme, and render technical diagrams across four engines (Pikchr,
-GraphViz, D2, Mermaid) with a shared 16-theme palette. Use whenever the user
-asks for a diagram, flowchart, sequence diagram, system architecture,
-state machine, data pipeline, swim lane, network topology, ER diagram,
-class diagram, or any boxes-and-arrows technical illustration AND mentions
-pikchr, graphviz, dot, d2, or mermaid OR has indicated a preference for
-text-defined diagrams (over excalidraw/figma). Also use when the user says
-"draw the architecture", "diagram this flow", "make a chart of X", "show
-the states", "graph this topology", or asks for any visual these engines
-are suited for. Outputs themed SVG (any of 16 themes via --theme NAME).
-Do NOT use for freeform sketches that need curves and pen strokes (use
-excalidraw), real Gantt/pie charts (use a chart library), or rich data viz.
+| pikchr-generator | skill | 0.3.0 | Author production-grade technical diagrams in Pikchr — a deterministic,
+text-defined diagram DSL that compiles to a single self-contained SVG.
+Use whenever the user asks for a flowchart, sequence diagram, system
+architecture, state machine, data pipeline, swim lane, or any
+boxes-and-arrows technical illustration AND has expressed a preference
+for text-defined / source-controlled diagrams (over excalidraw, figma,
+or hand-drawn art). Also use when the user says "draw the architecture",
+"diagram this flow", "show the states", "graph this topology", or
+mentions pikchr by name. Output is themed SVG (16 themes via --theme NAME)
+that renders inline in any Markdown surface that accepts SVG (GitHub,
+GitLab, Obsidian, mdBook, agent multimodal Read, etc.). Do NOT use for
+freeform sketches with curves and pen strokes (excalidraw), real
+Gantt/pie charts (a chart library), or rich data viz.
  | apm, claude-code |
+| shadcn-forms | skill | 0.1.0 | This skill should be used when generating React form components with shadcn/ui, wiring up react-hook-form with zod validation, choosing the right shadcn/ui input component for each field type, or when the user asks to "build a form with shadcn", "add form validation", "use react-hook-form", "create a zod schema for this form". Provides component selection guidance, validation patterns, and production-ready implementation recipes for shadcn/ui v4 forms.
+ | claude-code |
+| vitaly | skill | 0.1.0 | This skill should be used when generating web form components, auditing form accessibility, reviewing form UX, or when the user asks to "check form accessibility", "audit this form", "apply form best practices", "make this form accessible", "review form UX". Also triggers on form generation tasks where the output is a React form component. Based on Vitaly Friedman's (Smashing Magazine) accessible web form design patterns.
+ | claude-code |
 
 ### workflow
 
@@ -254,6 +259,20 @@ excalidraw), real Gantt/pie charts (use a chart library), or rich data viz.
 | subagent-to-subharness | skill | 0.1.0 | Use when you would normally dispatch a subagent via the Agent tool but you're operating as the Darkish Factory orchestrator. Translates the muscle memory into subharness dispatch. Maps task shapes to the right harness role, frames the task in caveman-standard, reads worker output back, decides next step. | claude-code |
 | tts-announcer | hook | 0.1.0 | Local, offline voice announcements for Claude Code and Pi via Kokoro-82M TTS. Wires Notification + SubagentStop hooks so the terminal whispers progress instead of going *bing*. Useful when subagents run for minutes and you've wandered off. Use when the user wants TTS announcements, voice notifications, audible subagent feedback, or mentions "/tts", "speak", "announce", or "Kokoro". Audio never leaves the machine; no API keys.
  | claude-code, pi |
+
+### Uncategorized
+
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+| aviation | persona | 1.0.0 | Aviation / flight planning work | claude-code, codex, copilot, gemini |
+| backend | persona | 1.0.0 | Backend dev work — Go, observability, infra, philosophy | apm, claude-code, codex, copilot, gemini, pi |
+| code | mode | 1.0.0 | Software development tasks: writing, reviewing, refactoring, debugging code. | apm, claude-code, codex, copilot, gemini, pi |
+| design | mode | 1.0.0 | UI, UX, interaction, and visual design tasks. | apm, claude-code, codex, copilot, gemini, pi |
+| focused | mode | 1.0.0 | Single-task deep focus, no scope creep | apm, claude-code, codex, copilot, gemini, pi |
+| frontend | persona | 1.0.0 | Frontend / Datastar work | apm, claude-code, codex, copilot, gemini, pi |
+| ops | mode | 1.0.0 | Operations, infrastructure, deployment, observability, and on-call work. | apm, claude-code, codex, copilot, gemini, pi |
+| personal | persona | 1.0.0 | Personal projects, journaling, knowledge-base maintenance | apm, claude-code, codex, copilot, gemini, pi |
+| taxes | persona | 1.0.0 | Tax preparation / non-code document work | claude-code, codex, copilot, gemini |
 <!-- /AUTO-GENERATED: COMPONENTS -->
 
 ## Building

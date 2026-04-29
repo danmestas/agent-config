@@ -1,19 +1,20 @@
 ---
 name: pikchr-generator
-version: 0.2.0
+version: 0.3.0
 description: |
-  Generate, theme, and render technical diagrams across four engines (Pikchr,
-  GraphViz, D2, Mermaid) with a shared 16-theme palette. Use whenever the user
-  asks for a diagram, flowchart, sequence diagram, system architecture,
-  state machine, data pipeline, swim lane, network topology, ER diagram,
-  class diagram, or any boxes-and-arrows technical illustration AND mentions
-  pikchr, graphviz, dot, d2, or mermaid OR has indicated a preference for
-  text-defined diagrams (over excalidraw/figma). Also use when the user says
-  "draw the architecture", "diagram this flow", "make a chart of X", "show
-  the states", "graph this topology", or asks for any visual these engines
-  are suited for. Outputs themed SVG (any of 16 themes via --theme NAME).
-  Do NOT use for freeform sketches that need curves and pen strokes (use
-  excalidraw), real Gantt/pie charts (use a chart library), or rich data viz.
+  Author production-grade technical diagrams in Pikchr — a deterministic,
+  text-defined diagram DSL that compiles to a single self-contained SVG.
+  Use whenever the user asks for a flowchart, sequence diagram, system
+  architecture, state machine, data pipeline, swim lane, or any
+  boxes-and-arrows technical illustration AND has expressed a preference
+  for text-defined / source-controlled diagrams (over excalidraw, figma,
+  or hand-drawn art). Also use when the user says "draw the architecture",
+  "diagram this flow", "show the states", "graph this topology", or
+  mentions pikchr by name. Output is themed SVG (16 themes via --theme NAME)
+  that renders inline in any Markdown surface that accepts SVG (GitHub,
+  GitLab, Obsidian, mdBook, agent multimodal Read, etc.). Do NOT use for
+  freeform sketches with curves and pen strokes (excalidraw), real
+  Gantt/pie charts (a chart library), or rich data viz.
 type: skill
 targets:
   - claude-code
@@ -22,13 +23,23 @@ category:
   primary: tooling
 ---
 
-# Pikchr Generator (multi-engine)
+# Pikchr Generator
 
-Author technical diagrams in any of four text-defined engines — **Pikchr**, **GraphViz `dot`**, **D2**, or **Mermaid** — compile them to themed SVG via a shared 16-theme palette, then inline or commit the result.
+Author technical diagrams in **Pikchr** — Brian Kernighan's PIC, modernized
+for the web — and compile them to themed SVG. One engine. One workflow.
+Every shape, line, and label flows through the 16-theme palette so the same
+source renders cleanly in dark mode, light mode, or any other theme.
+
+## Why Pikchr
+
+- **Deterministic.** Same source → same SVG, byte-for-byte. No layout engine roulette.
+- **Self-contained.** Output is a single `<svg>` block — no external fonts, scripts, or assets.
+- **Source-controlled.** Diff-friendly text. Commit `.pikchr` next to `.svg` so reviewers see both intent and result.
+- **Native rendering** in Fossil, mdBook (with `mdbook-pikchr`), Sphinx (`sphinxcontrib-kroki`), AsciiDoctor, and Obsidian (`Adamantine Pick`). Pre-render to SVG for everywhere else.
 
 ## Resolving the skill directory
 
-Every command below uses `$SKILL_DIR`. Set it once per session. The resolver finds the skill regardless of where it was installed (global, project-local, APM-deployed, symlinked):
+Every command below uses `$SKILL_DIR`. Set it once per session:
 
 ```bash
 SKILL_DIR="$(
@@ -42,151 +53,185 @@ SKILL_DIR="$(
 [[ -n "$SKILL_DIR" ]] || { echo "pikchr-generator skill not found"; exit 1; }
 ```
 
-## When to use this skill
+## First-run check: install the binary
 
-Trigger when the user wants a **technical diagram** — flowchart, sequence, system architecture, state machine, data pipeline, swim lane, ER, class, network topology — and either explicitly mentions one of the supported engines (pikchr, graphviz/dot, d2, mermaid) OR has expressed a preference for text-defined diagrams.
+```bash
+ls "$SKILL_DIR/bin/pikchr" 2>/dev/null || bash "$SKILL_DIR/bin/install-pikchr.sh"
+```
 
-Engine selection (see `docs/engine-matrix.md` for the full table):
+The installer compiles `pikchr.c` (single-file C source) and drops the binary at `$SKILL_DIR/bin/pikchr`. Needs a C compiler (`cc`).
 
-| Diagram type | Best engine | Fallback |
+## The one workflow
+
+```
+.pikchr (source)  →  bin/compile.sh --theme NAME  →  themed .svg
+```
+
+```bash
+# File input, themed output to stdout
+"$SKILL_DIR/bin/compile.sh" --theme tokyo-night diagram.pikchr > diagram.svg
+
+# Stdin
+echo 'box "hi"' | "$SKILL_DIR/bin/compile.sh" --theme dracula -
+
+# Prepend stdlib macros (db, actor, lambda, queue, decision, note, ...)
+"$SKILL_DIR/bin/compile.sh" --theme nord --with-stdlib diagram.pikchr > diagram.svg
+
+# Offline build offline? Fall back to Kroki HTTP
+"$SKILL_DIR/bin/compile.sh" --theme github-dark --kroki diagram.pikchr > diagram.svg
+```
+
+That's the entire interface. No dispatcher, no engine selection, no per-format compiler — `compile.sh` is the only entry point.
+
+## Themes (16)
+
+`default` (= `zinc-dark`), `zinc-light`, `zinc-dark`, `tokyo-night`, `tokyo-storm`, `tokyo-light`, `catppuccin`, `latte`, `nord`, `nord-light`, `dracula`, `github`, `github-dark`, `solarized`, `solar-dark`, `one-dark`, `cursor-dark`.
+
+Themes work via **sentinel-color substitution**: the SVG body uses 7 fixed hex sentinels (`#010203` … `#505152`), `lib/themeize.sh` rewrites them to `var(--bg)`, `var(--fg)`, `var(--line)`, `var(--accent)`, `var(--muted)`, `var(--surface)`, `var(--border)`, then injects a `<style>` block setting those custom properties to the chosen theme's hex values. Templates and the stdlib already use sentinels — your sources should too.
+
+See `references/theming.md` for the palette structure and how to add a theme.
+
+## Templates: start here
+
+The fastest path to a high-quality diagram is to copy a template and adapt it. Every template uses stdlib macros + sentinel colors so themes apply uniformly.
+
+| Template | Use for |
+|---|---|
+| `templates/architecture.pikchr` | System architecture (web → API → service → DB, with cache + queue side-branches) |
+| `templates/flowchart.pikchr` | Top-down decision flow with a yes/no branch |
+| `templates/sequence.pikchr` | Sequence-ish (actors + dashed lifelines + horizontal messages — pikchr has no native sequence type) |
+| `templates/state-machine.pikchr` | States + labelled transitions, with backedges |
+| `templates/data-pipeline.pikchr` | Source → transform → sink chain with a side-monitoring branch |
+| `templates/swim-lane.pikchr` | 3-lane process diagram with cross-lane arrows |
+
+## Authoring discipline
+
+Pikchr rewards a small number of strong habits. Follow these for diagrams that read cleanly and re-theme cleanly.
+
+### 1. Use the stdlib macros for visual hierarchy
+
+`--with-stdlib` prepends `lib/stdlib.pikchr`, which defines pseudo-primitives that map to **roles**, not shapes:
+
+| Macro | Role | Visual |
 |---|---|---|
-| System architecture (boxes + arrows) | **pikchr** or **d2** | — |
-| Flowchart | **mermaid** or **pikchr** | — |
-| Sequence diagram | **d2** (native) or **mermaid** | pikchr (hand-rolled lifelines) |
-| State machine | **mermaid** `stateDiagram-v2` | d2 |
-| Network topology / graph layout | **dot** | — |
-| ER diagram | **mermaid** `erDiagram` | — |
-| Class diagram | **mermaid** `classDiagram` | — |
-| BPMN / swim lanes | **pikchr** (hand-rolled) | d2 |
+| `actor("X")` | primary actors / entry points | accent fill, inverted text |
+| `lambda("X")` | services / functions | accent fill, rounded |
+| `decision("X")` | branches | accent fill, diamond |
+| `db("X")` | persistent stores | surface fill, cylinder |
+| `datastore("X")` | passive files / artifacts | surface fill, file shape |
+| `queue("X")` | queues / streams | muted fill, oval |
+| `cloud("X")` | external services | surface fill, ellipse |
+| `note("X")` | annotations | muted fill, dashed |
 
-**Do NOT use** for: freeform sketches (excalidraw), real Gantt/pie charts (charting libs), or rich data viz.
+When you need a custom shape, use sentinel colors directly (`fill 0x202122`, `color 0x0a0b0c`, etc.) — never raw RGB. Raw colors will not theme.
 
-## First-run check: install the engine(s)
+### 2. Position relatively, not absolutely
 
-The four engines are independent — install only what you need.
+Anchor every node off another node's edge. Use compass anchors (`A.e`, `B.s`, `C.ne`) and offsets (`A.e + (0.5, 0)`) instead of absolute coordinates. When you change a label and a node grows, the rest of the diagram still lines up.
 
-| Engine | Installer | Binary path | Runtime dep |
-|---|---|---|---|
-| pikchr | `bash $SKILL_DIR/bin/install-pikchr.sh` | `$SKILL_DIR/bin/pikchr` | C compiler |
-| dot (GraphViz) | `bash $SKILL_DIR/bin/install-dot.sh` | `$SKILL_DIR/bin/dot` (symlink) | brew / apt |
-| d2 | `bash $SKILL_DIR/bin/install-d2.sh` | `$SKILL_DIR/bin/d2` | — (tarball) or brew |
-| mermaid | `bash $SKILL_DIR/bin/install-mermaid.sh` | `$SKILL_DIR/bin/node_modules/` | Node 18+ |
+```
+# Good
+API: lambda("Service") at Web.e + (1.5, 0)
 
-Quick probe:
+# Brittle
+API: lambda("Service") at (3.5, 0)
+```
+
+### 3. Single pass — define before reference
+
+Pikchr parses top-to-bottom in a single pass. Forward references break. Put labels (capitalized: `Web`, `API`, `DB`) in the order the reader's eye will travel.
+
+### 4. Macro args are unquoted
+
+Token-level lexical substitution runs **before** the parser. `"$1"` inside a macro body is one literal string token — substitution never fires inside it.
+
+```
+# Correct — caller supplies quotes
+define step { box $1 fit fill 0x202122 color 0x010203 }
+step("Validate")     # → box "Validate" fit ...
+
+# Wrong — $1 is literal
+define step { box "$1" fit }
+step("Validate")     # → box "$1" fit  (literal label)
+```
+
+### 5. Manhattan routing for arrows that turn
+
+`arrow from A.s down 0.3in then right until even with B then to B.n` produces a clean L-shape. Use `\` for line continuation when the path gets long.
+
+### 6. Five strings max per object
+
+Each object can carry up to 5 string labels (multi-line). For more, use a separate `text` primitive at the desired position.
+
+### 7. Containers, not curly braces
+
+`[ ... ]` groups objects. `{ ... }` is **only** for `define` macro bodies. Mixing them is a common first-time error.
+
+### 8. One diagram, one direction
+
+Set `right` / `down` / `left` / `up` once at the top. Containers (`[ ... ]`) get their own local direction that doesn't leak out.
+
+## Anti-patterns
+
+| Don't | Why |
+|---|---|
+| Hard-coded RGB (`fill 0x4a90e2`) | Bypasses the theme pipeline; renders the same in every theme |
+| Color names (`fill lightcyan`) | Same problem — pikchr maps these to fixed hex |
+| Absolute coordinates (`at (3, -2)`) | Breaks when any upstream label resizes |
+| Forward references | Single-pass parser; the second pass doesn't exist |
+| `{ ... }` for grouping | That's macro-body syntax. Use `[ ... ]` |
+| Quoted `$1` in a macro body | Caller supplies quotes — `"$1"` is a literal token |
+| 6+ strings on one shape | Hard limit of 5; use a `text` primitive for the rest |
+
+## Delivering the diagram
+
+```
+Did the user ask to see the diagram NOW?
+├── YES  → compile.sh → Read the SVG (multimodal display)
+└── NO   → Where will it live?
+          ├── GitHub README / generic markdown → compile.sh → commit the .svg
+          ├── Fossil / mdBook+pikchr-plugin / Obsidian+Adamantine
+          │     → leave as `.pikchr` source in a fenced code block
+          └── Custom site → compile.sh → embed the <svg> inline
+```
+
+For the full surface-by-surface compatibility matrix and gotchas (GitHub strips `<script>`, `<img src>` doesn't inherit `currentColor`, etc.), see `references/renderers.md`.
+
+## Quick start
 
 ```bash
-ls "$SKILL_DIR/bin/pikchr" "$SKILL_DIR/bin/d2" 2>/dev/null
-command -v dot node
-ls "$SKILL_DIR/bin/node_modules/beautiful-mermaid" 2>/dev/null
+# 1. Copy a template
+cp "$SKILL_DIR/templates/architecture.pikchr" /tmp/diagram.pikchr
+
+# 2. Edit it (labels, structure)
+
+# 3. Compile + theme
+"$SKILL_DIR/bin/compile.sh" --with-stdlib --theme tokyo-night /tmp/diagram.pikchr > /tmp/diagram.svg
+
+# 4. Display via multimodal Read (or commit /tmp/diagram.svg into the repo)
 ```
-
-## Workflow
-
-```
-authoring (.pikchr / .dot / .d2 / .mmd) → compile → themed SVG
-```
-
-1. **Author** the source in whichever engine syntax fits the diagram type.
-2. **Compile** with the universal dispatcher (auto-detects engine from extension) or the engine-specific compiler.
-3. **Display** by reading the SVG with the multimodal `Read` tool (to show inline in this conversation) or committing it to the repo for README embedding.
-
-## Common commands
-
-### Universal dispatcher
-
-```bash
-# Auto-detect engine from extension, apply theme, emit SVG on stdout
-"$SKILL_DIR/bin/render.sh" --theme tokyo-night path/to/diagram.pikchr > diagram.svg
-"$SKILL_DIR/bin/render.sh" --theme cursor-dark path/to/topology.dot > topology.svg
-"$SKILL_DIR/bin/render.sh" --theme dracula path/to/flow.d2 > flow.svg
-"$SKILL_DIR/bin/render.sh" --theme github path/to/state.mmd > state.svg
-
-# Explicit engine override (required for stdin)
-echo 'box "x"' | "$SKILL_DIR/bin/render.sh" --engine pikchr --theme solar-dark -
-
-# Stdlib macros (pikchr + dot only)
-"$SKILL_DIR/bin/render.sh" --with-stdlib path/to/diagram.pikchr > diagram.svg
-```
-
-### Engine-specific compilers (bypass dispatcher)
-
-```bash
-# pikchr
-"$SKILL_DIR/bin/compile.sh"         [--theme NAME] [--with-stdlib] file.pikchr > file.svg
-
-# GraphViz dot
-"$SKILL_DIR/bin/compile-dot.sh"     [--theme NAME] [--with-stdlib] file.dot     > file.svg
-
-# D2
-"$SKILL_DIR/bin/compile-d2.sh"      [--theme NAME]                 file.d2      > file.svg
-
-# Mermaid
-"$SKILL_DIR/bin/compile-mermaid.sh" [--theme NAME]                 file.mmd     > file.svg
-```
-
-## Themes
-
-Sixteen shared themes work across all four engines. Every SVG output includes a `<style>` block defining CSS custom properties (`--bg`, `--fg`, `--line`, `--accent`, `--muted`, `--surface`, `--border`) — the body references these via `var(--token)` so the same source renders different colors per theme.
-
-Available themes: `default`, `zinc-light`, `zinc-dark`, `tokyo-night`, `tokyo-storm`, `tokyo-light`, `catppuccin`, `latte`, `nord`, `nord-light`, `dracula`, `github`, `github-dark`, `solarized`, `solar-dark`, `one-dark`, `cursor-dark`.
-
-`default` is an alias for `zinc-dark`.
-
-## How the theming works
-
-The per-engine compile wrappers all pipe their raw SVG through `$SKILL_DIR/lib/themeize.sh`, which:
-
-1. Replaces sentinel hex values (`#010203`, `#0a0b0c`, `#101112`, `#202122`, `#303132`, `#404142`, `#505152`) with `var(--bg)`, `var(--fg)`, `var(--line)`, `var(--accent)`, `var(--muted)`, `var(--surface)`, `var(--border)` respectively.
-2. Injects a `<style>` block that assigns the selected theme's concrete hex values to those custom properties.
-3. Ensures `text` elements inherit `currentColor` so foreground copy follows the theme.
-
-Engine-specific stdlibs (`lib/stdlib.pikchr`, `lib/stdlib.dot`) use sentinel colors in their shape macros. D2 and Mermaid handle defaults natively via `--theme=0` / beautiful-mermaid's theme map, but sentinel colors in user sources still get themed.
 
 ## Reference materials
 
 - `references/syntax.md` — pikchr language reference (primitives, attributes, layout, cheatsheet)
-- `references/theming.md` — theming guide (palette structure, gotchas, adding new themes)
-- `references/renderers.md` — which engines render where (GitHub, VS Code, mdBook, agent harnesses)
-- `references/stdlib-reference.md` — pikchr macro stdlib docs
-- `../../docs/engine-matrix.md` — full engine decision table
+- `references/theming.md` — palette structure, sentinel mapping, adding new themes
+- `references/renderers.md` — where pikchr renders natively vs. needs pre-render
+- `references/stdlib-reference.md` — the macro stdlib, every role explained
+- `lib/stdlib.pikchr` — read the source; it's 30 lines and shows every macro
 
-## Authoring tips
-
-**Pikchr:** single-pass (define before reference). Use relative positioning (`at A.e + (0.5, 0)`). Macro args: write `$1` **unquoted** in macro bodies — pikchr tokenises before substitution.
-
-**Dot:** let the layout engine do the work. Use `rankdir=LR` / `TB` and subgraph clusters; prefer attribute defaults (`node [shape=box,...]`) at the top.
-
-**D2:** use named shapes (`shape: sequence_diagram`, `shape: cylinder`) when they match your intent; apply per-node style for sequence diagrams (wildcards don't work inside `shape: sequence_diagram`).
-
-**Mermaid:** `graph TD;`, `sequenceDiagram`, `stateDiagram-v2`, `erDiagram`, `classDiagram`. One statement per line (semicolons work in classic `graph`/`flowchart` but not everywhere).
-
-## Quick start: produce a diagram for the user, right now
-
-```bash
-# 1. Write the source (picking the right engine for the job)
-cat > /tmp/diagram.d2 <<'EOF'
-shape: sequence_diagram
-Browser: "Browser"
-Server: "Server"
-Browser -> Server: GET /api
-Server -> Browser: 200 OK
-EOF
-
-# 2. Compile + theme
-"$SKILL_DIR/bin/render.sh" --theme tokyo-night /tmp/diagram.d2 > /tmp/diagram.svg
-
-# 3. Show the user via multimodal Read
-# (call the Read tool on /tmp/diagram.svg)
-```
-
-## Decision tree: delivering the diagram to the user
+## Layout
 
 ```
-Did the user ask to see the diagram NOW in this conversation?
-├── YES → render.sh → Read the SVG (multimodal display)
-└── NO  → Where will it eventually live?
-         ├── GitHub README / generic markdown → render.sh → commit the .svg
-         ├── Fossil / mdBook (with pikchr plugin)
-         │   → leave as `.pikchr` source in a fenced code block
-         └── Custom site → render.sh → embed the <svg> inline
+SKILL.md                 — this file
+bin/
+  pikchr                 — compiled binary
+  install-pikchr.sh      — builds pikchr.c → bin/pikchr
+  compile.sh             — only entry point: source → themed SVG
+lib/
+  stdlib.pikchr          — pseudo-primitive macros (actor, lambda, db, …)
+  themeize.sh            — SVG post-processor: sentinel hex → var(--token) + <style>
+  themes.json            — 16 themes × 7 tokens
+templates/               — 6 starting points (all use stdlib + sentinels)
+references/              — language, theming, renderers, stdlib docs
+test/                    — bash smoke tests (run.sh runs all)
 ```

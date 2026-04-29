@@ -1,20 +1,30 @@
 # System architecture template — component layout with stdlib macros.
-# Compile with: compile.sh --with-stdlib
+# Compile with: compile.sh --with-stdlib --theme NAME
+#
+# Every fill/stroke uses sentinel colors (via stdlib macros), so themes apply
+# uniformly. To add a new node type, prefer a stdlib macro; if you must inline
+# colors, use only the 7 sentinels (#010203, #0a0b0c, #101112, #202122,
+# #303132, #404142, #505152).
 
 right
-Web: box "Web App" fit fill 0xdbeafe color 0x1e40af rad 5px
+Web:  actor("Web App")
 arrow
-API: box "API Gateway" fit fill 0xdbeafe color 0x1e40af rad 5px
+API:  actor("API Gateway")
 arrow
 Auth: lambda("Auth")
-move
-Svc: lambda("Service") at API.s + (0, -1.2)
-arrow from API.s down to Svc.n
-arrow from Svc.s down
-DB: db("Postgres")
 
-# Side: cache + queue
-Cache: box "Redis" fit fill 0xfee2e2 color 0xb91c1c rad 5px at Svc.e + (1.5, 0)
+# Service tier sits below the gateway
+Svc:  lambda("Service")  at API.s + (0, -1.2)
+arrow from API.s down to Svc.n
+
+# Persistence
+arrow from Svc.s down
+DB:   db("Postgres")
+
+# Side: cache + queue (sentinel colors so the theme reaches them)
+Cache: box "Redis" fit \
+  fill 0x303132 color 0x0a0b0c thickness 1.5px rad 5px \
+  at Svc.e + (1.5, 0)
 arrow from Svc.e right to Cache.w "cache" above
 
 Queue: queue("Jobs") at DB.e + (1.5, 0)

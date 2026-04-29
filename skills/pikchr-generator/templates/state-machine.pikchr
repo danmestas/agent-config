@@ -1,13 +1,18 @@
 # State machine template — states + labelled transitions.
+# Compile with: compile.sh --with-stdlib --theme NAME
+
+# Circle states use sentinel accent fill so themes drive the look.
+define state { circle $1 fit fill 0x202122 color 0x010203 thickness 1.5px }
+
 right
-Idle: circle "Idle" fit
+Idle:    state("Idle")
 arrow "request" above
-Loading: circle "Loading" fit
+Loading: state("Loading")
 arrow "ok" above
-Ready: circle "Ready" fit
+Ready:   state("Ready")
 arrow "close" above
-Done: circle "Done" fit
+Done:    state("Done")
 
 # Error transition from Loading
 arrow from Loading.s down 0.5 then right then up to Done.s "error" below
-arrow from Ready.s down 0.4 then left to Idle.s "reset" below
+arrow from Ready.s   down 0.4 then left to Idle.s "reset" below

@@ -1,6 +1,6 @@
 # Stdlib Macros
 
-Prepend `../lib/stdlib.pikchr` to your source via `../bin/compile.sh --with-stdlib` (or `../bin/render.sh --with-stdlib`).
+Prepend `../lib/stdlib.pikchr` to your source via `../bin/compile.sh --with-stdlib`.
 
 Each macro takes one argument: the label.
 
@@ -17,7 +17,7 @@ Each macro takes one argument: the label.
 
 ## Color semantics
 
-Each macro has a deliberately distinct fill. The colors are baked into the SVG (not theme-aware) so the *meaning* of each shape is preserved across light/dark mode. Foreground (text + outlines) uses `currentColor` and follows the page theme.
+Each macro fills with a **sentinel hex** (`#202122`, `#303132`, `#404142`) that the post-render `themeize.sh` pass rewrites to `var(--accent)`, `var(--muted)`, `var(--surface)` respectively. The shape's *role* (primary/secondary/passive) survives across all 16 themes — only the concrete colors swap. Strokes default to `rgb(0,0,0)` which becomes `currentColor`, so the entire diagram follows the chosen theme's foreground.
 
 ## Combining macros
 
