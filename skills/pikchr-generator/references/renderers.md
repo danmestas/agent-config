@@ -40,7 +40,7 @@ Deeper rationale for each delivery target. For the decision tree, see `SKILL.md`
 Two workable responses:
 
 - **Compile to SVG and commit.** Write source with the pikchr CLI at `../bin/pikchr` via [../bin/compile.sh](../bin/compile.sh), commit the `.svg`, reference it from markdown with `![alt](./diagram.svg)`. Works on any downstream viewer.
-- **Read SVG inline for multimodal display.** In Claude Code and other multimodal harnesses, the `Read` tool displays SVG files as images in the conversation. Flow: write `.pikchr` → run [../bin/render.sh](../bin/render.sh) → `Read` the `.svg`. The user sees the rendered diagram in chat, plus has the source file on disk for edits.
+- **Read SVG inline for multimodal display.** In Claude Code and other multimodal harnesses, the `Read` tool displays SVG files as images in the conversation. Flow: write `.pikchr` → run [../bin/compile.sh](../bin/compile.sh) → `Read` the `.svg`. The user sees the rendered diagram in chat, plus has the source file on disk for edits.
 
 Web chat with artifacts (Claude.ai Artifacts, ChatGPT Canvas) will render `<svg>` tags inlined in HTML artifacts — but not `` ```pikchr `` fences. Pre-render, then inline the SVG tag in the artifact.
 
@@ -78,7 +78,7 @@ Fossil-only info-string modifiers: `center`, `indent`, `toggle` (click to see so
 When the user is chatting with an agent and wants to see the diagram in the conversation:
 
 1. Write source to `./diagram.pikchr` (persisted for edits).
-2. Run [../bin/render.sh](../bin/render.sh) `./diagram.pikchr` → writes `./diagram.svg`.
+2. Run [../bin/compile.sh](../bin/compile.sh) `--theme tokyo-night ./diagram.pikchr > ./diagram.svg`.
 3. `Read` `./diagram.svg`. Multimodal harnesses display it as an image.
 
 Alternative quick-share path: URL-encode the source and emit `https://pikchr.org/home/pikchrshow?p=<encoded>`. The user clicks through to the playground. No build step, but the user has to click.

@@ -1,202 +1,183 @@
 # Pikchr Theming Reference
 
-How the `pikchr-generator` skill produces diagrams that follow light/dark mode
-without re-rendering. See [`./syntax.md`](./syntax.md) for the pikchr language,
-[`./renderers.md`](./renderers.md) for rendering pipeline, and
-[`./stdlib-reference.md`](./stdlib-reference.md) for reusable macros.
+How `pikchr-generator` produces themed SVG. See [`./syntax.md`](./syntax.md)
+for the language, [`./renderers.md`](./renderers.md) for delivery surfaces,
+and [`./stdlib-reference.md`](./stdlib-reference.md) for the macro library.
 
-## 1. The Two Layers
+## 1. The model in one paragraph
 
-Pikchr theming splits into two layers because pikchr's maintainer explicitly
-rejected arbitrary CSS-var support in source (pikchr needs a concrete RGB value
-for its internal dark-mode inversion pass).
+Pikchr emits raw RGB hex into the SVG it produces — there's no `currentColor`
+flag and no CSS-variable support in the language. To make the same source
+render across 16 themes, the skill defines a **7-token sentinel palette** of
+fixed hex values that the post-render [`../lib/themeize.sh`](../lib/themeize.sh)
+script rewrites to the chosen theme's concrete hex values. It also prefixes
+the SVG with a `<style>` block (so text inherits theme color via
+`currentColor`) and a full-viewport `<rect>` painted with the theme's
+background. Result: a single self-contained SVG that renders identically in
+browsers, librsvg, ImageMagick, kitten icat, GitHub preview, and every other
+SVG consumer — no `var()` refs, no `color-mix()`, just baked hex.
 
-| Layer | Lives in | Controls | Runtime-switchable? |
-|-------|----------|----------|---------------------|
-| Pikchr source | `.pikchr` file | Semantic accent colors (error red, success green), line weight, dashes, radii, font weight/italic, layout | No — baked into SVG |
-| CSS | Host page / [`../assets/css/*.css`](../assets/css/) | Foreground (lines + labels), background, wrapper box, anything keyed to `currentColor` | Yes — flips instantly |
+## 2. The 7-token sentinel palette
 
-**Rule of thumb:** let every structural stroke and label default to ambient
-color. Only set `color`/`fill` in pikchr source for *semantic accents* you
-want to keep their hue in both modes.
+Author your source using only these 7 hex values for fills/strokes that
+should follow the theme:
 
-## 2. The `currentColor` Strategy
+| Sentinel  | Token name | Role                                           |
+|-----------|------------|------------------------------------------------|
+| `#010203` | `bg`       | Background; inverted text on accent fills      |
+| `#0a0b0c` | `fg`       | Foreground / primary text                      |
+| `#101112` | `line`     | Connector / lane separator                     |
+| `#202122` | `accent`   | Primary actors, services, decisions            |
+| `#303132` | `muted`    | Secondary infra, queues, annotations           |
+| `#404142` | `surface`  | Passive data stores, files                     |
+| `#505152` | `border`   | Borders / outlines (rarely needed directly)    |
 
-`currentColor` is a CSS keyword that resolves to the computed `color` property
-of the nearest ancestor. When an SVG attribute (`stroke`, `fill`, `<text fill>`)
-receives it, the value follows CSS cascade — no JS, no re-render.
+Each sentinel is rewritten by `themeize.sh` to the theme's concrete hex.
+Tokens missing from a theme (most themes only define `bg`, `fg`, `line`,
+`accent`, `muted`) are derived via sRGB mix against `fg` and `bg` at
+compile time, also yielding concrete hex.
 
-**Pikchr v1.0 emits `rgb(0,0,0)` for every default-color element** (stroke,
-fill, text). The CLI has **no** `-C` / `--x-current-color` flag — only
-`--dont-stop` and `--svg-only` exist. This skill substitutes post-render with
-a single sed:
+Plus one bonus: `rgb(0,0,0)` (pikchr's default for un-colored elements) is
+rewritten to `currentColor`. So if you set NO `color`/`fill` on a shape, it
+will paint with `var(--fg)` automatically — that's why minimalist diagrams
+just work.
 
-```bash
-# from bin/compile.sh
-printf '%s' "$SRC" | "$LOCAL_BIN" --svg-only - \
-  | sed 's/rgb(0,0,0)/currentColor/g'
+## 3. Inline form vs. macro form
+
+```
+# Inline sentinel — full control
+box "Custom" fit fill 0x202122 color 0x010203 thickness 1.5px rad 5px
+
+# Stdlib macro — same effect, semantic name
+actor("Custom")
 ```
 
-The substitution is deterministic: pikchr only emits `rgb(0,0,0)` when the user
-did not supply a color, so every match genuinely maps to "follow the theme."
-Explicit colors like `fill 0x2563eb` pass through as `rgb(37,99,235)` and stay
-constant across themes — the semantic-accent guarantee. See
-[`../bin/compile.sh`](../bin/compile.sh) for the full pipeline, including the
-Kroki HTTP fallback (which applies the identical sed).
+Prefer macros (`actor`, `lambda`, `db`, `queue`, `decision`, `note`,
+`datastore`, `cloud`) for visual consistency across diagrams. See
+[`./stdlib-reference.md`](./stdlib-reference.md). Drop to inline sentinels
+only when no macro fits.
 
-## 3. Three-Layer CSS Cascade
+**Never use raw RGB or color names** for theme-tracked elements — `fill 0x4a90e2`
+or `fill lightcyan` will pass through unchanged and look wrong in 15 of 16
+themes. The only exception is **semantic accent colors** you intentionally
+want to keep (a hard-coded red for "error" branches, etc.); those are
+recognized as user intent and left alone.
 
-The stylesheets in [`../assets/css/`](../assets/css/) layer defaults, OS
-preference, and an explicit toggle. Each layer is independent; combined they
-cover every user state. See [`../assets/html/wrapper.html`](../assets/html/wrapper.html)
-for the reference HTML shell that consumes them.
+## 4. Themes (16)
 
-**Layer 1 — `:root` light defaults.** Declared first. Provides the light-mode
-palette so that initial paint (before OS query resolves, before JS toggles)
-looks right.
+Defined in [`../lib/themes.json`](../lib/themes.json). Each theme is a JSON
+object mapping the 7 token names to concrete hex values:
 
-```css
-:root { --pikchr-fg: #1a1a1a; --pikchr-bg: #ffffff; }
-.pikchr { color: var(--pikchr-fg); background: var(--pikchr-bg); }
-```
-
-**Layer 2 — `@media (prefers-color-scheme: dark)`.** Zero-JS auto-follow for
-users whose OS is set to dark. This is the accessibility default — it respects
-user intent without requiring site code.
-
-```css
-@media (prefers-color-scheme: dark) {
-  :root { --pikchr-fg: #e5e7eb; --pikchr-bg: #0d1117; }
+```json
+"tokyo-night": {
+  "bg":      "#1a1b26",
+  "fg":      "#a9b1d6",
+  "line":    "#3d59a1",
+  "accent":  "#7aa2f7",
+  "muted":   "#565f89",
+  "surface": "...",
+  "border":  "..."
 }
 ```
 
-**Layer 3 — `[data-theme="dark"]` / `[data-theme="light"]` attribute.** Manual
-override so a site's theme-toggle button can force a mode regardless of OS.
-Must come *after* the media query so explicit user choice wins. Compatible
-with Docusaurus, Mintlify, Starlight, VitePress, Next.js docs, GitHub Primer.
+Available: `default` (= `zinc-dark`), `zinc-light`, `zinc-dark`, `tokyo-night`,
+`tokyo-storm`, `tokyo-light`, `catppuccin`, `latte`, `nord`, `nord-light`,
+`dracula`, `github`, `github-dark`, `solarized`, `solar-dark`, `one-dark`,
+`cursor-dark`.
 
-```css
-[data-theme="dark"]  { --pikchr-fg: #e5e7eb; --pikchr-bg: #0d1117; }
-[data-theme="light"] { --pikchr-fg: #1a1a1a; --pikchr-bg: #ffffff; }
+Missing tokens fall back to `color-mix()` derivations against `--fg` and
+`--bg`, so a minimal theme defining only `bg` + `fg` still works.
+
+## 5. The full pipeline
+
+```
+.pikchr source
+    ↓  (compile.sh)
+pikchr binary --svg-only
+    ↓
+raw SVG with sentinel hexes (#010203 … #505152)
+    ↓  (themeize.sh)
+1. Resolve theme tokens; derive missing surface/border via sRGB mix(fg,bg,pct)
+2. Replace each sentinel hex with the theme's concrete hex
+3. Replace rgb(0,0,0) with currentColor (so default-colored shapes follow theme)
+4. Inject inside <svg ...>:
+     <style>:where(svg) { color:#FG; background:#BG; }
+            :where(svg) text { font-family:system-ui,…; fill:currentColor; }</style>
+     <rect width="100%" height="100%" fill="#BG"/>
+    ↓
+themed self-contained SVG (stdout) — every color is concrete hex
 ```
 
-The three layers chain via CSS variables, so `currentColor` on each SVG stroke
-resolves through `.pikchr { color: var(--pikchr-fg) }` and flips on whichever
-signal fires last.
+Read [`../lib/themeize.sh`](../lib/themeize.sh) — it's the entire theming
+engine in one file.
 
-## 4. Palette Catalog
+## 6. Adding a new theme
 
-All three palettes are verified for WCAG AA (3:1 non-text, 4.5:1 text) on
-`#ffffff` and `#0d1117`. Pick one and include it alongside the diagram.
+1. Open [`../lib/themes.json`](../lib/themes.json).
+2. Add an entry with at minimum `bg` + `fg`. Add `line`, `accent`, `muted`,
+   `surface`, `border` for full control; otherwise they derive via
+   `color-mix(in srgb, var(--fg) X%, var(--bg))`.
+3. Verify WCAG AA contrast: ≥ 4.5:1 for text (fg on bg, bg on accent) and
+   ≥ 3:1 for non-text (line on bg).
+4. Run `bash test/run.sh` — the theme test enumerates all themes and ensures
+   every template renders cleanly under each.
 
-- **Neutral** — [`../assets/css/neutral.css`](../assets/css/neutral.css).
-  Blue / green / amber / red accents. **Use when** the diagram is generic
-  (flowchart, architecture, state machine) and should match most docs sites.
-  This is the skill's default.
-- **Blueprint** — [`../assets/css/blueprint.css`](../assets/css/blueprint.css).
-  Slate + sky-blue, engineering-schematic feel. **Use when** the diagram is a
-  technical schematic, system map, or network topology where restraint reads
-  as precision.
-- **Warm** — [`../assets/css/warm.css`](../assets/css/warm.css). Orange /
-  violet / yellow. **Use when** the diagram is marketing or blog content that
-  needs to feel friendly rather than utilitarian.
+## 7. Hard limitations
 
-Each palette exposes `--pikchr-fg`, `--pikchr-bg`, `--pikchr-muted`, and four
-`--pikchr-accent-*` variables. The `.pikchr` rule binds `color` to
-`--pikchr-fg`, which is what `currentColor` inside the SVG picks up.
+- **No CSS variables in pikchr source.** `fill var(--accent)` will not parse.
+  Pikchr requires concrete RGB to perform its internal layout pass. Use the
+  sentinel hex (`fill 0x202122`) and let `themeize.sh` rewrite it.
+- **`<img src="diagram.svg">` does NOT inherit parent `color`.** When the
+  SVG is loaded as an image, its `currentColor` resolves against the SVG's
+  own `color` (set by the injected `<style>` block to the theme's `fg` hex).
+  This is intentional: the SVG carries its theme with it. To follow the
+  host page's theme dynamically, inline the SVG — but for committed-to-repo
+  SVGs that's almost never what you want.
+- **`color black` / `color 0x000000` baking.** Pikchr emits these as
+  `rgb(0,0,0)`, which `themeize.sh` rewrites to `currentColor`. If you
+  genuinely need forced-black, use `color 0x010101` — close enough to read
+  as black, sentinel-distinct.
+- **5 strings per object max.** For more, use a `text` primitive at the
+  desired position.
 
-## 5. Hard Limitations
+## 8. Worked example
 
-**CSS variables are not allowed in pikchr source.** You cannot write
-`fill var(--primary)` in a `.pikchr` file — the pikchr maintainer rejected
-arbitrary color strings because pikchr needs an actual RGB value to perform its
-internal dark-mode inversion. Only hex (`0x2563eb`), named colors, and value 0
-(default) are accepted. Workaround: pick an accent that reads acceptably on
-both backgrounds, or override via CSS attribute selector on the rendered SVG.
+A flowchart with one "error" branch that stays red across all themes.
 
-**`<img src="diagram.svg">` does NOT inherit parent `color`.** `currentColor`
-resolves to the SVG document's own `color`, which defaults to black when
-loaded as an image. Theming only works when the SVG is *inlined* into the
-host HTML. This is why [`../bin/render.sh`](../bin/render.sh) emits full inline
-SVG markup inside the wrapper, not an `<img>` reference.
-
-**`--dont-stop` is the only error-handling flag.** There is no way to ask
-pikchr for structured error output or theme hints from the CLI. Syntax errors
-land on stdout (yes, stdout) with a non-zero exit — `compile.sh` handles this.
-
-**Named-black equivalents bake.** Writing `color black`, `color 0x000000`, or
-`fill 0x000000` in pikchr source emits `rgb(0,0,0)` *textually identical* to
-the default case — which means the sed substitutes them to `currentColor` too,
-likely not what you wanted. Skill rule: never write explicit black in source.
-For forced black, use `color 0x010101`.
-
-## 6. Worked Example
-
-A flowchart with one accent-colored "error" branch. Compare
-[`../templates/flowchart.pikchr`](../templates/flowchart.pikchr) for the actual
-template shipped with the skill.
-
-**Pikchr source (`example.pikchr`):**
+**Source (`example.pikchr`):**
 
 ```pikchr
 down
 Start: oval "Start" fit
 arrow
-Check: diamond "Valid?" fit
+Check: decision("Valid?")            # decision macro → sentinel accent
 arrow "yes" rjust
-OK:    box "Process" fit
+OK:    lambda("Process")
 arrow
 Done:  oval "Done" fit
 
-# Error branch — explicit accent color (baked into SVG, same in both themes)
+# Error branch — explicit semantic red, baked into every theme
 arrow from Check.e right 0.8in "no" above color 0xdc2626
-Err:   box "Show error" fit color 0xdc2626
+Err:   box "Show error" fit color 0xdc2626 fill 0xfecaca
 ```
 
-Compile with `../bin/compile.sh example.pikchr > example.svg`. After the
-sed pass, the relevant SVG fragment becomes:
+**Compile:**
 
-```html
-<!-- Default-color structural elements: follow theme via currentColor -->
-<path d="..." style="fill:none;stroke-width:2.16;stroke:currentColor;"/>
-<text ... fill="currentColor">Start</text>
-<text ... fill="currentColor">Process</text>
-
-<!-- Error branch: rgb() baked, stays red in light AND dark mode -->
-<path d="..." style="fill:none;stroke-width:2.16;stroke:rgb(220,38,38);"/>
-<text ... fill="rgb(220,38,38)">Show error</text>
+```bash
+bin/compile.sh --with-stdlib --theme tokyo-night example.pikchr > example.svg
 ```
 
-**Host CSS (imports neutral palette):**
+**Result.** Default-color shapes follow the tokyo-night palette. The decision
+diamond and process box use accent fill from the theme. The error branch
+stays red on every theme, a deliberate semantic accent.
 
-```css
-@import url("./neutral.css");
+## 9. Skill checklist
 
-/* The wrapper used by bin/render.sh */
-.pikchr { padding: 1rem; border-radius: 6px; overflow-x: auto; }
-.pikchr svg { display: block; max-width: 100%; height: auto; }
-.pikchr svg text { font-family: ui-sans-serif, system-ui, sans-serif; }
-```
-
-**Result.** In light mode `.pikchr` has `color: #1a1a1a`, so every
-`currentColor` stroke/label paints near-black on white. Flip the OS to dark
-(or set `data-theme="dark"` on `<html>`) and `--pikchr-fg` becomes `#e5e7eb`;
-the same strokes repaint light-gray on `#0d1117` without re-rendering. The
-red error branch stays red in both modes — exactly the semantic distinction
-the pikchr author baked in.
-
-## Quick Skill Checklist
-
-- Compile with [`../bin/compile.sh`](../bin/compile.sh) (the sed pass is
-  mandatory; never emit raw pikchr output).
-- Render with [`../bin/render.sh`](../bin/render.sh) to get the
-  [`../assets/html/wrapper.html`](../assets/html/wrapper.html) shell and
-  inlined SVG.
-- Ship exactly one of [`../assets/css/neutral.css`](../assets/css/neutral.css),
-  [`../assets/css/blueprint.css`](../assets/css/blueprint.css), or
-  [`../assets/css/warm.css`](../assets/css/warm.css) alongside.
-- No `color black`, `color white`, `color 0x000000`, `color 0xffffff`,
-  `fill 0x000000`, `fill 0xffffff` in pikchr source.
-- Never use `<img src="...">` — theming requires inlined SVG.
-- Accent colors baked in source should pass 3:1 contrast on both `#ffffff`
-  and `#0d1117`.
+- Compile with [`../bin/compile.sh`](../bin/compile.sh) — never invoke
+  `bin/pikchr` directly; you'd skip themeize and emit non-themed output.
+- Author with sentinel hex (`0x202122`, etc.) or stdlib macros — never raw
+  RGB except for intentional semantic accents.
+- Forced-black: `0x010101`. Forced-white: `0xfefefe`. Avoid `0x000000` /
+  `0xffffff`.
+- Themes are runtime-pickable per render. Same source can ship 16 different
+  SVGs with `for t in $(jq -r 'keys[]' lib/themes.json); do …; done`.

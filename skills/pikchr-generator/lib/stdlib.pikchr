@@ -11,8 +11,9 @@
 #   #202122 = accent    #303132 = muted      #404142 = surface    #505152 = border
 #
 # After compile.sh pipes the SVG through themeize.sh, these sentinels are
-# rewritten to var(--bg), var(--fg), etc., and the chosen theme's palette
-# is applied via a <style> block injected at the top of the SVG.
+# rewritten to the chosen theme's concrete hex values (no var() refs), and
+# a <style> block + background rect are injected so the SVG renders
+# identically in every consumer (browsers, librsvg, ImageMagick, GitHub).
 #
 # Role assignment:
 #   - Primary actions/actors/decisions use accent (#202122) with INVERTED

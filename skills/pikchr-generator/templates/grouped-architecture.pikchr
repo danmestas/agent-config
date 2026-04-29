@@ -1,0 +1,72 @@
+# Grouped architecture — pure pikchr style mimicking the official SQLite-arch
+# example. No stdlib macros: just `box same` chains for uniform sizing, group
+# regions with computed extent, and italic side captions. Sentinel colors
+# throughout so the diagram themes.
+# Compile: compile.sh --theme NAME   (no --with-stdlib needed)
+
+# --- Globals: density and breathing room ---
+lineht    *= 0.4
+$margin    = lineht * 2.5
+scale      = 0.8
+fontscale  = 1.1
+charht    *= 1.15
+fill       = 0x010203          # sentinel bg — themed white-equivalent
+
+down
+
+# --- Left column: request path ---
+Br:   box "Browser"   wid 150% ht 75% thickness 1.5px
+      arrow
+GW:   box same "API" "Gateway"
+      arrow
+App:  box same "App Server"
+      arrow down 1.25*$margin
+DB:   box same "Database"
+      arrow
+Ca:   box same "Cache"
+      arrow
+FS:   box same "File Store"
+
+# --- Middle column: service tier (offset right) ---
+      box same  with .w at 1.25*$margin east of 1st box.e  "Auth"
+      arrow
+      box same "Validator"
+      arrow
+BL:   box same ht 200% "Business" "Logic"
+
+# --- Right column: async workers ---
+WK:   box same as 1st box  at (Auth, Ca)  "Workers"
+      move lineht
+JQ:   box same "Job Queue"
+      arrow from WK.s to JQ.n chop
+
+# --- Cross-edges: split entry points with edge fractions, chop everything ---
+arrow from GW           to 1/4<Auth.sw, Auth.nw>  chop
+arrow from 1/3<BL.nw, BL.sw>   to GW              chop
+arrow from App.e        to WK.w                   chop
+
+# --- Group regions: computed extent, sentinel pastels, italic side labels ---
+
+# Frontend (top-left): Browser → Gateway → App
+box ht (Br.n.y - App.s.y) + $margin   wid Br.wid + $margin \
+    at GW   fill 0x404142   behind Br   thin
+line invis from 0.25*$margin east of last.sw up last.ht \
+     "Frontend" italic aligned
+
+# Backend (bottom-left): Database → Cache → File Store
+box ht (DB.n.y - FS.s.y) + $margin   wid Br.wid + $margin \
+    at Ca   fill 0x303132   behind Br   thin
+line invis from 0.25*$margin east of last.sw up last.ht \
+     "Backend" italic aligned
+
+# Service (middle): Auth → Validator → Business Logic
+box ht (Auth.n.y - BL.s.y) + $margin   wid Br.wid + $margin \
+    at 1/2<Auth.n, BL.s>   fill 0x404142   behind Br   thin
+line invis from 0.25*$margin west of last.se up last.ht \
+     "Service" italic aligned
+
+# Async (right): Workers + Queue
+box ht (WK.n.y - JQ.s.y) + $margin   wid Br.wid + $margin \
+    at 1/2<WK.n, JQ.s>   fill 0x303132   behind Br   thin
+line invis from 0.25*$margin west of last.se up last.ht \
+     "Async" italic aligned

@@ -27,7 +27,7 @@ rm -f /tmp/pikchr-err-$$.log
 
 # A4: --theme flag piped through themeize.sh
 out="$(echo 'box "hi"' | bin/compile.sh --theme tokyo-night -)"
-assert_contains "$out" "--bg:#1a1b26" "compile.sh --theme tokyo-night injects tokyo-night bg"
-assert_contains "$out" "var(--fg)" "compile.sh --theme rewrites sentinels (none here, but the rgb(0,0,0) -> currentColor path is kept)"
+assert_contains "$out" "background:#1a1b26" "compile.sh --theme tokyo-night injects tokyo-night bg"
+assert_contains "$out" "currentColor" "compile.sh keeps rgb(0,0,0) -> currentColor path"
 out_default="$(echo 'box "hi"' | bin/compile.sh -)"
-assert_contains "$out_default" "--bg:#18181B" "compile.sh without --theme uses default theme"
+assert_contains "$out_default" "background:#18181B" "compile.sh without --theme uses default theme"

@@ -23,6 +23,5 @@ fi
 # Body must reference the bin scripts so the agent knows how to invoke them
 body="$(awk '/^---$/{c++; next} c>=2' SKILL.md)"
 assert_contains "$body" "bin/compile.sh" "body must reference compile.sh"
-assert_contains "$body" "bin/render.sh" "body must reference render.sh"
 assert_contains "$body" "bin/install-pikchr.sh" "body must reference install script"
 assert_contains "$body" "lib/stdlib.pikchr" "body must mention the stdlib"

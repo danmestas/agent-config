@@ -93,42 +93,69 @@ if [[ -z "$BG" || -z "$FG" ]]; then
   BORDER="$(theme_field default border)"
 fi
 
-# --- Build the <style> block ---
-opt_var() {
-  local name="$1" value="$2" fallback="$3"
-  if [[ -n "$value" ]]; then
-    printf '%s:%s;' "--$name" "$value"
+# --- Derive missing tokens via sRGB mix(fg, bg, pct) ---
+# Output is concrete hex so the SVG renders identically in every renderer
+# (browsers, librsvg, ImageMagick, kitten icat, GitHub preview, ...).
+derive_hex() {
+  local fg="$1" bg="$2" pct="$3"
+  if command -v node >/dev/null 2>&1; then
+    node -e '
+      const [fg, bg, p] = process.argv.slice(1);
+      const parse = (h) => {
+        h = h.replace(/^#/, "");
+        if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+        return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+      };
+      const [fr, fg_, fb] = parse(fg);
+      const [br, bg_, bb] = parse(bg);
+      const t = Number(p) / 100;
+      const mix = (a, b) => Math.round(a * t + b * (1 - t));
+      const out = [mix(fr, br), mix(fg_, bg_), mix(fb, bb)]
+        .map((n) => n.toString(16).padStart(2, "0")).join("");
+      process.stdout.write("#" + out);
+    ' -- "$fg" "$bg" "$pct"
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 -c '
+import sys
+fg, bg, p = sys.argv[1], sys.argv[2], sys.argv[3]
+def parse(h):
+    h = h.lstrip("#")
+    if len(h) == 3: h = "".join(c*2 for c in h)
+    return int(h[0:2],16), int(h[2:4],16), int(h[4:6],16)
+fr,fg_,fb = parse(fg); br,bg_,bb = parse(bg)
+t = float(p)/100
+mix = lambda a,b: round(a*t + b*(1-t))
+out = "".join(f"{c:02x}" for c in (mix(fr,br),mix(fg_,bg_),mix(fb,bb)))
+sys.stdout.write("#" + out)
+' "$fg" "$bg" "$pct"
   else
-    printf '%s:%s;' "--$name" "$fallback"
+    # No interpreter — emit fg as-is (visible, suboptimal contrast, never invisible).
+    printf '%s' "$fg"
   fi
 }
-LINE_FB="color-mix(in srgb, var(--fg) 50%, var(--bg))"
-ACCENT_FB="color-mix(in srgb, var(--fg) 85%, var(--bg))"
-MUTED_FB="color-mix(in srgb, var(--fg) 40%, var(--bg))"
-SURFACE_FB="color-mix(in srgb, var(--fg) 3%, var(--bg))"
-BORDER_FB="color-mix(in srgb, var(--fg) 20%, var(--bg))"
 
-VARS="$(printf -- '--bg:%s;--fg:%s;%s%s%s%s%s' \
-  "$BG" "$FG" \
-  "$(opt_var line    "$LINE"    "$LINE_FB")" \
-  "$(opt_var accent  "$ACCENT"  "$ACCENT_FB")" \
-  "$(opt_var muted   "$MUTED"   "$MUTED_FB")" \
-  "$(opt_var surface "$SURFACE" "$SURFACE_FB")" \
-  "$(opt_var border  "$BORDER"  "$BORDER_FB")")"
+[[ -z "$LINE"    ]] && LINE="$(derive_hex    "$FG" "$BG" 50)"
+[[ -z "$ACCENT"  ]] && ACCENT="$(derive_hex  "$FG" "$BG" 85)"
+[[ -z "$MUTED"   ]] && MUTED="$(derive_hex   "$FG" "$BG" 40)"
+[[ -z "$SURFACE" ]] && SURFACE="$(derive_hex "$FG" "$BG"  3)"
+[[ -z "$BORDER"  ]] && BORDER="$(derive_hex  "$FG" "$BG" 20)"
 
 FONT='font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;'
 
-STYLE="<style>:where(svg){$VARS color:var(--fg);background:var(--bg);}:where(svg) text{$FONT fill:currentColor;}</style>"
+STYLE="<style>:where(svg){color:$FG;background:$BG;}:where(svg) text{$FONT fill:currentColor;}</style>"
 
 # --- Do the substitution + style injection in a single awk pass ---
-awk -v style="$STYLE" '
+# Sentinels are replaced with the theme's resolved hex (not var() refs), so the
+# output SVG is self-contained and renders identically in every SVG consumer.
+awk -v style="$STYLE" \
+    -v c1="$BG"     -v c2="$FG"      -v c3="$LINE"   -v c4="$ACCENT" \
+    -v c5="$MUTED"  -v c6="$SURFACE" -v c7="$BORDER" '
   BEGIN {
     RS = "\0";
     n = split("010203 0a0b0c 101112 202122 303132 404142 505152", hex, " ");
-    split("--bg --fg --line --accent --muted --surface --border", var_, " ");
     split("1,2,3 10,11,12 16,17,18 32,33,34 48,49,50 64,65,66 80,81,82", rgb_, " ");
+    tok[1]=c1; tok[2]=c2; tok[3]=c3; tok[4]=c4; tok[5]=c5; tok[6]=c6; tok[7]=c7;
     for (i = 1; i <= n; i++) {
-      tok[i] = "var(" var_[i] ")";
       h = tolower(hex[i]);
       hex_lower[i] = "#" h;
       hex_upper[i] = "#" toupper(h);
@@ -151,7 +178,10 @@ awk -v style="$STYLE" '
     if (match($0, /<svg[^>]*>/)) {
       s = substr($0, 1, RSTART + RLENGTH - 1);
       rest = substr($0, RSTART + RLENGTH);
-      printf "%s%s%s", s, style, rest;
+      # Background <rect> so renderers that ignore CSS `background:` (librsvg,
+      # ImageMagick, kitten icat) still paint the theme bg behind the diagram.
+      bg_rect = "<rect width=\"100%\" height=\"100%\" fill=\"" c1 "\"/>";
+      printf "%s%s%s%s", s, style, bg_rect, rest;
     } else {
       printf "%s", $0;
     }
