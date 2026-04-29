@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { simpleGit } from 'simple-git';
-import { publishGitUrl } from '../../lib/release/publish/git-url.ts';
+import { publishGitUrl } from '../../lib/release/publish.ts';
 
 describe('publishGitUrl', () => {
   it('returns a target -> install-URL map for each git-URL target', async () => {
