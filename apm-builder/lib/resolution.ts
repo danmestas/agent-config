@@ -103,6 +103,21 @@ export async function writeResolutionArtifact(r: Resolution): Promise<string> {
   return filepath;
 }
 
+/**
+ * Resolve and persist in one call. Use this when a caller needs both the
+ * in-memory resolution and an on-disk artifact path (e.g. AC harness flows
+ * that hand the path to a child process via env). Pure callers — including
+ * `resolveAgainstHarness` and the prelaunch composition path — keep using
+ * `resolve()` directly to avoid the unnecessary tmpdir write.
+ */
+export async function resolveAndPersist(
+  opts: ResolveOptions,
+): Promise<{ resolution: Resolution; artifactPath: string }> {
+  const resolution = resolve(opts);
+  const artifactPath = await writeResolutionArtifact(resolution);
+  return { resolution, artifactPath };
+}
+
 export interface ResolveAgainstHarnessOptions {
   target: Target;
   harnessHome: string;

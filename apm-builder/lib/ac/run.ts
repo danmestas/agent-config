@@ -1,14 +1,4 @@
-import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import os from 'node:os';
-import path from 'node:path';
-import { findPersona } from '../persona.ts';
-import { findMode } from '../mode.ts';
-import { resolve, writeResolutionArtifact } from '../resolution.ts';
-import { discoverComponents } from '../discover.ts';
-import type { Target } from '../types.ts';
-import { prelaunchComposeClaudeCode, prelaunchComposeGemini, prelaunchComposePi, prelaunchComposeCodex, prelaunchComposeCopilot, prelaunchComposeApm } from './prelaunch.ts';
+import { runAcSession, type AcSessionDeps } from './session.ts';
 
 export interface ParsedAcArgs {
   harness: string;
@@ -19,27 +9,8 @@ export interface ParsedAcArgs {
   harnessArgs: string[];
 }
 
-/** Walk upward from `start` and return the directory containing the topmost `marker` file. */
-function findRepoRoot(start: string, marker = 'package.json'): string {
-  let dir = path.resolve(start);
-  let lastFound: string | null = null;
-  while (dir !== path.dirname(dir)) {
-    if (existsSync(path.join(dir, marker))) lastFound = dir;
-    dir = path.dirname(dir);
-  }
-  if (!lastFound) throw new Error(`findRepoRoot: no ${marker} found from ${start}`);
-  return lastFound;
-}
-
-const HARNESS_ALIASES: Record<string, Target> = {
-  claude: 'claude-code',
-  'claude-code': 'claude-code',
-  apm: 'apm',
-  codex: 'codex',
-  gemini: 'gemini',
-  copilot: 'copilot',
-  pi: 'pi',
-};
+/** Backwards-compatible alias for callers that import `RunDeps`. */
+export type RunDeps = AcSessionDeps;
 
 export function parseAcArgs(argv: string[]): ParsedAcArgs {
   if (argv.length === 0 || argv[0]!.startsWith('--')) {
@@ -91,146 +62,12 @@ export function parseAcArgs(argv: string[]): ParsedAcArgs {
   return out;
 }
 
-export interface RunDeps {
-  /** Override discovery roots (test injection). */
-  projectDir?: string;
-  userDir?: string;
-  builtinDir?: string;
-  /** Override real HOME dir used as source for prelaunch composition (test injection). */
-  homeDir?: string;
-  /** Override harness binary lookup (test injection). */
-  resolveHarnessBin?: (harness: string) => string;
-  /** Catalog provider (test injection). */
-  loadCatalog?: () => Promise<any[]>;
-  /** Hook called instead of execvp; used in tests to avoid replacing the process. */
-  exec?: (bin: string, args: string[], env: NodeJS.ProcessEnv) => never | Promise<number>;
-}
-
-function defaultResolveHarnessBin(harness: string): string {
-  const target = HARNESS_ALIASES[harness];
-  if (!target) throw new Error(`ac: unknown harness "${harness}"`);
-  // The actual on-PATH binary differs from the target name in some cases.
-  const binNames: Record<Target, string> = {
-    'claude-code': 'claude',
-    apm: 'apm',
-    codex: 'codex',
-    gemini: 'gemini',
-    copilot: 'copilot',
-    pi: 'pi',
-  };
-  return binNames[target];
-}
-
+/**
+ * CLI entry point: parse argv and hand off to the AC session orchestrator.
+ * Kept as a separate export so existing tests and the `ac` shebang script
+ * keep working unchanged.
+ */
 export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number> {
   const args = parseAcArgs(argv);
-  const target = HARNESS_ALIASES[args.harness];
-  if (!target) {
-    throw new Error(`ac: unknown harness "${args.harness}". Recognized: ${Object.keys(HARNESS_ALIASES).join(', ')}`);
-  }
-
-  const projectDir = deps.projectDir ?? process.cwd();
-  const userDir = deps.userDir ?? path.join(os.homedir(), '.config', 'agent-config');
-  // run.ts lives at <repo>/apm-builder/lib/ac/run.ts — walk up 3 dirs to the repo
-  // root where personas/ and modes/ live.
-  const builtinDir = deps.builtinDir ?? findRepoRoot(path.dirname(fileURLToPath(import.meta.url)));
-  const dirs = { projectDir, userDir, builtinDir };
-
-  const env: NodeJS.ProcessEnv = { ...process.env, AC_WRAPPED: '1', AC_HARNESS: target };
-
-  if (!args.noFilter && (args.persona || args.mode)) {
-    const persona = args.persona ? (await findPersona(args.persona, dirs)).manifest : undefined;
-    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
-    const mode = found?.manifest;
-    const modeBody = found?.body;
-
-    const catalog = await (deps.loadCatalog ?? (async () => discoverComponents(builtinDir)))();
-    const resolution = resolve({ catalog, persona, mode, modeBody, harness: target });
-    const artifactPath = await writeResolutionArtifact(resolution);
-    env.AC_RESOLUTION_PATH = artifactPath;
-  }
-
-  let cwd = process.cwd();
-  let cleanup: (() => Promise<void>) | undefined;
-
-  // Claude Code: HOME-override pre-launch — physically filter ~/.claude/skills/
-  // before claude reads it. Path C achieves real token reduction.
-  if (!args.noFilter && target === 'claude-code' && (args.persona || args.mode)) {
-    const personaManifest = args.persona
-      ? (await findPersona(args.persona, dirs)).manifest
-      : undefined;
-    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
-    const result = await prelaunchComposeClaudeCode({
-      realHome: deps.homeDir ?? os.homedir(),
-      persona: personaManifest,
-      mode: found?.manifest,
-      modeBody: found?.body,
-    });
-    env.HOME = result.tempHome;
-    cleanup = result.cleanup;
-  } else if (!args.noFilter && target === 'gemini' && (args.persona || args.mode)) {
-    const personaManifest = args.persona
-      ? (await findPersona(args.persona, dirs)).manifest
-      : undefined;
-    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
-    const result = await prelaunchComposeGemini({
-      realHome: deps.homeDir ?? os.homedir(),
-      persona: personaManifest,
-      mode: found?.manifest,
-      modeBody: found?.body,
-    });
-    env.HOME = result.tempHome;
-    cleanup = result.cleanup;
-  } else if (!args.noFilter && target === 'pi' && (args.persona || args.mode)) {
-    const personaManifest = args.persona
-      ? (await findPersona(args.persona, dirs)).manifest
-      : undefined;
-    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
-    const result = await prelaunchComposePi({
-      realHome: deps.homeDir ?? os.homedir(),
-      persona: personaManifest,
-      mode: found?.manifest,
-      modeBody: found?.body,
-    });
-    env.HOME = result.tempHome;
-    cleanup = result.cleanup;
-  } else if (!args.noFilter && target === 'apm' && (args.persona || args.mode)) {
-    const personaManifest = args.persona
-      ? (await findPersona(args.persona, dirs)).manifest
-      : undefined;
-    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
-    const result = await prelaunchComposeApm({
-      packageDir: deps.homeDir ?? process.cwd(),
-      persona: personaManifest,
-      mode: found?.manifest,
-      modeBody: found?.body,
-    });
-    env.APM_PACKAGE_DIR = result.tempPackageDir;
-    cleanup = result.cleanup;
-  } else if (target === 'codex' && env.AC_RESOLUTION_PATH) {
-    const r = await prelaunchComposeCodex({ resolutionPath: env.AC_RESOLUTION_PATH, originalCwd: cwd });
-    cwd = r.tempdir;
-    env.AC_ORIGINAL_CWD = process.cwd();
-    cleanup = r.cleanup;
-  } else if (target === 'copilot' && env.AC_RESOLUTION_PATH) {
-    const r = await prelaunchComposeCopilot({ resolutionPath: env.AC_RESOLUTION_PATH, originalCwd: cwd });
-    cwd = r.tempdir;
-    env.AC_ORIGINAL_CWD = process.cwd();
-    cleanup = r.cleanup;
-  }
-
-  const bin = (deps.resolveHarnessBin ?? defaultResolveHarnessBin)(args.harness);
-  if (deps.exec) {
-    return deps.exec(bin, args.harnessArgs, env);
-  }
-  // Real execution: spawn and inherit stdio. We cannot use execvp from Node
-  // directly without an extra dep; spawning + forwarding signals + exiting
-  // on close achieves the same outcome from the user's perspective.
-  return new Promise<number>((resolveCb, reject) => {
-    const child = spawn(bin, args.harnessArgs, { stdio: 'inherit', env, cwd });
-    child.on('error', reject);
-    child.on('close', async (code) => {
-      if (cleanup) await cleanup();
-      resolveCb(code ?? 0);
-    });
-  });
+  return runAcSession(args, deps);
 }

@@ -8,9 +8,7 @@ import { renderReadme } from '../docs.ts';
 import { tagRelease } from './git.ts';
 import { appendChangelogEntry } from './changelog.ts';
 import { renderReleaseNotes } from './notes.ts';
-import { publishClaudeCode } from './publish/claude-code.ts';
-import { publishAPM } from './publish/apm.ts';
-import { publishGitUrl } from './publish/git-url.ts';
+import { publishAPM, publishClaudeCode, publishGitUrl } from './publish.ts';
 import { renderMarketplaceEntry, marketplaceFilePath } from './marketplace.ts';
 import type { Target } from '../types.ts';
 

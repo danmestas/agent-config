@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { publishAPM } from '../../lib/release/publish/apm.ts';
+import { publishAPM } from '../../lib/release/publish.ts';
 
 describe('publishAPM', () => {
   it('runs `apm publish` with APM_TOKEN in env', async () => {

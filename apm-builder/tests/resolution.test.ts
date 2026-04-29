@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { resolve, writeResolutionArtifact, resolveAgainstHarness, skillsKeepFromResolution } from '../lib/resolution.ts';
+import { resolve, writeResolutionArtifact, resolveAndPersist, resolveAgainstHarness, skillsKeepFromResolution } from '../lib/resolution.ts';
 import type { ComponentSource } from '../lib/types.ts';
 
 const skill = (name: string, category: string | undefined): ComponentSource => ({
@@ -166,6 +166,28 @@ describe('writeResolutionArtifact', () => {
     const filepath = await writeResolutionArtifact(r);
     expect(filepath.startsWith(os.tmpdir())).toBe(true);
     expect(path.basename(path.dirname(filepath))).toMatch(/^ac-sess-/);
+  });
+});
+
+describe('resolveAndPersist', () => {
+  it('returns both the in-memory resolution and a path to its on-disk artifact', async () => {
+    const catalog = [skill('a', 'tooling'), skill('b', 'workflow')];
+    const persona = {
+      name: 'p',
+      type: 'persona',
+      categories: ['tooling'],
+      skill_include: [],
+      skill_exclude: [],
+    } as any;
+    const { resolution, artifactPath } = await resolveAndPersist({
+      catalog,
+      persona,
+      harness: 'claude-code',
+    });
+    expect(resolution.skillsDrop).toContain('b');
+    expect(artifactPath).toMatch(/resolution\.json$/);
+    const parsed = JSON.parse(await fs.readFile(artifactPath, 'utf8'));
+    expect(parsed.skillsDrop).toEqual(resolution.skillsDrop);
   });
 });
 

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { publishClaudeCode } from '../../lib/release/publish/claude-code.ts';
+import { publishClaudeCode } from '../../lib/release/publish.ts';
 
 describe('publishClaudeCode', () => {
   it('zips dist/claude-code/skills/<name>/ and calls gh release create', async () => {
