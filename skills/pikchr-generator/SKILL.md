@@ -171,6 +171,110 @@ Each object can carry up to 5 string labels (multi-line). For more, use a separa
 
 Set `right` / `down` / `left` / `up` once at the top. Containers (`[ ... ]`) get their own local direction that doesn't leak out.
 
+## Visual style — the SQLite-arch idiom
+
+The official pikchr examples (SQLite architecture, VCS graphs, Fossil swim-lane) share a distinct, polished feel. These nine patterns produce that look.
+
+### 1. Globals tuning block at the top
+
+Every serious diagram opens with a tuning block. Pick density before shapes land.
+
+```
+scale = 0.85               # overall scale (0.7–1.0 for dense, >1 for sparse)
+lineht *= 0.4              # tighten arrow length (default = boxht)
+$margin = lineht * 2.5     # one variable for region/group padding everywhere
+fontscale = 1.05           # nudge labels up if they look small
+charht *= 1.15             # extra leading on multi-line labels
+fill = 0x010203            # default fill (sentinel = theme bg)
+down                       # primary direction
+```
+
+### 2. `box same` chain for uniform sizing
+
+The single biggest "this looks designed" trick. The first named box sets `wid`/`ht`/`fill`/`thickness`/`rad`; every sibling repeats with `box same "Label"`. The whole row of shapes carries the same dimensions.
+
+```
+In:  box "Interface"  wid 150% ht 75% thickness 1.5px rad 5px fill 0x010203
+     arrow
+CP:  box same "Command" "Processor"   # inherits wid, ht, fill, rad, thickness
+     arrow
+VM:  box same "Virtual Machine"
+```
+
+To inherit from a non-adjacent shape: `box same as 1st box`.
+
+### 3. Group regions = invisible rect + italic side label
+
+Cluster related shapes inside a colored region drawn `behind` them. Compute the rect's extent from named anchors so it auto-resizes when labels grow.
+
+```
+# A region wrapping In..VM with $margin breathing room
+box ht (In.n.y - VM.s.y) + $margin   wid In.wid + $margin \
+    at CP   fill 0x404142   behind In   thin
+# Italic side label running up the rect's left edge
+line invis from 0.25*$margin east of last.sw up last.ht \
+    "Core" italic aligned
+```
+
+Use sentinel hex (`0x404142` = surface, `0x303132` = muted) so themes apply. Stack 2–3 regions for hierarchy (foreground / mid / background).
+
+### 4. Edge-fraction anchors for arrows
+
+When two arrows enter the same shape, don't both hit the same anchor — split the edge with a fraction.
+
+```
+arrow from CP to 1/4<Tokenizer.sw, Tokenizer.nw>  chop   # quarter down west edge
+arrow from 1/3<CG.nw, CG.sw> to CP                chop   # third down west edge of CG
+```
+
+### 5. `chop` every connector
+
+Default arrows draw to shape *centers* and pierce the edge. `chop` clips to the edge — every connection in the official examples uses it.
+
+```
+arrow from A to B chop          # endpoint clipped at B's edge
+arrow from A to B.s chop        # ditto, even when targeting a compass anchor
+```
+
+### 6. Polar positioning for branches
+
+For VCS-style diagrams or anything with consistent angled branches, place via `heading` from a known node:
+
+```
+circle "C3" at dist(C2, C4) heading 30 from C2
+```
+
+Distance and angle stay consistent as upstream nodes shift.
+
+### 7. Italic for meta-labels, plain for content
+
+Group labels, axis names, region tags use `italic`. Content labels (node names, edge text) stay plain. Visual hierarchy without color.
+
+```
+"Backend" italic aligned             # group label
+arrow "200 OK" above                 # content label
+```
+
+### 8. Restrained palette
+
+Use the sentinel palette for all theme-driven color (`0x010203`–`0x505152`). For semantic accents you intentionally want fixed (errors, warnings), pick desaturated values: `0xfecaca` light red, `0xc6e2ff` pale blue, `0xd8ecd0` pale green. Avoid named colors (`red`, `lightcyan`) — pikchr maps them to vivid hex that clashes.
+
+Group regions: layer 2–3 pastels, each `thin color gray` (or sentinel `0x101112` line) for a stroke.
+
+### 9. Two-letter capitalized anchor names
+
+Pikchr labels must start with a capital. The official examples use 2–3 letters: `In:`, `CP:`, `VM:`, `BT:`, `CG:`, `A1:`, `B3:`. Forces conciseness, reads like math, leaves arrow lines short and aligned.
+
+```
+# Good
+DB:   db("Postgres")
+Svc:  lambda("Service")
+
+# Worse
+DatabasePrimary: db("Postgres")
+ServiceTier:     lambda("Service")
+```
+
 ## Anti-patterns
 
 | Don't | Why |

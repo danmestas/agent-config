@@ -1,31 +1,52 @@
-# System architecture template — component layout with stdlib macros.
-# Compile with: compile.sh --with-stdlib --theme NAME
-#
-# Every fill/stroke uses sentinel colors (via stdlib macros), so themes apply
-# uniformly. To add a new node type, prefer a stdlib macro; if you must inline
-# colors, use only the 7 sentinels (#010203, #0a0b0c, #101112, #202122,
-# #303132, #404142, #505152).
+# System architecture — SQLite-arch idiom: globals tuning + group regions
+# with italic side labels + stdlib macros for shape variety.
+# Compile: compile.sh --with-stdlib --theme NAME
 
+# --- Globals: density and breathing room ---
+scale      = 0.85
+lineht    *= 0.5
+$margin    = lineht * 2.5
+fontscale  = 1.05
+
+# --- Edge tier (top row) ---
 right
-Web:  actor("Web App")
-arrow
-API:  actor("API Gateway")
-arrow
-Auth: lambda("Auth")
+Web:   actor("Web App")
+       arrow
+API:   actor("API")
+       arrow
+Auth:  lambda("Auth")
 
-# Service tier sits below the gateway
-Svc:  lambda("Service")  at API.s + (0, -1.2)
-arrow from API.s down to Svc.n
+# --- Service tier (middle row) ---
+Svc:   lambda("Service") at API.s + (0, -1.4)
+       arrow from API.s to Svc.n chop
 
-# Persistence
-arrow from Svc.s down
-DB:   db("Postgres")
-
-# Side: cache + queue (sentinel colors so the theme reaches them)
 Cache: box "Redis" fit \
-  fill 0x303132 color 0x0a0b0c thickness 1.5px rad 5px \
-  at Svc.e + (1.5, 0)
-arrow from Svc.e right to Cache.w "cache" above
+         fill 0x303132 color 0x0a0b0c thickness 1.5px rad 5px \
+         at Svc.e + (1.6, 0)
+       arrow from Svc.e to Cache.w chop "cache" above
 
-Queue: queue("Jobs") at DB.e + (1.5, 0)
-arrow from Svc.e + (0, -0.6) right then down to Queue.n
+# --- Data tier (bottom row) ---
+DB:    db("Postgres") at Svc.s + (0, -1.0)
+       arrow from Svc.s to DB.n chop
+
+Queue: queue("Jobs") at DB.e + (1.6, 0)
+       arrow from 1/3<Svc.se, Svc.s> down then right to Queue.nw chop
+
+# --- Group regions: invisible rects with italic side labels ---
+# Edge (top): wraps Web/API/Auth
+box ht (Web.n.y - Web.s.y) + $margin   wid (Auth.e.x - Web.w.x) + $margin \
+    at 0.5<Web.c, Auth.c>   fill 0x404142   behind Web   thin
+line invis from 0.25*$margin east of last.sw up last.ht \
+     "Edge" italic aligned
+
+# Service (middle): wraps Svc + Cache
+box ht (Svc.n.y - Svc.s.y) + $margin   wid (Cache.e.x - Svc.w.x) + $margin \
+    at 0.5<Svc.c, Cache.c>   fill 0x303132   behind Svc   thin
+line invis from 0.25*$margin east of last.sw up last.ht \
+     "Service" italic aligned
+
+# Data (bottom): wraps DB + Queue
+box ht (DB.n.y - DB.s.y) + $margin   wid (Queue.e.x - DB.w.x) + $margin \
+    at 0.5<DB.c, Queue.c>   fill 0x404142   behind DB   thin
+line invis from 0.25*$margin east of last.sw up last.ht \
+     "Data" italic aligned
