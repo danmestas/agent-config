@@ -17,7 +17,7 @@ Each macro takes one argument: the label.
 
 ## Color semantics
 
-Each macro fills with a **sentinel hex** (`#202122`, `#303132`, `#404142`) that the post-render `themeize.sh` pass rewrites to `var(--accent)`, `var(--muted)`, `var(--surface)` respectively. The shape's *role* (primary/secondary/passive) survives across all 16 themes — only the concrete colors swap. Strokes default to `rgb(0,0,0)` which becomes `currentColor`, so the entire diagram follows the chosen theme's foreground.
+Each macro fills with a **sentinel hex** (`#202122` for accent, `#303132` for muted, `#404142` for surface) that `themeize.sh` rewrites to the theme's concrete hex at compile time. The shape's *role* (primary/secondary/passive) survives across all 16 themes — only the concrete colors swap. Strokes default to `rgb(0,0,0)` which becomes `currentColor`, so the entire diagram follows the chosen theme's foreground.
 
 ## Combining macros
 

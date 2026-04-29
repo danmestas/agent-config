@@ -10,26 +10,32 @@ Pikchr emits raw RGB hex into the SVG it produces — there's no `currentColor`
 flag and no CSS-variable support in the language. To make the same source
 render across 16 themes, the skill defines a **7-token sentinel palette** of
 fixed hex values that the post-render [`../lib/themeize.sh`](../lib/themeize.sh)
-script rewrites to CSS custom properties (`var(--bg)`, `var(--fg)`,
-`var(--line)`, `var(--accent)`, `var(--muted)`, `var(--surface)`,
-`var(--border)`) and prefixes with a `<style>` block that assigns those
-properties to the chosen theme's hex values. Result: a single self-contained
-SVG that looks correct on dark, light, or any custom background.
+script rewrites to the chosen theme's concrete hex values. It also prefixes
+the SVG with a `<style>` block (so text inherits theme color via
+`currentColor`) and a full-viewport `<rect>` painted with the theme's
+background. Result: a single self-contained SVG that renders identically in
+browsers, librsvg, ImageMagick, kitten icat, GitHub preview, and every other
+SVG consumer — no `var()` refs, no `color-mix()`, just baked hex.
 
 ## 2. The 7-token sentinel palette
 
 Author your source using only these 7 hex values for fills/strokes that
 should follow the theme:
 
-| Sentinel  | CSS variable    | Role                                           |
-|-----------|-----------------|------------------------------------------------|
-| `#010203` | `var(--bg)`     | Background; inverted text on accent fills      |
-| `#0a0b0c` | `var(--fg)`     | Foreground / primary text                      |
-| `#101112` | `var(--line)`   | Connector / lane separator                     |
-| `#202122` | `var(--accent)` | Primary actors, services, decisions            |
-| `#303132` | `var(--muted)`  | Secondary infra, queues, annotations           |
-| `#404142` | `var(--surface)`| Passive data stores, files                     |
-| `#505152` | `var(--border)` | Borders / outlines (rarely needed directly)    |
+| Sentinel  | Token name | Role                                           |
+|-----------|------------|------------------------------------------------|
+| `#010203` | `bg`       | Background; inverted text on accent fills      |
+| `#0a0b0c` | `fg`       | Foreground / primary text                      |
+| `#101112` | `line`     | Connector / lane separator                     |
+| `#202122` | `accent`   | Primary actors, services, decisions            |
+| `#303132` | `muted`    | Secondary infra, queues, annotations           |
+| `#404142` | `surface`  | Passive data stores, files                     |
+| `#505152` | `border`   | Borders / outlines (rarely needed directly)    |
+
+Each sentinel is rewritten by `themeize.sh` to the theme's concrete hex.
+Tokens missing from a theme (most themes only define `bg`, `fg`, `line`,
+`accent`, `muted`) are derived via sRGB mix against `fg` and `bg` at
+compile time, also yielding concrete hex.
 
 Plus one bonus: `rgb(0,0,0)` (pikchr's default for un-colored elements) is
 rewritten to `currentColor`. So if you set NO `color`/`fill` on a shape, it
@@ -90,18 +96,20 @@ Missing tokens fall back to `color-mix()` derivations against `--fg` and
 pikchr binary --svg-only
     ↓
 raw SVG with sentinel hexes (#010203 … #505152)
-    ↓  (themeize.sh, single awk pass)
-1. Replace each sentinel hex with var(--token)
-2. Replace rgb(0,0,0) with currentColor
-3. Inject <style> block:
-     :where(svg) { --bg:…; --fg:…; --line:…; … color:var(--fg); background:var(--bg); }
-     :where(svg) text { font-family:system-ui,…; fill:currentColor; }
+    ↓  (themeize.sh)
+1. Resolve theme tokens; derive missing surface/border via sRGB mix(fg,bg,pct)
+2. Replace each sentinel hex with the theme's concrete hex
+3. Replace rgb(0,0,0) with currentColor (so default-colored shapes follow theme)
+4. Inject inside <svg ...>:
+     <style>:where(svg) { color:#FG; background:#BG; }
+            :where(svg) text { font-family:system-ui,…; fill:currentColor; }</style>
+     <rect width="100%" height="100%" fill="#BG"/>
     ↓
-themed self-contained SVG (stdout)
+themed self-contained SVG (stdout) — every color is concrete hex
 ```
 
-Read [`../lib/themeize.sh`](../lib/themeize.sh) — it's 160 lines and is the
-entire theming engine.
+Read [`../lib/themeize.sh`](../lib/themeize.sh) — it's the entire theming
+engine in one file.
 
 ## 6. Adding a new theme
 
@@ -121,10 +129,10 @@ entire theming engine.
   sentinel hex (`fill 0x202122`) and let `themeize.sh` rewrite it.
 - **`<img src="diagram.svg">` does NOT inherit parent `color`.** When the
   SVG is loaded as an image, its `currentColor` resolves against the SVG's
-  own document (which defaults to black). The injected `<style>` block makes
-  the SVG self-theming, so this still works *within* the SVG — but a host
-  page that wants the diagram to follow page theme must inline the SVG
-  instead of using `<img>`.
+  own `color` (set by the injected `<style>` block to the theme's `fg` hex).
+  This is intentional: the SVG carries its theme with it. To follow the
+  host page's theme dynamically, inline the SVG — but for committed-to-repo
+  SVGs that's almost never what you want.
 - **`color black` / `color 0x000000` baking.** Pikchr emits these as
   `rgb(0,0,0)`, which `themeize.sh` rewrites to `currentColor`. If you
   genuinely need forced-black, use `color 0x010101` — close enough to read

@@ -24,11 +24,17 @@ for theme in $THEMES; do
   out="$(printf '%s' "$MINIMAL_SVG" | bash "$THEMEIZE" --theme "$theme")"
   assert_contains "$out" "<svg" "$theme: has <svg>"
   assert_contains "$out" "<style>" "$theme: style block injected"
-  assert_contains "$out" "--bg:" "$theme: --bg declared"
-  assert_contains "$out" "--fg:" "$theme: --fg declared"
-  assert_contains "$out" "var(--bg)" "$theme: sentinel rewritten to var(--bg)"
-  assert_contains "$out" "var(--fg)" "$theme: sentinel rewritten to var(--fg)"
+  assert_contains "$out" "background:#" "$theme: background declared as concrete hex"
+  assert_contains "$out" "color:#" "$theme: color declared as concrete hex"
   assert_contains "$out" "font-family" "$theme: font-family injected"
+  # Output must be self-contained — no CSS vars, no color-mix() — so the SVG
+  # renders identically in librsvg / ImageMagick / kitten icat / GitHub preview.
+  if printf '%s' "$out" | grep -q 'var(--'; then
+    echo "FAIL: $theme: output contains var(--*) — must be resolved to concrete hex"; exit 1
+  fi
+  if printf '%s' "$out" | grep -q 'color-mix'; then
+    echo "FAIL: $theme: output contains color-mix() — must be resolved to concrete hex"; exit 1
+  fi
   count=$((count + 1))
 done
 
@@ -37,27 +43,27 @@ if (( count < 16 )); then
   echo "FAIL: expected >= 16 themes, processed $count"; exit 1
 fi
 
-# 2. Missing-token derivation: default theme sets all 7; tokyo-night
-# doesn't set `surface` or `border` — those must fall back to color-mix().
+# 2. Missing-token derivation: tokyo-night doesn't set `surface` or `border`,
+# so themeize derives them via sRGB mix(fg, bg, pct). The output must be
+# self-contained hex (no var(), no color-mix()).
 out_tokyo="$(printf '%s' "$MINIMAL_SVG" | bash "$THEMEIZE" --theme tokyo-night)"
-assert_contains "$out_tokyo" "color-mix(in srgb, var(--fg)" "tokyo-night: surface/border fallback via color-mix"
+if printf '%s' "$out_tokyo" | grep -qE 'var\(--|color-mix'; then
+  echo "FAIL: tokyo-night derivation left unresolved tokens"; exit 1
+fi
 
 # 3. Unknown theme falls back to default (with a warning to stderr).
 out_err=$(mktemp)
 out_unknown="$(printf '%s' "$MINIMAL_SVG" | bash "$THEMEIZE" --theme does-not-exist 2>"$out_err")"
-assert_contains "$out_unknown" "--bg:#18181B" "unknown theme falls back to default bg"
+assert_contains "$out_unknown" "background:#18181B" "unknown theme falls back to default bg"
 assert_contains "$(cat "$out_err")" "falling back to 'default'" "warning printed to stderr"
 rm -f "$out_err"
 
 # 4. Cursor-dark (custom theme): all 7 tokens set, none derived.
 out_cursor="$(printf '%s' "$MINIMAL_SVG" | bash "$THEMEIZE" --theme cursor-dark)"
-assert_contains "$out_cursor" "--bg:#1e1e1e" "cursor-dark bg"
-assert_contains "$out_cursor" "--fg:#d4d4d4" "cursor-dark fg"
-assert_contains "$out_cursor" "--accent:#007acc" "cursor-dark accent"
-# Should have NO color-mix() in cursor-dark output since every token is explicit.
-if printf '%s' "$out_cursor" | grep -q 'color-mix'; then
-  echo "FAIL: cursor-dark should not have any color-mix() fallbacks (all 7 tokens explicit)"
-  exit 1
-fi
+assert_contains "$out_cursor" "background:#1e1e1e" "cursor-dark bg in style block"
+assert_contains "$out_cursor" "color:#d4d4d4" "cursor-dark fg in style block"
+# Accent (#007acc) is baked into every sentinel-accent fill (#202122 in the
+# input MINIMAL_SVG becomes #007acc in the output).
+assert_contains "$out_cursor" "#007acc" "cursor-dark accent baked into sentinel fills"
 
 echo "themeize OK"

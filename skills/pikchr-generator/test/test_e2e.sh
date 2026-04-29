@@ -17,7 +17,7 @@ for theme in default tokyo-night dracula; do
   content="$(cat "$out")"
   assert_contains "$content" "<svg" "$theme: SVG emitted"
   assert_contains "$content" "</svg>" "$theme: SVG closed"
-  assert_contains "$content" "--bg:" "$theme: themeize style block applied"
+  assert_contains "$content" "background:#" "$theme: themeize style block applied with concrete hex"
   shasum -a 256 "$out" >> "$WORK/hashes.txt"
 done
 

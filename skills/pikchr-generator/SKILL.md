@@ -87,7 +87,7 @@ That's the entire interface. No dispatcher, no engine selection, no per-format c
 
 `default` (= `zinc-dark`), `zinc-light`, `zinc-dark`, `tokyo-night`, `tokyo-storm`, `tokyo-light`, `catppuccin`, `latte`, `nord`, `nord-light`, `dracula`, `github`, `github-dark`, `solarized`, `solar-dark`, `one-dark`, `cursor-dark`.
 
-Themes work via **sentinel-color substitution**: the SVG body uses 7 fixed hex sentinels (`#010203` … `#505152`), `lib/themeize.sh` rewrites them to `var(--bg)`, `var(--fg)`, `var(--line)`, `var(--accent)`, `var(--muted)`, `var(--surface)`, `var(--border)`, then injects a `<style>` block setting those custom properties to the chosen theme's hex values. Templates and the stdlib already use sentinels — your sources should too.
+Themes work via **sentinel-color substitution**: the SVG body uses 7 fixed hex sentinels (`#010203` … `#505152`); `lib/themeize.sh` rewrites each one to the chosen theme's concrete hex, injects a `<style>` block (so default-colored text follows the theme via `currentColor`), and prepends a full-viewport `<rect>` painted with the theme's bg. The output is fully baked hex — no `var()`, no `color-mix()` — so it renders identically in browsers, librsvg, ImageMagick, kitten icat, GitHub preview, and every other SVG consumer. Templates and the stdlib already use sentinels — your sources should too.
 
 See `references/theming.md` for the palette structure and how to add a theme.
 
@@ -229,7 +229,7 @@ bin/
   compile.sh             — only entry point: source → themed SVG
 lib/
   stdlib.pikchr          — pseudo-primitive macros (actor, lambda, db, …)
-  themeize.sh            — SVG post-processor: sentinel hex → var(--token) + <style>
+  themeize.sh            — SVG post-processor: sentinel hex → theme hex + <style> + bg rect
   themes.json            — 16 themes × 7 tokens
 templates/               — 6 starting points (all use stdlib + sentinels)
 references/              — language, theming, renderers, stdlib docs
