@@ -3,6 +3,7 @@ import path from 'node:path';
 import YAML from 'yaml';
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
 import { selectRules, composeRulesBody, isOwnerOfRulesFile } from '../lib/rules.ts';
+import { effectiveTargets } from '../lib/validate.ts';
 
 function yamlValue(v: string): string {
   // Use yaml.stringify to safely encode a single scalar (with quoting if needed).
@@ -14,13 +15,13 @@ export const claudeCodeAdapter: Adapter = {
   target: 'claude-code',
 
   supports(component) {
-    return component.manifest.targets.includes('claude-code');
+    return effectiveTargets(component).includes('claude-code');
   },
 
   async emit(component, ctx) {
     switch (component.manifest.type) {
       case 'skill':
-        return emitSkill(component);
+        return emitSkill(component, ctx);
       case 'agent':
         return emitAgent(component);
       case 'rules':
@@ -42,20 +43,60 @@ export const claudeCodeAdapter: Adapter = {
   },
 };
 
-function emitSkill(component: ComponentSource): EmittedFile[] {
-  const { manifest, body } = component;
+async function emitSkill(component: ComponentSource, ctx: AdapterContext): Promise<EmittedFile[]> {
+  const { manifest, body, relativeDir } = component;
   const frontmatter = [
     '---',
     `name: ${yamlValue(manifest.name)}`,
     `description: ${yamlValue(manifest.description)}`,
     '---',
   ].join('\n');
-  return [
+
+  // Plugin-bundled skills (manifest.plugin is set) use relativeDir to preserve
+  // the plugin namespace in dist (e.g. plugins/bones-powers/skills/<name>/SKILL.md).
+  // Regular skills continue to emit to the flat skills/<name>/SKILL.md path.
+  const skillMdPath = manifest.plugin
+    ? `${relativeDir}/SKILL.md`
+    : `skills/${manifest.name}/SKILL.md`;
+
+  const files: EmittedFile[] = [
     {
-      path: `skills/${manifest.name}/SKILL.md`,
+      path: skillMdPath,
       content: `${frontmatter}\n\n${body.trimStart()}`,
     },
   ];
+
+  // For plugin-bundled skills, also copy any extra files (e.g. references/)
+  // that live alongside SKILL.md in the component source directory.
+  if (manifest.plugin) {
+    const extraFiles = await collectExtraFiles(component.dir, relativeDir);
+    files.push(...extraFiles);
+  }
+
+  return files;
+}
+
+/**
+ * Walk `sourceDir` recursively and collect all files that are NOT SKILL.md,
+ * returning them as EmittedFiles with paths relative to `relativeDir`.
+ */
+async function collectExtraFiles(sourceDir: string, relativeDir: string): Promise<EmittedFile[]> {
+  const results: EmittedFile[] = [];
+  async function walk(dir: string): Promise<void> {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+      } else if (entry.isFile() && entry.name !== 'SKILL.md') {
+        const relativePath = path.relative(sourceDir, fullPath);
+        const content = await fs.readFile(fullPath);
+        results.push({ path: `${relativeDir}/${relativePath}`, content });
+      }
+    }
+  }
+  await walk(sourceDir);
+  return results;
 }
 
 function emitAgent(component: ComponentSource): EmittedFile[] {

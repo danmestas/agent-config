@@ -12,6 +12,7 @@ import type {
   ComponentSource,
   EmittedFile,
 } from '../lib/types.ts';
+import { effectiveTargets } from '../lib/validate.ts';
 
 interface ApmConfig {
   package_scope?: string;
@@ -68,7 +69,7 @@ export const apmAdapter: Adapter = {
   target: 'apm',
 
   supports(component) {
-    return component.manifest.targets.includes('apm');
+    return effectiveTargets(component).includes('apm');
   },
 
   async emit(component, ctx) {
