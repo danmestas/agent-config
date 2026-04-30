@@ -17,8 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - run: npm ci
 
       - name: Parse tag
         id: parse
@@ -56,7 +54,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APM_TOKEN: ${{ secrets.APM_TOKEN }}
         run: |
-          npx tsx apm-builder/cli.ts release \
+          npx -y -p @agent-ops/suit suit-build release \
             --skill "${{ steps.parse.outputs.skill }}" \
             --version "${{ steps.parse.outputs.version }}" \
             --no-dry-run

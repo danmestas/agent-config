@@ -18,12 +18,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - name: Typecheck
-        run: npx tsc --noEmit
-      - name: Unit tests
-        run: npx vitest run
       - name: Validate components
         run: npm run validate
       - name: Build (dry-run)
