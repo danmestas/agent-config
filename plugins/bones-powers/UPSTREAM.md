@@ -30,7 +30,14 @@ Upstream license: MIT (Jesse Vincent / fsck.com).
 
 ## Resyncing from upstream (manual procedure)
 
-1. Identify the upstream version: `cat ~/.claude/plugins/cache/claude-plugins-official/superpowers/<version>/.claude-plugin/plugin.json | jq .version`
+1. Identify the latest installed upstream version:
+   ```
+   ls ~/.claude/plugins/cache/claude-plugins-official/superpowers/ | sort -V | tail -1
+   ```
+   Confirm by reading that path's manifest:
+   ```
+   cat ~/.claude/plugins/cache/claude-plugins-official/superpowers/<version>/.claude-plugin/plugin.json | jq .version
+   ```
 2. For each file in the table above marked "verbatim copy", overwrite with the upstream copy.
 3. For each "refactored" or "full rewrite" file, manually merge upstream changes into the bones-powers version.
 4. Update this file's "forked from v5.0.7 on 2026-04-29" header.
