@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# bones-powers SessionStart hook.
+# Injects skills/using-bones-powers/SKILL.md ONLY when cwd is a bones workspace
+# (marker: .bones/repo.fossil). Outside a bones workspace, exits silently with
+# empty additionalContext so other plugins/hooks are unaffected.
+
+set -u
+
+# Gate: bones workspace marker.
+if [[ ! -f .bones/repo.fossil ]]; then
+  if [[ -n "${CURSOR_PLUGIN_ROOT:-}" ]]; then
+    printf '{\n  "additional_context": ""\n}\n'
+  elif [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]] && [[ -z "${COPILOT_CLI:-}" ]]; then
+    printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": ""\n  }\n}\n'
+  else
+    printf '{\n  "additionalContext": ""\n}\n'
+  fi
+  exit 0
+fi
+
+# Locate the using-bones-powers skill relative to this hook script.
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+SKILL_FILE="${PLUGIN_ROOT}/skills/using-bones-powers/SKILL.md"
+
+if [[ ! -f "${SKILL_FILE}" ]]; then
+  # Skill missing — fail open with empty context rather than block the session.
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": ""\n  }\n}\n'
+  exit 0
+fi
+
+skill_content=$(cat "${SKILL_FILE}")
+
+# JSON-escape the skill content. Matches upstream superpowers approach: bash
+# parameter substitution rather than character-by-character loop. Each ${s//old/new}
+# is a single C-level pass.
+escape_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+
+session_context=$(escape_json "$skill_content")
+
+# Multi-platform output format (preserves upstream behavior; see
+# https://github.com/obra/superpowers/issues/571).
+if [[ -n "${CURSOR_PLUGIN_ROOT:-}" ]]; then
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+elif [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]] && [[ -z "${COPILOT_CLI:-}" ]]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+  printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
+fi
+
+exit 0
