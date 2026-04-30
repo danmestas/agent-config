@@ -4,7 +4,7 @@ version: 1.0.0
 type: persona
 description: Aviation / flight planning work
 targets: [claude-code, codex, gemini, copilot]
-categories: [tooling, integrations, memory-management]
+categories: [tooling, integrations, memorymanagement]
 skill_include: []
 skill_exclude: []
 ---

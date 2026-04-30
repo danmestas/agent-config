@@ -4,7 +4,7 @@ version: 1.0.0
 type: persona
 description: Backend dev work — Go, observability, infra, philosophy
 targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [tooling, workflow, context-management, evolution, backpressure]
+categories: [tooling, workflow, contextmanagement, evolution, backpressure]
 skill_include: [idiomatic-go]
 skill_exclude: [datastar-tao, datastar-patterns, datastar]
 ---

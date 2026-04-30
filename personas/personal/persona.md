@@ -4,7 +4,7 @@ version: 1.0.0
 type: persona
 description: Personal projects, journaling, knowledge-base maintenance
 targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [memory-management, context-management]
+categories: [memorymanagement, contextmanagement]
 skill_include: [knowledge-base-overview, memorize]
 skill_exclude: []
 ---

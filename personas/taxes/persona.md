@@ -4,7 +4,7 @@ version: 1.0.0
 type: persona
 description: Tax preparation / non-code document work
 targets: [claude-code, codex, gemini, copilot]
-categories: [memory-management]
+categories: [memorymanagement]
 skill_include: []
 skill_exclude: []
 ---
