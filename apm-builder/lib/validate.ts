@@ -27,6 +27,27 @@ function validTargetsForType(type: ComponentType): Target[] {
   return (Object.keys(MATRIX[type]) as Target[]).filter((t) => MATRIX[type][t] !== 'error');
 }
 
+/**
+ * Resolve effective targets for a component using a 3-tier fallback:
+ *   1. Skill frontmatter `targets` (explicit, non-empty)
+ *   2. Plugin-level `defaultTargets` propagated from parent plugin.json
+ *   3. All 6 known targets (global default — only when both tiers 1 and 2
+ *      are present; an absent defaultTargets means "not yet configured",
+ *      not "all targets")
+ */
+export function effectiveTargets(component: ComponentSource): Target[] {
+  if (component.manifest.targets && component.manifest.targets.length > 0) {
+    return component.manifest.targets;
+  }
+  if (component.manifest.defaultTargets && component.manifest.defaultTargets.length > 0) {
+    return component.manifest.defaultTargets;
+  }
+  // No explicit targets and no plugin-level defaults — omit from target checks.
+  // Adapters that need a true "all targets" fallback should call effectiveTargets
+  // directly and check for an empty result.
+  return [];
+}
+
 export function validateComponents(components: ComponentSource[]): ValidationError[] {
   const errors: ValidationError[] = [];
   const byName = new Map<string, ComponentSource>();
@@ -44,7 +65,7 @@ export function validateComponents(components: ComponentSource[]): ValidationErr
   }
 
   for (const c of components) {
-    for (const t of c.manifest.targets) {
+    for (const t of effectiveTargets(c)) {
       const cell = MATRIX[c.manifest.type][t];
       if (cell === 'error') {
         const altTypes = validTypesForTarget(t).join(', ');
@@ -136,8 +157,11 @@ export function validateComponents(components: ComponentSource[]): ValidationErr
 
   // Soft nudge: skills missing a category get a warning to encourage tagging.
   // Not an error — the field is optional during the migration to canonical SKILL.md.
+  // Plugin-bundled skills (those with a parent plugin set) are exempt — their
+  // categories are managed at the plugin level, not individual skill frontmatter.
   for (const c of components) {
     if (c.manifest.type !== 'skill') continue;
+    if (c.manifest.plugin) continue; // plugin-bundled — exempt from category nudge
     if (!c.manifest.category) {
       errors.push({
         severity: 'warning',

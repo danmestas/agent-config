@@ -11,6 +11,7 @@ import {
   composeRulesBody,
   isOwnerOfRulesFile,
 } from '../lib/rules.ts';
+import { effectiveTargets } from '../lib/validate.ts';
 
 const GEMINI_EVENTS = new Set([
   'SessionStart',
@@ -35,13 +36,13 @@ export const geminiAdapter: Adapter = {
   target: 'gemini',
 
   supports(component) {
-    return component.manifest.targets.includes('gemini');
+    return effectiveTargets(component).includes('gemini');
   },
 
   async emit(component, ctx) {
     switch (component.manifest.type) {
       case 'skill':
-        return emitSkill(component);
+        return emitSkill(component, ctx);
       case 'rules':
         return emitRules(component, ctx);
       case 'hook':
@@ -62,8 +63,13 @@ export const geminiAdapter: Adapter = {
   },
 };
 
-function emitSkill(component: ComponentSource): EmittedFile[] {
-  const { manifest, body } = component;
+async function emitSkill(component: ComponentSource, _ctx: AdapterContext): Promise<EmittedFile[]> {
+  const { manifest, body, relativeDir } = component;
+
+  // Plugin-bundled skills (manifest.plugin set) preserve the plugin namespace
+  // in dist (e.g. plugins/bones-powers/skills/<name>/). Regular skills use
+  // the flat skills/<name>/ path.
+  const skillDir = manifest.plugin ? relativeDir : `skills/${manifest.name}`;
 
   // Metadata: loaded at session start, used by Gemini's skill index.
   const metadata = {
@@ -82,16 +88,43 @@ function emitSkill(component: ComponentSource): EmittedFile[] {
     '---',
   ].join('\n');
 
-  return [
+  const files: EmittedFile[] = [
     {
-      path: `skills/${manifest.name}/metadata.json`,
+      path: `${skillDir}/metadata.json`,
       content: `${JSON.stringify(metadata, null, 2)}\n`,
     },
     {
-      path: `skills/${manifest.name}/skill.md`,
+      path: `${skillDir}/skill.md`,
       content: `${bodyFrontmatter}\n\n${body.trimStart()}`,
     },
   ];
+
+  // For plugin-bundled skills, also copy extra files (e.g. references/).
+  if (manifest.plugin) {
+    const extraFiles = await collectExtraFiles(component.dir, relativeDir);
+    files.push(...extraFiles);
+  }
+
+  return files;
+}
+
+async function collectExtraFiles(sourceDir: string, relativeDir: string): Promise<EmittedFile[]> {
+  const results: EmittedFile[] = [];
+  async function walk(dir: string): Promise<void> {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+      } else if (entry.isFile() && entry.name !== 'SKILL.md') {
+        const relativePath = path.relative(sourceDir, fullPath);
+        const content = await fs.readFile(fullPath);
+        results.push({ path: `${relativeDir}/${relativePath}`, content });
+      }
+    }
+  }
+  await walk(sourceDir);
+  return results;
 }
 
 function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {

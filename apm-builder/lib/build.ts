@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import pLimit from 'p-limit';
 import { discoverComponents } from './discover.ts';
-import { validateComponents, type ValidationError } from './validate.ts';
+import { validateComponents, effectiveTargets, type ValidationError } from './validate.ts';
 import { loadRepoConfig } from './config.ts';
 import { matchesGlob } from './glob.ts';
 import { getAdapter } from '../adapters/index.ts';
@@ -48,7 +48,7 @@ export async function runBuild(opts: BuildOptions): Promise<BuildResult> {
     const targetConfig = (config[target] ?? {}) as Record<string, unknown>;
     const ctx = { config: targetConfig, allComponents: filtered, repoRoot: opts.repoRoot };
     for (const c of filtered) {
-      if (!c.manifest.targets.includes(target)) continue;
+      if (!effectiveTargets(c).includes(target)) continue;
       if (!adapter.supports(c)) continue;
       tasks.push(
         limit(async () => {

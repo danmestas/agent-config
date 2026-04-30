@@ -8,7 +8,7 @@ Bones-native workflow skills, forked from [superpowers](https://github.com/obra/
 
 | Skill | Phase | What changed vs. upstream |
 |---|---|---|
-| `using-bones-powers` | Bootstrap meta | Renamed from `using-superpowers`; speaks bones vocabulary. |
+| `using-bones-powers` | Bootstrap meta | Renamed from `using-superpowers`; speaks bones vocabulary. v0.4 adds harness tool-name mapping refs (codex/gemini/copilot/pi). |
 | `brainstorming` | Design | Spec output `docs/bones-powers/specs/`; commits via `bones repo ci`. |
 | `writing-plans` | Plan | Plans annotate `[slot: X]` per task; emit `bones tasks` graph at end. |
 | `executing-plans` | Single-session execution | TodoWrite plan-tracking replaced with `bones tasks list/claim/close`. |
@@ -37,9 +37,23 @@ The plugin's SessionStart hook auto-injects the `using-bones-powers` meta-skill 
 
 If you have both `superpowers` and `bones-powers` installed and you're in a bones workspace, both meta-skills bootstrap. Acceptable; gives you both vocabularies.
 
-## Out of v0.3
+## Multi-harness support
 
-- Codex/Gemini/Cursor adapters
+v0.4 ships bones-powers across 6 harness targets via apm-builder:
+
+- **claude-code** — primary target; full plugin (skills + hook + manifest)
+- **apm** — neutral package format
+- **codex** — Codex CLI (AGENTS.md based)
+- **gemini** — Gemini CLI
+- **copilot** — GitHub Copilot CLI
+- **pi** — Pi runtime
+
+Tool-name translation between Claude Code and other harnesses lives in `using-bones-powers/references/<harness>-tools.md` (codex, gemini, copilot, pi). The agent reads these mappings at session start via the gated SessionStart hook and translates implicitly when reading downstream skills.
+
+Build per-target output via `npm run build -- --target <target>` (or `--target all` for everything).
+
+## Out of v0.4
+
 - Automated test suite
 - Suppress-superpowers escape valve
 - Auto-resync from upstream

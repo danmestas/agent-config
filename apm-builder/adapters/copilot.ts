@@ -1,11 +1,12 @@
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
 import { composeRulesBody, selectRules } from '../lib/rules.ts';
+import { effectiveTargets } from '../lib/validate.ts';
 
 export const copilotAdapter: Adapter = {
   target: 'copilot',
 
   supports(component) {
-    return component.manifest.targets.includes('copilot');
+    return effectiveTargets(component).includes('copilot');
   },
 
   async emit(component, ctx) {
@@ -45,7 +46,7 @@ export function composeCopilotInstructions(allComponents: ComponentSource[]): st
     .filter(
       (c) =>
         c.manifest.type === 'skill' &&
-        c.manifest.targets.includes('copilot'),
+        effectiveTargets(c).includes('copilot'),
     )
     .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
 
@@ -69,7 +70,7 @@ function emitInstructions(component: ComponentSource, ctx: AdapterContext): Emit
     .filter(
       (c) =>
         c.manifest.type === 'skill' &&
-        c.manifest.targets.includes('copilot'),
+        effectiveTargets(c).includes('copilot'),
     )
     .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
 

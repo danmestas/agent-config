@@ -55,6 +55,19 @@ bones-powers skills assume you understand these concepts. If any are unfamiliar,
 | TodoWrite (for plan tracking) | `bones tasks create/list/claim/close` |
 | TodoWrite (for in-session steps) | TodoWrite (still — see hybrid task model in § 6 of the spec) |
 
+## Cross-harness tool names
+
+bones-powers skill content uses Claude Code tool names (TodoWrite, Skill, Read, Edit, Write, Bash, Glob, Grep, Agent/Task). On non-Claude-Code harnesses, see the per-harness mapping in `references/`:
+
+- Codex: `references/codex-tools.md`
+- Gemini: `references/gemini-tools.md`
+- Copilot CLI: `references/copilot-tools.md`
+- Pi: `references/pi-tools.md`
+
+When you encounter a Claude Code tool name in a bones-powers skill running on another harness, translate using the relevant mapping. The agent reads this meta-skill at session start (via the gated SessionStart hook), so the mapping is implicit context for all downstream skill reads.
+
+apm is intentionally not listed — apm is an intermediate package format whose downstream consumers (codex, gemini, etc.) bring their own tool naming. If you're authoring an apm-published variant, refer to the consumer harness's mapping.
+
 # Using Skills
 
 ## The Rule

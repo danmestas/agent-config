@@ -1,10 +1,10 @@
 {
   "name": "bones-powers",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Bones-native workflow skills (forked from superpowers v5.0.7). Brainstorming → planning → execution → fan-in, expressed in slots, leaves, swarm sessions, and the persistent task graph.",
   "publisher": "danmestas",
   "homepage": "https://github.com/danmestas/agent-config/tree/main/plugins/bones-powers",
-  "release": "https://github.com/danmestas/agent-config/releases/tag/bones-powers@v0.3.0",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/bones-powers@v0.4.0",
   "categories": ["developer-tools", "workflows"],
   "includes": [
     "using-bones-powers",

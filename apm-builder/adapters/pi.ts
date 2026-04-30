@@ -1,12 +1,13 @@
 import path from 'node:path';
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
 import { composeAgentsMd } from '../lib/agents-md.ts';
+import { effectiveTargets } from '../lib/validate.ts';
 
 export const piAdapter: Adapter = {
   target: 'pi',
 
   supports(component) {
-    return component.manifest.targets.includes('pi');
+    return effectiveTargets(component).includes('pi');
   },
 
   async emit(component, ctx) {
@@ -60,7 +61,7 @@ function emitAgentsMdContribution(
   // Only that one emits the file; others contribute via the shared composer and return [].
   const contributors = ctx.allComponents.filter(
     (c) =>
-      c.manifest.targets.includes('pi') &&
+      effectiveTargets(c).includes('pi') &&
       (c.manifest.type === 'rules' ||
         c.manifest.type === 'agent' ||
         c.manifest.type === 'skill'),
