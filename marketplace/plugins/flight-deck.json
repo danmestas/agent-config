@@ -1,0 +1,10 @@
+{
+  "name": "flight-deck",
+  "version": "0.1.0",
+  "description": "Development session lifecycle skills: takeoff (begin), landing (post-merge cleanup), course-correct (rewind a bad chunk of work). Workflow taxonomy plugin — skills compose with finishing-a-bones-leaf, finishing-a-development-branch, and other workflow primitives.",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/plugins/flight-deck",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/flight-deck@v0.1.0",
+  "categories": ["developer-tools", "workflows"],
+  "includes": ["takeoff", "landing", "course-correct"]
+}
