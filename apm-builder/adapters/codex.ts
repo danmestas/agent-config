@@ -12,6 +12,7 @@ import {
   type AgentsMdSection,
 } from '../lib/agents-md.ts';
 import { renderMcpServerToml } from '../lib/toml.ts';
+import { effectiveTargets } from '../lib/validate.ts';
 
 const TARGET = 'codex' as const;
 
@@ -19,7 +20,7 @@ export const codexAdapter: Adapter = {
   target: TARGET,
 
   supports(component) {
-    return component.manifest.targets.includes(TARGET);
+    return effectiveTargets(component).includes(TARGET);
   },
 
   async emit(component, ctx) {
@@ -101,7 +102,7 @@ function emitAgentsMd(
         (c.manifest.type === 'skill' ||
           c.manifest.type === 'agent' ||
           c.manifest.type === 'rules') &&
-        c.manifest.targets.includes(TARGET),
+        effectiveTargets(c).includes(TARGET),
     )
     .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
 
@@ -123,7 +124,7 @@ function emitMcp(
   // Idempotency: only the alphabetically-first mcp component emits the file.
   const allMcp = ctx.allComponents
     .filter(
-      (c) => c.manifest.type === 'mcp' && c.manifest.targets.includes(TARGET),
+      (c) => c.manifest.type === 'mcp' && effectiveTargets(c).includes(TARGET),
     )
     .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
   if (allMcp[0]?.manifest.name !== component.manifest.name) return [];
