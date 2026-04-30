@@ -4,6 +4,8 @@
 
 This is a **one-time copy + diverge**. There is no automated resync from upstream. Future upstream changes must be hand-merged.
 
+Set B (test-driven-development, systematic-debugging, verification-before-completion, requesting-code-review, receiving-code-review) added 2026-04-30 in v0.2.0.
+
 ## Per-file provenance
 
 | `bones-powers` file | Upstream source (`superpowers v5.0.7`) | Treatment |
@@ -25,6 +27,20 @@ This is a **one-time copy + diverge**. There is no automated resync from upstrea
 | `skills/dispatching-parallel-agents/SKILL.md` | same | refactored — parallel = N concurrent slot sessions |
 | `skills/using-bones-swarm/SKILL.md` | `skills/using-git-worktrees/SKILL.md` | full rewrite — bones swarm flow (join/cwd/work/commit/close) |
 | `skills/finishing-a-bones-leaf/SKILL.md` | `skills/finishing-a-development-branch/SKILL.md` | full rewrite — fan-in/keep/abandon menu instead of merge/PR/keep/discard |
+| `skills/test-driven-development/SKILL.md` | same | refactored — `bones-powers:` prefix swap; description gains "in a bones workspace" qualifier |
+| `skills/test-driven-development/testing-anti-patterns.md` | same | refactored — `bones-powers:` prefix swap |
+| `skills/systematic-debugging/SKILL.md` | same | refactored — prefix swap; new "## Bones context" sub-section noting `bones repo status`, leaf logs, sibling-slot reproduction |
+| `skills/systematic-debugging/root-cause-tracing.md` | same | refactored — prefix swap |
+| `skills/systematic-debugging/defense-in-depth.md` | same | refactored — prefix swap |
+| `skills/systematic-debugging/condition-based-waiting.md` | same | refactored — prefix swap |
+| `skills/systematic-debugging/condition-based-waiting-example.ts` | same | verbatim copy |
+| `skills/systematic-debugging/find-polluter.sh` | same | verbatim copy |
+| `skills/verification-before-completion/SKILL.md` | same | refactored — `git status` → `bones repo status`; test-run cwd note via `bones swarm cwd`; prefix swap |
+| `skills/requesting-code-review/SKILL.md` | same | refactored — `git diff` → `bones repo diff <rev>`; reviewer-as-sibling-slot note; prefix swap |
+| `skills/requesting-code-review/code-reviewer.md` | same | refactored — `git diff` → `bones repo diff <rev>`; fossil rev guidance for BASE/HEAD; prefix swap |
+| `skills/receiving-code-review/SKILL.md` | same | refactored — re-dispatch loop pointer to `bones-powers:subagent-driven-development`; prefix swap |
+
+**Skipped upstream files (Set B):** The following upstream files from `systematic-debugging/` are NOT copied — they are upstream meta/QA material, not user-facing skill content: `CREATION-LOG.md` (internal authoring history), `test-academic.md`, `test-pressure-1.md`, `test-pressure-2.md`, `test-pressure-3.md` (upstream skill QA/dogfood material).
 
 Upstream license: MIT (Jesse Vincent / fsck.com).
 
