@@ -1,5 +1,6 @@
 import type { ComponentSource, Target } from './types.ts';
 import { selectRules } from './rules.ts';
+import { effectiveTargets } from './validate.ts';
 
 export type AgentsMdSection = 'rules' | 'agents' | 'skills';
 export const DEFAULT_SECTION_ORDER: AgentsMdSection[] = ['rules', 'agents', 'skills'];
@@ -37,12 +38,12 @@ export function composeAgentsMd(opts: ComposeOptions): string {
 
   // Agents and skills: alphabetical by name, filtered to ones targeting this harness.
   const agents = components
-    .filter((c) => c.manifest.type === 'agent' && c.manifest.targets.includes(target))
+    .filter((c) => c.manifest.type === 'agent' && effectiveTargets(c).includes(target))
     .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
   sections.set('agents', agents);
 
   const skills = components
-    .filter((c) => c.manifest.type === 'skill' && c.manifest.targets.includes(target))
+    .filter((c) => c.manifest.type === 'skill' && effectiveTargets(c).includes(target))
     .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
   sections.set('skills', skills);
 
