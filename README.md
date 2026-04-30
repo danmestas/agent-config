@@ -223,9 +223,8 @@ The table below is regenerated from canonical `SKILL.md` frontmatter via `npm ru
 
 | Name | Type | Version | Description | Targets |
 |------|------|---------|-------------|---------|
-| apm-builder | skill | 0.1.0 | Use when building, validating, or scaffolding skills in this monorepo. Triggers: "validate skills", "build apm-builder", "scaffold a new skill", "init a hook/agent/rules/plugin", "run apm-builder", or any work on the multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini, Copilot CLI, Pi targets).
- | claude-code |
 | career-interview | skill | 0.1.0 | This skill should be used when the user asks to "interview me", "build my career profile", "let's work on my resume background", "career interview", "start a career session", "update my profile", "let's talk about my experience", or invokes /career-interview. Conducts deep conversational interviews to build structured career profiles for technical professionals. | claude-code |
+| clone-config | skill | 0.1.0 | Use when bootstrapping a fresh Mac/server, managing dotfiles, tracking shell configs, refreshing a Brewfile, adding ~/.zshrc to a dotfiles repo, or asking how to replicate a machine's config to a new device. Manages macOS (and Linux-compatible) machine config via chezmoi — install once, apply on every machine, edit source not target. | claude-code |
 | datastar | skill | 0.1.0 | Use when building web applications with Datastar — the hypermedia framework that drives frontend reactivity from the backend using HTML data-* attributes and Server-Sent Events. Triggers on Datastar, data-star, SSE-driven UI, hypermedia framework, backend-driven frontend, data-signals, data-on, PatchElements, or any Go/Python web app using Datastar SDKs. | claude-code |
 | datastar-patterns | skill | 0.1.0 | Use when implementing UI patterns with Datastar — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling, lazy loading, progress indicators, or keyboard shortcuts. Triggers on data-* attributes, @get/@post/@put/@patch helpers, SSE response formatting, or any "how do I do X in Datastar" implementation question. | claude-code |
 | defuddle | skill | 0.1.0 | Strip clutter from web pages before ingesting into the wiki. Removes ads, navigation, headers, footers, and boilerplate: leaving clean readable markdown that saves 40-60% tokens. Triggers on: defuddle, clean this page, strip this url, fetch and clean, clean web content before ingesting, strip ads, remove clutter, clean URL content, readable markdown from URL. | claude-code |
@@ -253,6 +252,8 @@ Gantt/pie charts (a chart library), or rich data viz.
  | apm, claude-code |
 | shadcn-forms | skill | 0.1.0 | This skill should be used when generating React form components with shadcn/ui, wiring up react-hook-form with zod validation, choosing the right shadcn/ui input component for each field type, or when the user asks to "build a form with shadcn", "add form validation", "use react-hook-form", "create a zod schema for this form". Provides component selection guidance, validation patterns, and production-ready implementation recipes for shadcn/ui v4 forms.
  | claude-code |
+| suit-build | skill | 0.1.0 | Use when building, validating, or scaffolding skills in this monorepo. Triggers: "validate skills", "build suit-build", "scaffold a new skill", "init a hook/agent/rules/plugin", "run suit-build", or any work on the multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini, Copilot CLI, Pi targets).
+ | claude-code |
 | vitaly | skill | 0.1.0 | This skill should be used when generating web form components, auditing form accessibility, reviewing form UX, or when the user asks to "check form accessibility", "audit this form", "apply form best practices", "make this form accessible", "review form UX". Also triggers on form generation tasks where the output is a React form component. Based on Vitaly Friedman's (Smashing Magazine) accessible web form design patterns.
  | claude-code |
 
@@ -276,6 +277,7 @@ Gantt/pie charts (a chart library), or rich data viz.
 | design | mode | 1.0.0 | UI, UX, interaction, and visual design tasks. | apm, claude-code, codex, copilot, gemini, pi |
 | focused | mode | 1.0.0 | Single-task deep focus, no scope creep | apm, claude-code, codex, copilot, gemini, pi |
 | frontend | persona | 1.0.0 | Frontend / Datastar work | apm, claude-code, codex, copilot, gemini, pi |
+| machines | persona | 1.0.0 | Machine + server management — chezmoi dotfiles, Doppler secrets, observability, infra changes | apm, claude-code, codex, copilot, gemini, pi |
 | ops | mode | 1.0.0 | Operations, infrastructure, deployment, observability, and on-call work. | apm, claude-code, codex, copilot, gemini, pi |
 | personal | persona | 1.0.0 | Personal projects, journaling, knowledge-base maintenance | apm, claude-code, codex, copilot, gemini, pi |
 | taxes | persona | 1.0.0 | Tax preparation / non-code document work | claude-code, codex, copilot, gemini |

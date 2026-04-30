@@ -1,0 +1,15 @@
+{
+  "name": "suit-build",
+  "version": "0.1.0",
+  "description": "Use when building, validating, or scaffolding skills in this monorepo. Triggers: \"validate skills\", \"build suit-build\", \"scaffold a new skill\", \"init a hook/agent/rules/plugin\", \"run suit-build\", or any work on the multi-harness skill emission pipeline (Claude Code, APM, Codex, Gemini, Copilot CLI, Pi targets).",
+  "publisher": "danmestas",
+  "homepage": "https://github.com/danmestas/agent-config/tree/main/skills/suit-build",
+  "release": "https://github.com/danmestas/agent-config/releases/tag/suit-build@v0.1.0",
+  "categories": [
+    "tooling"
+  ],
+  "type": "skill",
+  "targets": [
+    "claude-code"
+  ]
+}
