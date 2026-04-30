@@ -1,6 +1,6 @@
 {
   "name": "bones-powers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Bones-native workflow skills (forked from superpowers v5.0.7). Brainstorming → planning → execution → fan-in, expressed in slots, leaves, swarm sessions, and the persistent task graph.",
   "author": {
     "name": "Daniel Mestas",

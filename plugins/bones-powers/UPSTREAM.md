@@ -5,6 +5,7 @@
 This is a **one-time copy + diverge**. There is no automated resync from upstream. Future upstream changes must be hand-merged.
 
 Set B (test-driven-development, systematic-debugging, verification-before-completion, requesting-code-review, receiving-code-review) added 2026-04-30 in v0.2.0.
+v0.3.0 (2026-04-30): added bones-native git push + PR flow to `finishing-a-bones-leaf`. Depends on `bones apply` subcommand (forthcoming bones release).
 
 ## Per-file provenance
 
@@ -26,7 +27,7 @@ Set B (test-driven-development, systematic-debugging, verification-before-comple
 | `skills/subagent-driven-development/code-quality-reviewer-prompt.md` | same | verbatim copy |
 | `skills/dispatching-parallel-agents/SKILL.md` | same | refactored — parallel = N concurrent slot sessions |
 | `skills/using-bones-swarm/SKILL.md` | `skills/using-git-worktrees/SKILL.md` | full rewrite — bones swarm flow (join/cwd/work/commit/close) |
-| `skills/finishing-a-bones-leaf/SKILL.md` | `skills/finishing-a-development-branch/SKILL.md` | full rewrite — fan-in/keep/abandon menu instead of merge/PR/keep/discard |
+| `skills/finishing-a-bones-leaf/SKILL.md` | `skills/finishing-a-development-branch/SKILL.md` | full rewrite — fan-in/keep/abandon menu instead of merge/PR/keep/discard. v0.3 added optional ## After fan-in: push to git remote section using bones apply |
 | `skills/test-driven-development/SKILL.md` | same | refactored — `bones-powers:` prefix swap; description gains "in a bones workspace" qualifier |
 | `skills/test-driven-development/testing-anti-patterns.md` | same | refactored — `bones-powers:` prefix swap |
 | `skills/systematic-debugging/SKILL.md` | same | refactored — prefix swap; new "## Bones context" sub-section noting `bones repo status`, leaf logs, sibling-slot reproduction |

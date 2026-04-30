@@ -15,7 +15,7 @@ Bones-native workflow skills, forked from [superpowers](https://github.com/obra/
 | `subagent-driven-development` | Parallel execution | Each implementer = `bones swarm join` (slot + claim + worktree atomic). |
 | `dispatching-parallel-agents` | Parallel debug | N concurrent slot sessions; `bones tasks aggregate` for rollup. |
 | `using-bones-swarm` | Workspace primitive | Full rewrite — `swarm join → cwd → work → commit → close`. Replaces `using-git-worktrees`. |
-| `finishing-a-bones-leaf` | Integration | `swarm fan-in` to trunk (with `--dry-run` preview), keep, or abandon. Replaces `finishing-a-development-branch`. |
+| `finishing-a-bones-leaf` | Integration | `swarm fan-in` to trunk (with `--dry-run` preview); optionally materialize via `bones apply` + push + open PR. Replaces `finishing-a-development-branch`. |
 | `test-driven-development` | Discipline | Forked v5.0.7; `bones-powers:` prefix swap. |
 | `systematic-debugging` | Discipline | Forked v5.0.7; new "Bones context" section (`bones repo status`, leaf logs, sibling-slot repro). |
 | `verification-before-completion` | Discipline | Forked v5.0.7; `git status` → `bones repo status`; test-run cwd note. |
@@ -37,11 +37,10 @@ The plugin's SessionStart hook auto-injects the `using-bones-powers` meta-skill 
 
 If you have both `superpowers` and `bones-powers` installed and you're in a bones workspace, both meta-skills bootstrap. Acceptable; gives you both vocabularies.
 
-## Out of v0.2
+## Out of v0.3
 
 - Codex/Gemini/Cursor adapters
 - Automated test suite
-- Push-to-git-remote step in `finishing-a-bones-leaf`
 - Suppress-superpowers escape valve
 - Auto-resync from upstream
 
