@@ -47,7 +47,20 @@ export interface ComponentManifest {
   description: string;
   category?: { primary: Category; secondary?: Category[] };
   type: ComponentType;
+  /**
+   * Explicit targets from skill frontmatter. May be empty for plugin-bundled
+   * skills that inherit targets from the parent plugin's `default-targets`.
+   * Use `effectiveTargets()` in validate.ts to resolve the full set.
+   */
   targets: Target[];
+  /** When bundled inside a plugin, the parent plugin's name. */
+  plugin?: string;
+  /**
+   * Plugin-level default targets, propagated from the parent plugin's
+   * plugin.json `default-targets` field. Used as tier-2 fallback when
+   * skill frontmatter has no explicit `targets`.
+   */
+  defaultTargets?: Target[];
   author?: string;
   /**
    * Either a SPDX-style string ("MIT", "Apache-2.0") or an attribution block

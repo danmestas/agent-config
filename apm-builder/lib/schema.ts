@@ -77,6 +77,13 @@ const ManifestBaseSchema = z
         z.record(z.unknown()),
       )
       .optional(),
+    // Plugin-bundling metadata. Set programmatically by discover.ts when
+    // walking nested plugin skills; not user-authored in skill frontmatter
+    // (though technically tolerated if present).
+    plugin: z.string().optional(),
+    defaultTargets: z
+      .array(z.enum(TARGETS as unknown as [Target, ...Target[]]))
+      .optional(),
   })
   .strict();
 

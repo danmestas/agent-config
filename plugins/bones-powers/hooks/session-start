@@ -14,6 +14,8 @@ if [[ ! -f .bones/repo.fossil ]]; then
   elif [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]] && [[ -z "${COPILOT_CLI:-}" ]]; then
     printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": ""\n  }\n}\n'
   else
+    # SDK-standard format consumed by: Codex, Gemini, Pi, Copilot CLI (and any
+    # harness that uses the Anthropic SDK's standard hook output convention).
     printf '{\n  "additionalContext": ""\n}\n'
   fi
   exit 0
@@ -54,6 +56,8 @@ if [[ -n "${CURSOR_PLUGIN_ROOT:-}" ]]; then
 elif [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]] && [[ -z "${COPILOT_CLI:-}" ]]; then
   printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
 else
+  # SDK-standard format consumed by: Codex, Gemini, Pi, Copilot CLI (and any
+  # harness that uses the Anthropic SDK's standard hook output convention).
   printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
 fi
 
