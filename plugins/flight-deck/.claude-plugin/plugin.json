@@ -1,0 +1,12 @@
+{
+  "name": "flight-deck",
+  "version": "0.1.0",
+  "description": "Development session lifecycle skills: takeoff (begin), landing (post-merge cleanup), course-correct (rewind a bad chunk of work). Workflow taxonomy plugin — skills compose with finishing-a-bones-leaf, finishing-a-development-branch, and other workflow primitives.",
+  "default-targets": ["claude-code", "apm", "codex", "gemini", "copilot", "pi"],
+  "author": {
+    "name": "Daniel Mestas",
+    "email": "dan5446@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["workflow", "lifecycle", "session", "cleanup", "post-merge", "worktree", "branches", "git", "rewind"]
+}
