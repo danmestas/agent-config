@@ -1,6 +1,6 @@
 ---
 name: investigating-agent-sessions
-version: 0.1.0
+version: 0.2.0
 description: Use when debugging or auditing another Claude Code session, investigating what a prior agent did or left behind, reconstructing a failure that hit an earlier session, finding the cause of mystery state in a project (orphan processes, dirty files, broken hooks), or building context before continuing someone else's work
 type: skill
 targets:
@@ -56,6 +56,7 @@ Priority order. Stop early if the question is answered.
 | Trash | `~/.Trash/` (macOS), `~/.local/share/Trash/files/` (Linux) | Manually-deleted state that processes may still hold open. |
 | Git history | `git log --oneline -30`, `git log -p -- <path>`, `git reflog` | What was done, when, by whom. Reflog catches branch checkouts/resets the log doesn't. |
 | Tool source | the tool's repo | Pin the exact code path that produced an error message; don't guess from the error string. |
+| In-session subagent reports / Agent tool outputs | Parent JSONL (`jq` for `tool_use` with `name: "Agent"` and matching `tool_result`); subagent outputs at `/private/tmp/claude-*/tasks/<id>.output` | What subagents the prior agent dispatched, what they reported, where their work landed. **Subagents lie too** — verify their claims before acting on them. |
 | Prior agent notes | scratch markdown, observation files, PR descriptions, ADRs | **Use as leads, not conclusions.** See "Critical reading" below. |
 
 ## Encoding the project path for `~/.claude/projects/`
@@ -87,22 +88,61 @@ jq -r 'select(.type=="user") | .message.content[]? | select(.type=="tool_result"
   ~/.claude/projects/-Users-dan-projects-serverdom/<uuid>.jsonl
 ```
 
-## Critical reading of prior agent artifacts
+## Critical reading of prior agent artifacts and in-session subagent reports
 
-If you find a prior agent's note (markdown observation, PR description,
-ADR, scratch doc) **read it in full**, not just the introduction.
+The same discipline applies to two kinds of prior claim:
 
-- Look for "falsified", "actually", "update:", "correction", "wrong",
-  "scratch that", or new sections appended later.
-- Check the file's `git log` / mtime to see whether the conclusion was
-  amended after the original analysis.
-- Treat hypotheses as leads to verify, not as answers. **A prior
-  agent's wrong conclusion is worse than no prior context** — it
-  steers you away from the true cause.
+1. **Notes left by past agents** (markdown observation files, PR
+   descriptions, ADRs, scratch docs).
+2. **Reports returned by subagents you delegated in the current
+   session.**
 
-If you cannot independently re-derive the prior agent's conclusion
-from current evidence, mark it `unverified` in your report and keep
-investigating.
+Both can be wrong, abbreviated, falsified later, or written before
+the agent had complete information.
+
+For prior notes:
+
+- Read them **in full**, not just the introduction.
+- Look for "falsified", "actually", "update:", "correction",
+  "wrong", "scratch that", or new sections appended later.
+- Check the file's `git log` / mtime to see whether the conclusion
+  was amended after the original analysis.
+
+For your own subagent reports:
+
+- The subagent only saw the slice you asked them to see. Counts,
+  dates, and "no X observed" claims are bounded by the subagent's
+  query — not by reality.
+- Re-derive every load-bearing claim against direct evidence
+  before acting on it (filing an issue, writing a final report,
+  proposing a fix). Especially: numeric counts, time-ordering
+  claims, and "X never happened" negatives.
+
+In both cases: **a prior claim's wrong conclusion is worse than no
+prior context** — it steers you away from the true cause. If you
+cannot independently re-derive a claim from current evidence, mark
+it `unverified` in your report and keep investigating.
+
+## Replicate to verify
+
+When a claim cites tool output (a log line, a JSON payload, a
+process listing, a file's contents), **re-run the underlying
+command yourself** to confirm. Tools change state. Subagents
+abbreviate output. Logs rotate. Files get rewritten.
+
+Examples:
+
+- A subagent reports `bones tasks prime --json` returns an empty
+  payload — re-run `bones tasks prime --json` to confirm the live
+  shape (tasks may have been filed since).
+- A note quotes a log line — `tail`/`grep` the log directly to
+  confirm the line still exists and the file's mtime matches the
+  note's timestamp.
+- A claim names a file path — `ls -la` the path; check size, mode,
+  whether it's a symlink, whether it's tracked.
+
+Cheap to do, catches a class of stale-claim bugs that cause wrong
+issues to be filed.
 
 ## Detecting orphan processes (high-value pattern)
 
@@ -237,6 +277,24 @@ agent's environment**. If you can identify "the next agent shouldn't
 have to rediscover this", that's an evolutionary deliverable. Skip
 this step and the investigation only helps once.
 
+### Watch for operator-nuke-instinct
+
+When the user proposes a "blow it all away" recovery — uninstall +
+reinstall, `git reset --hard`, deleting `.bones/`, dropping a
+database, wiping config — that's the user reporting a UX gap they
+don't have language for. The literal answer is rarely the right
+answer. Instead:
+
+1. Stop the nuke. The current state is evidence.
+2. Capture what made the user reach for the nuke as a finding —
+   the underlying tool is missing a recovery affordance, not the
+   user panicking.
+3. Propose a non-destructive recovery path (kill orphan processes,
+   rotate a corrupt file, repair a setting) backed by your
+   investigation.
+4. The "nuke-was-the-only-option" friction itself is filable —
+   route it through the table above as a tool-friction issue.
+
 When evolution proposals are applied (e.g., a diff lands, an issue
 gets fixed, a memory entry is written), record it in `EVOLUTION.md`
 via the `evolution-changelog` skill so the loop is closed.
@@ -257,6 +315,12 @@ via the `evolution-changelog` skill so the loop is closed.
 
 - You're about to write a report whose root cause comes verbatim
   from a prior note, without your own re-derivation.
+- You're about to **file an issue or write a final report based on
+  a hypothesis you have not reproduced.** An unfalsified hypothesis
+  becomes a wrong issue in production.
+- You're about to act on a subagent's report's load-bearing
+  numeric claim ("six leaves", "zero invocations", "duration 545ms")
+  without re-deriving it from direct evidence.
 - You found one suspicious file/process and stopped looking.
 - You can't say "I checked X, here's what it shows" for each item in
   the Quick Reference table you decided was relevant.
@@ -264,5 +328,6 @@ via the `evolution-changelog` skill so the loop is closed.
   them about the discrepancy.
 - You're tempted to run a mutating command "just to confirm".
 
-All of these mean: stop, gather more evidence, re-read prior notes
-critically, then write the report.
+All of these mean: stop, gather more evidence, re-read prior claims
+critically, replicate the underlying observations, then write the
+report.
