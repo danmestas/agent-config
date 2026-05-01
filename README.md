@@ -1,90 +1,93 @@
 # agent-config
 
-Multi-harness AI agent configuration monorepo. Authors write skills, plugins, hooks, agents, rules, and MCP server configs once in canonical `SKILL.md` format; [`suit`](https://github.com/danmestas/suit) emits per-harness artifacts for **Claude Code**, **APM**, **Codex**, **Gemini CLI**, **Copilot CLI**, and **Pi**.
+Dan's content monorepo for AI-coding harnesses. Personas, modes, skills, plugins, hooks, and agents — authored once in canonical formats and shipped to Claude Code, APM, Codex, Gemini CLI, Copilot CLI, and Pi via [`suit`](https://github.com/danmestas/suit).
 
-> **Status (2026-04-27):** All six adapters merged. All components on canonical frontmatter (`name` + `version` + `description` + `type` + `targets` + `category`); `npm run validate` runs cleanly across the repo and `npm run build -- --target all` emits artifacts for every harness.
+This repo is content-only. The build/launcher tool lives separately in the suit repo; this repo holds the YAML-fronted markdown that suit reads.
 
-## Using this content with suit
+## Quick start
 
-Install [suit](https://github.com/danmestas/suit) and point it at this repo:
+Install [suit](https://github.com/danmestas/suit), point it at this repo, launch a harness:
 
 ```bash
 npm install -g @agent-ops/suit
 suit init https://github.com/danmestas/agent-config
-suit list personas
 suit claude --persona backend --mode focused
 ```
 
-Or for development against a local clone:
+Or work against a local clone:
 
 ```bash
 git clone https://github.com/danmestas/agent-config
 cd agent-config
 SUIT_CONTENT_PATH=$PWD suit list personas
+SUIT_CONTENT_PATH=$PWD suit show persona backend
 ```
 
-## Layout
+## What's in here
 
-The repo's directory structure mirrors the component-type schema:
+| Directory | What it contains | Count |
+|---|---|---|
+| `personas/` | Long-lived role filters (backend, frontend, machines, personal, aviation, taxes) | 6 |
+| `modes/` | Short-lived task filters (code, design, ops, focused) | 4 |
+| `skills/` | Canonical `SKILL.md` capabilities triggered by description | 49 |
+| `plugins/` | Multi-component bundles (knowledge-base, bones-powers, monorepo-profiles, gh-project-management, career-interview, flight-deck) | 6 |
+| `hooks/` | Event-driven scripts (tts-announcer, trace, recall) | 3 |
+| `agents/` | Subagent definitions (architect-review, code-reviewer, debugger, golang-pro, observability-engineer) | 5 |
+| `marketplace/` | Claude Code marketplace metadata for the published plugins | — |
+| `docs/` | Authoring docs (TAXONOMY, CONVENTIONS, CONTEXT, plans, ADRs) | — |
 
-```
-skills/      — type: skill   (46 components — typed agent capabilities triggered by description)
-plugins/     — type: plugin  (1 component — multi-skill bundles)
-hooks/       — type: hook    (3 components — tts-announcer, trace, recall — event-driven scripts)
-agents/      — type: agent   (5 components — wshobson-sourced subagents)
-rules/       — type: rules   (planned)
-mcp/         — type: mcp     (planned)
-```
+## How content gets to your harness
 
-The suit-build discovery pipeline walks all six top-level dirs.
+When you run `suit claude --persona backend --mode focused`, suit reads this repo's `personas/backend/persona.md` and `modes/focused/mode.md`, computes which skills survive the persona's `skill_include` / `skill_exclude` and `categories` filters, and prelaunches Claude Code with a temp `~/.claude/` mirror containing only the filtered components.
 
-## Conventions
+The same content also feeds APM, Codex, Gemini CLI, Copilot CLI, and Pi: each component declares `targets:` in its frontmatter, and per-harness adapters (in the suit repo) emit native artifacts. Run `suit list skills`, `suit show skill <name>`, or `suit claude --help` for the full surface. See the [suit README](https://github.com/danmestas/suit) for the launcher reference.
 
-Cross-cutting rules every component follows live in [`CONVENTIONS.md`](CONVENTIONS.md):
+## Want your own?
 
-- **Fail-safe hook scripts** — hooks never block the host session.
-- **Markdown flat-line format** — append-only changelogs use one entry per line for grep + diff friendliness.
-- **Per-project state directory** — `.agent-config/` for trace logs, recall toggles, and per-project excludes (gitignored).
-- **Cross-harness contract** — hooks read JSON from stdin and write JSON to stdout; the harness adapter library handles per-host envelope differences.
+This is Dan's personal/team config. To start your own:
 
-## Taxonomy
+- Fork [`suit-template`](https://github.com/danmestas/suit-template) — minimal starter with one persona and one mode.
+- Or fork this repo as a richer starting point and trim what you don't want.
+- Or `suit init https://github.com/your-username/your-fork` once your fork exists.
 
-Skills and configs are tagged across an 8-axis taxonomy. See [`TAXONOMY.md`](TAXONOMY.md) for definitions, examples, and the gap analysis.
+## Authoring
 
-| Axis | What it is |
-|---|---|
-| **Economy** | Cost-shaping (output / context / cache / model) |
-| **Workflow** | Forward-driving orchestration (brainstorm → spec → plan → execute) |
-| **BackPressure** | Quality feedback that pulls the agent back to revisit work |
-| **Tooling** | Capability extensions (new senses/abilities) |
-| **Integrations** | External-service hookups |
-| **ContextManagement** | Runtime session strategies (subagents, worktrees, rewinds) |
-| **MemoryManagement** | Persistent cross-session memory |
-| **Evolution** | Meta-skills that observe sessions and propose config updates |
-
-## Install
-
-### Claude Code (marketplace)
-
-```text
-/plugin marketplace add danmestas/agent-config
-/plugin install <plugin-name>@danmestas/agent-config
-```
-
-Plugin available today: `knowledge-base`. Individual skills can also be installed directly — every skill in this repo is on the canonical schema and emits to `dist/claude-code/skills/<name>/`.
-
-### APM
+New components follow the canonical schema with YAML frontmatter:
 
 ```yaml
-# apm.yml
-dependencies:
-  apm:
-    - danmestas/agent-config
+---
+name: my-skill
+version: 1.0.0
+description: Use when [describe triggering conditions in one sentence]
+type: skill
+targets: [claude-code, apm, codex, gemini, copilot, pi]
+category:
+  primary: tooling
+  secondary: [economy]
+---
+
+(skill body)
 ```
 
-### Codex / Gemini CLI / Copilot CLI / Pi
+- [`CONVENTIONS.md`](CONVENTIONS.md) — cross-cutting rules every component follows (fail-safe hooks, flat-line changelogs, `.agent-config/` state directory, cross-harness contract).
+- [`TAXONOMY.md`](TAXONOMY.md) — the 8-axis taxonomy (Economy, Workflow, BackPressure, Tooling, Integrations, ContextManagement, MemoryManagement, Evolution) used to classify and bundle components.
+- [`CONTEXT.md`](CONTEXT.md) — domain vocabulary (skill, plugin, persona, mode, harness, adapter, prelaunch, suit session).
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to run validation locally and submit a PR.
 
-Adapters emit native artifacts for each harness when a skill declares it in `targets:`. Run `npm run build -- --target <harness>` to generate the per-harness output under `dist/<harness>/`. Install paths follow each harness's convention.
+## Building
+
+```bash
+npm run validate -- --filter <name>     # validate one component
+npm run build -- --target claude-code   # build Claude Code artifacts
+npm run watch -- --target claude-code   # rebuild on change
+npm run docs                            # regenerate the components table below
+npm run init -- my-skill --type skill   # scaffold a new component
+npm run evolve -- --since 7d --dry-run  # detect friction patterns in session history
+```
+
+Each script invokes [`suit-build`](https://github.com/danmestas/suit) via `npx -y -p @agent-ops/suit suit-build <cmd>` — no global install required. Available `--target` values: `claude-code`, `apm`, `codex`, `gemini`, `copilot`, `pi`, or `all`.
+
+`npm run docs` only rewrites the region between `<!-- AUTO-GENERATED: COMPONENTS -->` and `<!-- /AUTO-GENERATED: COMPONENTS -->`. Everything outside the markers is hand-written and preserved across regenerations.
 
 ## Categories
 
@@ -128,7 +131,7 @@ Bundled as the [knowledge-base](plugins/knowledge-base) plugin — install once 
 
 Harness-specific plugin shells (no `SKILL.md`, not transpiled). Each has its own README.
 
-[knowledge-base](plugins/knowledge-base) · [monorepo-profiles](plugins/monorepo-profiles) · [career-interview](plugins/career-interview) · [gh-project-management](plugins/gh-project-management)
+[knowledge-base](plugins/knowledge-base) · [monorepo-profiles](plugins/monorepo-profiles) · [career-interview](plugins/career-interview) · [gh-project-management](plugins/gh-project-management) · [bones-powers](plugins/bones-powers) · [flight-deck](plugins/flight-deck)
 
 ### Agents
 
@@ -283,43 +286,9 @@ Gantt/pie charts (a chart library), or rich data viz.
 | taxes | persona | 1.0.0 | Tax preparation / non-code document work | claude-code, codex, copilot, gemini |
 <!-- /AUTO-GENERATED: COMPONENTS -->
 
-## Building
-
-```bash
-npm run validate -- --filter <name>     # validate one component
-npm run build -- --target claude-code   # build Claude Code artifacts
-npm run watch -- --target claude-code   # rebuild on change
-npm run docs                            # regenerate the components table above
-npm run init -- my-skill --type skill   # scaffold a new component
-npm run evolve -- --since 7d --dry-run  # detect friction patterns in session history
-```
-
-Each script invokes [`suit-build`](https://github.com/danmestas/suit) via `npx -y -p @agent-ops/suit suit-build <cmd>` — no global install required.
-
-Available `--target` values: `claude-code`, `apm`, `codex`, `gemini`, `copilot`, `pi`, or `all`.
-
-`npm run docs` only rewrites the region between `<!-- AUTO-GENERATED: COMPONENTS -->` and `<!-- /AUTO-GENERATED: COMPONENTS -->`. Everything outside the markers — including the categorized list above — is hand-written and preserved across regenerations.
-
 ## Architecture
 
 For the full build-tool reference, read [`skills/suit-build/SKILL.md`](skills/suit-build/SKILL.md). For the design rationale, see [`TAXONOMY.md`](TAXONOMY.md).
-
-The canonical source format is one `SKILL.md` per component with YAML frontmatter:
-
-```yaml
----
-name: my-skill
-version: 1.0.0
-description: Use when [describe triggering conditions in one sentence]
-type: skill
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-category:
-  primary: tooling
-  secondary: [economy]
----
-
-(skill body)
-```
 
 Per-harness emission honors a compatibility matrix enforced by `suit-build validate` — not every component type works on every harness. The validator rejects incompatible combinations and warns on best-effort ones. See the [suit repo](https://github.com/danmestas/suit) for source.
 
@@ -331,14 +300,6 @@ Repos that aren't component bundles but pair naturally with `agent-config`:
 
 - [`claude-hud-combo`](https://github.com/danmestas/claude-hud-combo) — Self-contained Deno statusline for Claude Code. Doesn't fit any of the six component types (it's a runtime artifact, not authored content), so it lives separately. Install with its own `install.sh`.
 - [`meta-scout`](https://github.com/danmestas/meta-scout) — Library that powers the [`evolution-engine`](skills/evolution-engine) skill's deeper detection (12 behavioral signals, struggle-then-success arcs). The skill currently uses two inline detectors; once `meta-scout` publishes to npm or commits a built `dist/`, a follow-up PR wires its full signal catalog into the orchestrator.
-
-## Contributing
-
-- Branch from `main` and open a PR — direct pushes to `main` are not accepted.
-- Run `npm run validate` before pushing; it must be green.
-- Keep commit messages focused and imperative (e.g., `feat(skill): ...`, `docs: ...`).
-- Do not include AI-tool attribution in commit messages or PR bodies.
-- New skills follow the `kebab-case` directory convention under `skills/`. Plugins live under `plugins/`. See [`AGENTS.md`](AGENTS.md) for repo-level guidelines.
 
 ## License
 
