@@ -1,10 +1,10 @@
 {
-  "name": "agent-skills",
+  "name": "agent-config",
   "version": "0.1.0",
   "description": "Multi-harness skills monorepo: skills, plugins, rules, hooks, agents, MCP servers built once, published per-harness.",
   "publisher": "danmestas",
-  "homepage": "https://github.com/danmestas/agent-skills",
-  "release": "https://github.com/danmestas/agent-skills/releases/latest",
+  "homepage": "https://github.com/danmestas/agent-config",
+  "release": "https://github.com/danmestas/agent-config/releases/latest",
   "categories": ["productivity", "developer-tools"],
   "includes": "all"
 }
