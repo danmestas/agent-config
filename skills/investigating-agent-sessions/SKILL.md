@@ -6,8 +6,9 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: tooling
+  primary: evolution
   secondary:
+    - tooling
     - backpressure
 ---
 
@@ -217,6 +218,28 @@ The user wants three things:
 
 Always include #3. Investigations without admitted gaps usually have
 hidden ones.
+
+## Evolutionary feedback (this skill is in the Evolution category)
+
+An investigation that ends with a report and no proposals for change
+is incomplete. Before closing, produce four kinds of evolutionary
+output and route each to the right surface.
+
+| Output | Goes to |
+|---|---|
+| Friction with a specific tool | A GitHub issue on that tool's repo, with the captured trace as evidence |
+| Cross-session pattern (could `evolution-engine` detect this if it ran across many sessions?) | A note in `~/.claude/evolution-reports/` for aggregation; see the `evolution-engine` skill |
+| Gap in this skill itself (you had to improvise around something the Quick Reference / Common Mistakes table didn't cover) | A diff against this SKILL.md — the skill must grow each time it's used |
+| Settings / memory / hook change that would have shortened this investigation | A diff candidate via `update-config` or a memory write; record what would have helped |
+
+Findings are not just artifacts — they are **proposals for the next
+agent's environment**. If you can identify "the next agent shouldn't
+have to rediscover this", that's an evolutionary deliverable. Skip
+this step and the investigation only helps once.
+
+When evolution proposals are applied (e.g., a diff lands, an issue
+gets fixed, a memory entry is written), record it in `EVOLUTION.md`
+via the `evolution-changelog` skill so the loop is closed.
 
 ## Common Mistakes
 
