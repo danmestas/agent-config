@@ -1,0 +1,23 @@
+{
+  "skill_name": "farley",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit this repo's CI/CD setup in Dave Farley's Continuous Delivery style. Tell me whether main is releasable, score the project, and give the smallest useful improvement plan.",
+      "expected_output": "A CD assessment with deployability judgment, evidence-backed 14-marker scorecard, highest-risk gaps, and incremental experiments rather than generic tool recommendations.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "We're a regulated fintech team. Releases happen every six weeks from a hardening branch, but leadership wants Continuous Delivery without losing auditability. Draft a practical migration plan.",
+      "expected_output": "A plan that treats compliance as automation and traceability, preserves business release control, removes hardening-branch dependence incrementally, and includes pipeline/evidence recommendations.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Design a deployment pipeline for a legacy monolith with manual database migrations, flaky integration tests, and no production observability. Keep it realistic for a small team.",
+      "expected_output": "A staged pipeline design with build-once artifacts, fast commit feedback, acceptance and migration checks, smoke tests, observability, and first implementation steps sized for a small team.",
+      "files": []
+    }
+  ]
+}
