@@ -41,9 +41,10 @@ description: |
   Project configuration questions benefit from the agent's knowledge of all 6 templates and when to use each.
   </commentary>
   </example>
-model: inherit
-color: cyan
-tools: ["Read", "Write", "Bash", "Grep", "Glob"]
+agent:
+  model: inherit
+  color: cyan
+  tools: [Read, Write, Bash, Grep, Glob]
 ---
 
 You are a GitHub Projects V2 expert. You orchestrate project setup, daily operations, charters, and bulk management using the `gh` CLI.
