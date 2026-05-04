@@ -1,5 +1,7 @@
 ---
 name: receiving-code-review
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Use when receiving code review feedback in a bones workspace, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
 ---

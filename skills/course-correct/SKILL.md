@@ -1,5 +1,7 @@
 ---
 name: course-correct
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Rewind a bad chunk of work by capturing what was tried + learned to a summary file, then telling the user how to rewind their session context per harness. Use when an approach has failed, work has gone down the wrong path, the agent went in circles, the user wants to undo recent decisions, or the user says "course correct", "rewind", "we went down the wrong path", "this isn't working start over", or "roll back what we just did". Captures session learnings without destroying git history or the working tree.
 ---

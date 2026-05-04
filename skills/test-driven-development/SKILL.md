@@ -1,5 +1,7 @@
 ---
 name: test-driven-development
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Use when implementing any feature or bugfix in a bones workspace, before writing implementation code
 ---

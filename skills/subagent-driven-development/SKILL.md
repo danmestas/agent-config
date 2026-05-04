@@ -1,5 +1,7 @@
 ---
 name: subagent-driven-development
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Execute a plan in parallel slot sessions. Each implementer subagent runs in its own bones swarm session (slot + claim + worktree atomic via bones swarm join). Two-stage review (spec compliance + code quality) per task. Use when the plan has independent tasks that can run concurrently; use executing-plans instead for single-session inline runs.
 ---

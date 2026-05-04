@@ -1,5 +1,7 @@
 ---
 name: takeoff
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Beginning-of-session inventory and orientation. Surfaces stale worktrees, behind-origin state, recent specs/plans, open PRs, and recent memory entries to help the agent re-orient. Use when starting a new session, asking "where were we", running a takeoff check, beginning work, or wanting a situational report before diving in. Read-only — pure inventory + recommendations, no automatic actions.
 ---

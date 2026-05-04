@@ -1,5 +1,7 @@
 ---
 name: career-interview-setup
+version: 1.0.0
+targets: [claude-code]
 type: command
 description: Configure career-interview plugin settings (TTS engine, voice, model)
 allowed-tools: ["Read", "Write", "mcp__plugin_career-interview_tts__openai_tts", "mcp__plugin_career-interview_tts__say_tts", "mcp__plugin_career-interview_tts__elevenlabs_tts", "mcp__plugin_career-interview_tts__google_tts"]

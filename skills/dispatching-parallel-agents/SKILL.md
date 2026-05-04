@@ -1,5 +1,7 @@
 ---
 name: dispatching-parallel-agents
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Run N concurrent slot sessions in a bones workspace for parallel debugging or independent work. Discover ready work via bones swarm tasks --slot=X --json. Roll up cross-slot status via bones tasks aggregate. Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies.
 ---

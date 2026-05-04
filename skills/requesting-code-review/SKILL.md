@@ -1,5 +1,7 @@
 ---
 name: requesting-code-review
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Use when completing tasks, implementing major features, or before fan-in to verify work meets requirements in a bones workspace
 ---

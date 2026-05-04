@@ -1,5 +1,7 @@
 ---
 name: gh-project-expert
+version: 1.0.0
+targets: [claude-code]
 type: agent
 description: |
   Use this agent when the user needs to create, configure, or manage GitHub Projects — including setting up boards, managing issues, writing charters, or performing bulk operations. Examples:

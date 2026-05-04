@@ -1,5 +1,7 @@
 ---
 name: finishing-a-bones-leaf
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: After a bones swarm session closes, decide what to do with the open leaf — fan-in to trunk, keep open, or abandon — and (optionally) materialize trunk into the git worktree, push, and open a PR for the swarmed changes. Use when implementation is complete, all tests pass, and you need to integrate the work back into the bones hub trunk.
 ---

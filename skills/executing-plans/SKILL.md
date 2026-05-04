@@ -1,5 +1,7 @@
 ---
 name: executing-plans
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Execute a plan task-by-task in a single session inside a bones workspace. Coordinator enumerates tasks via bones tasks list, claims one at a time, and closes with --reason on completion. Use when running a plan inline (single agent, single session); use subagent-driven-development instead for parallel slot work.
 ---

@@ -1,5 +1,7 @@
 ---
 name: writing-plans
+version: 1.0.0
+targets: [claude-code]
 type: skill
 description: Use when you have a spec or requirements for a multi-step task in a bones workspace, before touching code — produces a bones task graph plan with slot assignments and leaf-level steps
 ---

@@ -1,5 +1,7 @@
 ---
 name: monorepo-profile
+version: 1.0.0
+targets: [claude-code]
 type: command
 description: Manage monorepo profiles. Subcommands: switch, status, validate, diff.
 argument-hint: switch <name> | status | validate [name] | diff [name]
