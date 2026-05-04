@@ -1,0 +1,12 @@
+{
+  "name": "stasi",
+  "version": "0.1.0",
+  "description": "Surveillance skills for agent sessions: live-watch a Claude Code session under bones (`spy-on-bones-session`) and cold-read a finished session's artifacts (`investigating-agent-sessions`). Produces structured findings reports — bugs, inconveniences, improvements — ready to hand off to systematic-debugging and to-issues.",
+  "default-targets": ["claude-code", "apm", "codex", "gemini", "copilot", "pi"],
+  "author": {
+    "name": "Daniel Mestas",
+    "email": "dan5446@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["surveillance", "audit", "agent-sessions", "bones", "investigation", "evolution", "claude-code", "transcripts", "fingerprint", "spy"]
+}
