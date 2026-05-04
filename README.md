@@ -1,54 +1,82 @@
-# agent-config
+# wardrobe
 
-Dan's content monorepo for AI-coding harnesses. Personas, modes, skills, plugins, hooks, and agents — authored once in canonical formats and shipped to Claude Code, APM, Codex, Gemini CLI, Copilot CLI, and Pi via [`suit`](https://github.com/danmestas/suit).
+Dan's content monorepo for AI-coding harnesses. Outfits, modes, accessories,
+skills, agents, hooks, rules, and commands — authored once in canonical
+formats and shipped to Claude Code, APM, Codex, Gemini CLI, Copilot CLI, and
+Pi via [`suit`](https://github.com/danmestas/suit).
 
-This repo is content-only. The build/launcher tool lives separately in the suit repo; this repo holds the YAML-fronted markdown that suit reads.
+This repo is content-only. The build/launcher tool lives separately in the
+suit repo; this repo holds the YAML-fronted markdown that suit reads.
 
 ## Quick start
 
-Install [suit](https://github.com/danmestas/suit), point it at this repo, launch a harness:
+Install [suit](https://github.com/danmestas/suit), point it at this repo,
+launch a harness:
 
 ```bash
 npm install -g @agent-ops/suit
-suit init https://github.com/danmestas/agent-config
-suit claude --persona backend --mode focused
+suit init https://github.com/danmestas/wardrobe
+suit claude --outfit backend --mode focused
 ```
 
 Or work against a local clone:
 
 ```bash
-git clone https://github.com/danmestas/agent-config
-cd agent-config
-SUIT_CONTENT_PATH=$PWD suit list personas
-SUIT_CONTENT_PATH=$PWD suit show persona backend
+git clone https://github.com/danmestas/wardrobe
+cd wardrobe
+SUIT_CONTENT_PATH=$PWD suit list outfits
+SUIT_CONTENT_PATH=$PWD suit show outfit backend
+```
+
+Layer accessories onto the session at invocation time:
+
+```bash
+suit claude --outfit backend --mode focused --accessory tracing --accessory pr-policy
 ```
 
 ## What's in here
 
-| Directory | What it contains | Count |
-|---|---|---|
-| `personas/` | Long-lived role filters (backend, frontend, machines, personal, aviation, taxes) | 6 |
-| `modes/` | Short-lived task filters (code, design, ops, focused) | 4 |
-| `skills/` | Canonical `SKILL.md` capabilities triggered by description | 49 |
-| `plugins/` | Multi-component bundles (knowledge-base, bones-powers, monorepo-profiles, gh-project-management, career-interview, flight-deck) | 6 |
-| `hooks/` | Event-driven scripts (tts-announcer, trace, recall) | 3 |
-| `agents/` | Subagent definitions (architect-review, code-reviewer, debugger, golang-pro, observability-engineer) | 5 |
-| `marketplace/` | Claude Code marketplace metadata for the published plugins | — |
-| `docs/` | Authoring docs (TAXONOMY, CONVENTIONS, CONTEXT, plans, ADRs) | — |
+| Directory | What it contains |
+|---|---|
+| `outfits/` | Long-lived role bundles (backend, frontend, machines, personal, aviation, taxes) — set the baseline component set. |
+| `modes/` | Work-shape overlays (code, design, ops, focused) — extend/override outfit components and inject a prompt body. |
+| `accessories/` | Small repeatable add-ons applied via `--accessory`. (Empty for now; placeholder README.) |
+| `skills/` | Flat shared pool of `SKILL.md` capabilities triggered by description. |
+| `agents/` | Subagent definitions (`AGENT.md`). |
+| `hooks/` | Event-driven scripts (`HOOK.md` entrypoint, payload alongside). |
+| `rules/` | Harness-native rules referenced by outfits/modes/accessories. (Empty for now; placeholder README.) |
+| `commands/` | Slash commands (`COMMAND.md`). |
+| `docs/` | Authoring docs (TAXONOMY, CONVENTIONS, CONTEXT, contributing, GH project setup, plans, ADRs). |
 
 ## How content gets to your harness
 
-When you run `suit claude --persona backend --mode focused`, suit reads this repo's `personas/backend/persona.md` and `modes/focused/mode.md`, computes which skills survive the persona's `skill_include` / `skill_exclude` and `categories` filters, and prelaunches Claude Code with a temp `~/.claude/` mirror containing only the filtered components.
+When you run `suit claude --outfit backend --mode focused`, suit:
 
-The same content also feeds APM, Codex, Gemini CLI, Copilot CLI, and Pi: each component declares `targets:` in its frontmatter, and per-harness adapters (in the suit repo) emit native artifacts. Run `suit list skills`, `suit show skill <name>`, or `suit claude --help` for the full surface. See the [suit README](https://github.com/danmestas/suit) for the launcher reference.
+1. Starts with an empty component set.
+2. Applies the outfit (`outfits/backend/outfit.md`) → fills baseline.
+3. Applies the mode (`modes/focused/mode.md`) → merges/overrides components
+   plus injects the mode body as additional context.
+4. Applies each `--accessory <name>` flag in order.
+5. Emits per-harness via existing adapters into a temp tree the harness
+   reads at launch.
+
+The same content feeds APM, Codex, Gemini CLI, Copilot CLI, and Pi: each
+component declares `targets:` in its frontmatter, and per-harness adapters
+(in the suit repo) emit native artifacts. Run `suit list skills`,
+`suit show skill <name>`, or `suit claude --help` for the full surface. See
+the [suit README](https://github.com/danmestas/suit) for the launcher
+reference, and ADR-0010 / ADR-0011 in the suit repo for the vocabulary
+and layout decisions.
 
 ## Want your own?
 
 This is Dan's personal/team config. To start your own:
 
-- Fork [`suit-template`](https://github.com/danmestas/suit-template) — minimal starter with one persona and one mode.
+- Fork [`suit-template`](https://github.com/danmestas/suit-template) —
+  minimal starter with one outfit and one mode.
 - Or fork this repo as a richer starting point and trim what you don't want.
-- Or `suit init https://github.com/your-username/your-fork` once your fork exists.
+- Or `suit init https://github.com/your-username/your-fork` once your fork
+  exists.
 
 ## Authoring
 
@@ -69,10 +97,10 @@ category:
 (skill body)
 ```
 
-- [`CONVENTIONS.md`](CONVENTIONS.md) — cross-cutting rules every component follows (fail-safe hooks, flat-line changelogs, `.agent-config/` state directory, cross-harness contract).
-- [`TAXONOMY.md`](TAXONOMY.md) — the 8-axis taxonomy (Economy, Workflow, BackPressure, Tooling, Integrations, ContextManagement, MemoryManagement, Evolution) used to classify and bundle components.
-- [`CONTEXT.md`](CONTEXT.md) — domain vocabulary (skill, plugin, persona, mode, harness, adapter, prelaunch, suit session).
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to run validation locally and submit a PR.
+- [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) — cross-cutting rules every component follows (fail-safe hooks, flat-line changelogs, `.agent-config/` state directory, cross-harness contract).
+- [`docs/TAXONOMY.md`](docs/TAXONOMY.md) — the 8-axis taxonomy (Economy, Workflow, BackPressure, Tooling, Integrations, ContextManagement, MemoryManagement, Evolution) used to classify and bundle components.
+- [`docs/CONTEXT.md`](docs/CONTEXT.md) — domain vocabulary (skill, outfit, mode, accessory, harness, adapter, prelaunch, suit session).
+- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — how to run validation locally and submit a PR.
 
 ## Building
 
