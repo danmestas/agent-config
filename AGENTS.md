@@ -15,8 +15,15 @@ Expected layout:
 
 ## Build, Test, and Development Commands
 
-No build system is required by default.
-- If validation tooling is added, document commands here (e.g., `make lint`, `make test`).
+Validation and packaging are handled through `@agent-ops/suit` via npm scripts:
+- `npm run validate`: validate the repository configuration
+- `npm run build`: build generated artifacts
+- `npm run watch`: run the build in watch mode
+- `npm run docs`: generate documentation artifacts
+- `npm run evolve`: run suit evolution tooling
+- `npm run init`: initialize suit configuration
+
+This repository intentionally does not track a package lockfile. The scripts use `npx -y -p @agent-ops/suit` so contributors run the current published suit tooling unless a future change pins the toolchain.
 
 ## Coding Style & Naming Conventions
 
