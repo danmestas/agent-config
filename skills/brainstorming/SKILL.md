@@ -4,6 +4,8 @@ version: 1.0.0
 targets: [claude-code]
 type: skill
 description: Help turn ideas into fully formed designs and specs through natural collaborative dialogue. Use when the user wants to design something, brainstorm a feature, or plan a project in a bones workspace.
+category:
+  primary: workflow
 ---
 
 # Brainstorming Ideas Into Designs

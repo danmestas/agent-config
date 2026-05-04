@@ -10,9 +10,9 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: context-management
+  primary: memory-management
   secondary:
-    - memory-management
+    - context-management
 includes:
   - ../../skills/knowledge-base-overview
   - ../../skills/vault-overview

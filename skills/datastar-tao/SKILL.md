@@ -12,7 +12,7 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: backpressure
+  primary: tooling
 ---
 
 # The Tao of Datastar

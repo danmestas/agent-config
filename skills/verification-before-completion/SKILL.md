@@ -4,6 +4,8 @@ version: 1.0.0
 targets: [claude-code]
 type: skill
 description: Use when about to claim work is complete, fixed, or passing in a bones workspace, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+category:
+  primary: backpressure
 ---
 
 # Verification Before Completion

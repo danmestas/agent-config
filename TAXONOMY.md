@@ -61,7 +61,7 @@ External-service hookups. The skill exists to talk to one named system.
 
 **Differs from Tooling:** see above. The test: would this skill make sense if you swapped the backing service for a competitor? If yes, it's Tooling. If no, it's Integrations.
 
-### 6. ContextManagement
+### 6. Context-Management
 
 Runtime session strategies. How the agent allocates, isolates, rewinds, or hands off context inside a single working session.
 
@@ -73,7 +73,7 @@ Runtime session strategies. How the agent allocates, isolates, rewinds, or hands
 
 **Differs from MemoryManagement:** ContextManagement is intra-session; MemoryManagement is across-session.
 
-### 7. MemoryManagement
+### 7. Memory-Management
 
 Persistent, cross-session memory. State that survives the harness restart.
 

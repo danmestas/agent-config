@@ -4,6 +4,9 @@ version: 1.0.0
 targets: [claude-code]
 type: skill
 description: Open, work in, and close a bones swarm session — the slot-shaped lane that bundles a worktree, a claimed task, and an open hub branch. Use when starting feature work that needs isolation from current workspace, before executing implementation plans, or when you need a worktree for parallel work in a bones workspace.
+category:
+  primary: workflow
+  secondary: [context-management]
 ---
 
 # Using bones swarm

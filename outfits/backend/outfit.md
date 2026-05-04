@@ -1,16 +1,34 @@
 ---
 name: backend
-version: 1.0.0
+version: 2.0.0
 type: outfit
-description: Backend dev work — Go, observability, infra, philosophy
+description: Backend dev work — Go, server, observability, deterministic systems.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [tooling, workflow, contextmanagement, evolution, backpressure]
-skill_include: [idiomatic-go]
-skill_exclude: [datastar-tao, datastar-patterns, datastar]
+categories: [economy, workflow, backpressure, evolution, integrations, context-management]
+skill_include:
+  - writing-plans
+  - brainstorming
+  - subagent-driven-development
+  - systematic-debugging
+  - idiomatic-go
+  - signoz-dashboard-builder
+  - deterministic-simulation-testing
+  - farley
+  - tigerstyle
+  - ousterhout
+  - verification-before-completion
+skill_exclude:
+  - datastar
+  - datastar-tao
+  - datastar-patterns
+  - shadcn-forms
 ---
 
 # Backend Outfit
 
-For sessions focused on Go, server-side, infra, observability, debugging.
-Includes idiomatic-go for language-specific philosophy. Excludes Datastar and
-frontend-design specific skills to keep context lean.
+For Go-heavy server work — serverdom, dagnats, firestorm-dataworks, EdgeSync,
+agent-infra. Force-loads the core4 plus `idiomatic-go`, observability tooling
+(`signoz-dashboard-builder`), deterministic-sim philosophies
+(`deterministic-simulation-testing`, `farley`, `tigerstyle`, `ousterhout`),
+and `verification-before-completion`. Excludes Datastar and shadcn frontend
+skills to keep context lean.

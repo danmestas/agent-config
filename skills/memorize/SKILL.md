@@ -12,7 +12,8 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: evolution
+  primary: memory-management
+  secondary: [evolution]
 ---
 
 # memorize

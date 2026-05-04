@@ -4,6 +4,9 @@ version: 1.0.0
 targets: [claude-code]
 type: skill
 description: Execute a plan in parallel slot sessions. Each implementer subagent runs in its own bones swarm session (slot + claim + worktree atomic via bones swarm join). Two-stage review (spec compliance + code quality) per task. Use when the plan has independent tasks that can run concurrently; use executing-plans instead for single-session inline runs.
+category:
+  primary: context-management
+  secondary: [workflow]
 ---
 
 > **Execution mode**: this skill is for **parallel slot sessions** — multiple subagents claim and run plan steps concurrently, each in its own slot/leaf. For single-session inline runs, use `bones-powers:executing-plans` instead. (Per spec § 5 boundary.)

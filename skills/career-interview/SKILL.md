@@ -6,7 +6,8 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: tooling
+  primary: memory-management
+  secondary: [tooling]
 ---
 
 # Career Interview

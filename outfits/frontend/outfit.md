@@ -1,15 +1,29 @@
 ---
 name: frontend
-version: 1.0.0
+version: 2.0.0
 type: outfit
-description: Frontend / Datastar work
+description: Datastar / shadcn / UI work.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [tooling, workflow, contextmanagement, backpressure]
-skill_include: [datastar-tao, datastar-patterns]
-skill_exclude: [idiomatic-go]
+categories: [economy, workflow, backpressure, evolution, tooling]
+skill_include:
+  - writing-plans
+  - brainstorming
+  - subagent-driven-development
+  - systematic-debugging
+  - datastar-tao
+  - datastar-patterns
+  - datastar
+  - shadcn-forms
+  - obsidian-markdown
+  - norman
+skill_exclude:
+  - idiomatic-go
 ---
 
 # Frontend Outfit
 
-For sessions focused on Datastar, UI, client-side. Forces Datastar skills to
-load and excludes Go-specific ones to keep frontend context clear.
+For Datastar / shadcn / UI work — studs-cycles, studs-cycles-pb, darken.
+Force-loads the core4 plus the full Datastar stack (`datastar-tao`,
+`datastar-patterns`, `datastar`), `shadcn-forms`, `obsidian-markdown`, and
+`norman` design heuristics. Excludes `idiomatic-go` since this is not a Go
+project.

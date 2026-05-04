@@ -12,7 +12,7 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: context-management
+  primary: memory-management
 ---
 
 # save: File Conversations Into the Wiki

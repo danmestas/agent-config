@@ -4,6 +4,8 @@ version: 1.0.0
 targets: [claude-code]
 type: skill
 description: Use when starting any conversation in a bones workspace - establishes how to find and use bones-powers skills, requiring Skill tool invocation before ANY response including clarifying questions
+category:
+  primary: workflow
 ---
 
 <SUBAGENT-STOP>

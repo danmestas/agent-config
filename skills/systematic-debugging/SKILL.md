@@ -4,6 +4,9 @@ version: 1.0.0
 targets: [claude-code]
 type: skill
 description: Use when encountering any bug, test failure, or unexpected behavior in a bones workspace, before proposing fixes
+category:
+  primary: workflow
+  secondary: [backpressure]
 ---
 
 # Systematic Debugging

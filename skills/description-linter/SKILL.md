@@ -12,6 +12,7 @@ targets:
   - claude-code
 category:
   primary: evolution
+  secondary: [tooling]
 ---
 
 # description-linter

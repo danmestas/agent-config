@@ -28,23 +28,27 @@ SUIT_CONTENT_PATH=$PWD suit list outfits
 SUIT_CONTENT_PATH=$PWD suit show outfit backend
 ```
 
-Layer accessories onto the session at invocation time:
+Layer accessories onto the session at invocation time. Accessories can be a curated bundle (e.g. `philosophy`) or any wardrobe component name (any skill / hook / rule / agent), with suit ≥ 0.6 falling through to find it (see ADR-0013):
 
 ```bash
-suit claude --outfit backend --mode focused --accessory tracing --accessory pr-policy
+# bundle accessory
+suit claude --outfit backend --mode debugging --accessory philosophy
+
+# singleton accessory — any component name resolves
+suit claude --outfit backend --mode executing --accessory pr-policy --accessory test-driven-development
 ```
 
 ## What's in here
 
 | Directory | What it contains |
 |---|---|
-| `outfits/` | Long-lived role bundles (backend, frontend, machines, personal, aviation, taxes) — set the baseline component set. |
-| `modes/` | Work-shape overlays (code, design, ops, focused) — extend/override outfit components and inject a prompt body. |
-| `accessories/` | Small repeatable add-ons applied via `--accessory`. (Empty for now; placeholder README.) |
-| `skills/` | Flat shared pool of `SKILL.md` capabilities triggered by description. |
+| `outfits/` | Long-lived role bundles (aviation, backend, bones, code, frontend, kb, meta, personal, stasi) — set the baseline component set. Every outfit force-loads the universal core4: `writing-plans`, `brainstorming`, `subagent-driven-development`, `systematic-debugging`. |
+| `modes/` | Work-shape overlays (debugging, executing, focused, ops, planning, reviewing, ticketing, writing) — extend/override outfit components and inject a prompt body. |
+| `accessories/` | Two layers: (a) curated multi-component bundles (philosophy, skill-author, vault, gh-project) live here as `accessory.md`; (b) any wardrobe component name (skill / hook / rule / agent / command) is also reachable via `--accessory <name>` through accessory-as-role fall-through (suit ≥ 0.6, ADR-0013). |
+| `skills/` | Flat shared pool of `SKILL.md` capabilities triggered by description. Carry a `category:` block per the 8-axis TAXONOMY. |
 | `agents/` | Subagent definitions (`AGENT.md`). |
 | `hooks/` | Event-driven scripts (`HOOK.md` entrypoint, payload alongside). |
-| `rules/` | Harness-native rules referenced by outfits/modes/accessories. (Empty for now; placeholder README.) |
+| `rules/` | Harness-native rules referenced by outfits/modes/accessories. Currently: `pr-policy`. |
 | `commands/` | Slash commands (`COMMAND.md`). |
 | `docs/` | Authoring docs (TAXONOMY, CONVENTIONS, CONTEXT, contributing, GH project setup, plans, ADRs). |
 

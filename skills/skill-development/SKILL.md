@@ -11,7 +11,8 @@ targets:
   - copilot
   - pi
 category:
-  primary: workflow
+  primary: tooling
+  secondary: [evolution]
 ---
 
 # Skill Development for Claude Code Plugins
