@@ -45,7 +45,7 @@ Quality feedback skills that pull the agent **back** to revisit work that alread
 
 Capability extensions — new senses or abilities the agent can invoke. CLIs, MCPs, code-search engines, browser drivers, telemetry builders.
 
-**Examples:** `mgrep-code-search`, `suit-build`, `signoz-dashboard-builder`, `midscene-testing`, `deterministic-simulation-testing`, `datastar-tao`, `datastar-patterns`, `context-mode` (also Economy).
+**Examples:** `suit-build`, `signoz-dashboard-builder`, `midscene-testing`, `deterministic-simulation-testing`, `datastar-tao`, `datastar-patterns`, `context-mode` (also Economy).
 
 **Engineering concern:** what the agent *can do* at all. Without Tooling skills, an agent is limited to the harness's built-in tools and reasons about systems it has no levers on.
 
@@ -165,7 +165,7 @@ Existing skills slotted by primary category (best inference; subject to retag PR
 | Economy | `context-mode` (also tooling) | **Thin** — `caveman` lives in scion, not here |
 | Workflow | `superpowers:*` (brainstorming, writing-plans, executing-plans, finishing-a-development-branch, test-driven-development, requesting-code-review, receiving-code-review, verification-before-completion, systematic-debugging, writing-skills) | Rich (via plugin) |
 | BackPressure | `ousterhout`, `hipp`, `norman`, `tigerstyle`, `idiomatic-go`, `dx-audit` | **Rich** |
-| Tooling | `mgrep-code-search`, `suit-build`, `signoz-dashboard-builder`, `midscene-testing`, `deterministic-simulation-testing`, `datastar-tao`, `datastar-patterns`, `context-mode` | **Rich** |
+| Tooling | `suit-build`, `signoz-dashboard-builder`, `midscene-testing`, `deterministic-simulation-testing`, `datastar-tao`, `datastar-patterns`, `context-mode` | **Rich** |
 | Integrations | `linear-method`, `gh-project-charter`, `gh-project-setup`, `gh-project-operations`, `gh-project-shared`, `atlassian-cli-jira`, `doppler`, `cloudflare-email`, `apple-contacts` | **Rich** |
 | ContextManagement | `superpowers:subagent-driven-development`, `superpowers:dispatching-parallel-agents`, `superpowers:using-git-worktrees`, `superpowers:executing-plans` (secondary) | Adequate |
 | MemoryManagement | `knowledge-base` | Thin |
