@@ -10,3 +10,6 @@ release-artifacts/
 .vitest-cache/
 docs/superpowers/specs/
 docs/superpowers/plans/
+
+# Build artifact emitted by suit-build at the repo root.
+AGENTS.md
