@@ -1,10 +1,14 @@
 ---
 name: ops
-version: 2.0.0
+version: 2.1.0
 type: mode
 description: Incident / infra change — observe before changing.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [workflow, integrations, backpressure]
+# Re-enables observability MCPs even if the active outfit disabled them
+# (e.g. frontend/personal outfits drop signoz/axiom; ops mode pulls them back).
+enable:
+  mcps: [signoz, axiom]
 skill_include: []
 skill_exclude: []
 include:

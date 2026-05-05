@@ -1,0 +1,64 @@
+# globals.yaml — per-machine registry of globally-installed Claude Code
+# plugins, MCP servers, and hooks at user scope.
+#
+# WHAT THIS IS:
+#   A snapshot of every plugin/MCP/hook installed at the *user scope* on
+#   the machine that generated this file. Source of truth for plugins is
+#   ~/.claude/plugins/installed_plugins.json (user-scope entries only);
+#   source of truth for MCPs is the `mcpServers` block of ~/.claude.json.
+#   Suit (≥ v0.7) reads this file so outfits, modes, and accessories can
+#   target globals by name — enabling or disabling specific plugins/MCPs
+#   per session without the user having to uninstall anything.
+#
+# HOW TO REGENERATE:
+#   npm run sync-globals           # writes globals.yaml in this repo
+#   npm run sync-globals -- --pr   # also opens a PR via gh
+#   npm run sync-globals -- --dry-run  # prints to stdout, doesn't write
+#
+# IS THIS THE SAME ON EVERY MACHINE?
+#   No. Each developer's ~/.claude/ is different. The committed
+#   globals.yaml is a per-machine artifact and is expected to drift between
+#   collaborators. Run `npm run sync-globals` whenever you install or
+#   remove a plugin/MCP at user scope, and open a PR so the registry is
+#   up to date.
+#
+# DOES THIS LEAK SECRETS?
+#   No. stdio MCP entries record only `command`, `args`, and a `has_env`
+#   boolean. HTTP MCP entries record only `url` and a `has_headers` boolean.
+#   API tokens and other env/header values from ~/.claude.json never appear
+#   in this file — Claude continues to read them from ~/.claude.json at
+#   runtime.
+#
+# This is the EXAMPLE — the real one is generated. It's committed only so
+# new contributors can see the shape before running sync-globals.
+
+schemaVersion: 1
+generated_at: 2026-05-04T00:00:00.000Z
+machine: example-host
+
+plugins:
+  superpowers:
+    source: claude-code-marketplace
+    install: claude plugin install superpowers
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/superpowers/1.2.3
+    version: 1.2.3
+
+mcps:
+  # stdio MCP — captures command + args + presence flag for env values.
+  doppler:
+    source: claude-code-config
+    type: stdio
+    command: doppler
+    args:
+      - mcp
+    has_env: true
+    discover_path: ~/.claude.json#mcpServers.doppler
+  # HTTP MCP — captures url + presence flag for header values.
+  axiom:
+    source: claude-code-config
+    type: http
+    url: https://mcp.axiom.co/mcp
+    has_headers: true
+    discover_path: ~/.claude.json#mcpServers.axiom
+
+hooks: {}

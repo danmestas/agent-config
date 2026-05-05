@@ -1,10 +1,12 @@
 ---
 name: executing
-version: 1.0.0
+version: 1.1.0
 type: mode
 description: Working a plan — spawn subagents, dispatch parallel work, finish the branch.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [economy, workflow]
+enable:
+  plugins: [superpowers]
 skill_include: []
 skill_exclude: []
 include:

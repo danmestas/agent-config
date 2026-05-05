@@ -1,10 +1,13 @@
 ---
 name: personal
-version: 2.0.0
+version: 2.1.0
 type: outfit
 description: Journaling, resume, life admin (formerly personal + taxes).
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [economy, workflow, memory-management]
+disable:
+  plugins: [gopls-lsp, swift-lsp, frontend-design, plugin-dev, skill-creator, code-review, code-simplifier]
+  mcps: [signoz, axiom, doppler]
 skill_include:
   - writing-plans
   - brainstorming

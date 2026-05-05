@@ -1,10 +1,13 @@
 ---
 name: meta
-version: 1.0.0
+version: 1.1.0
 type: outfit
 description: Wardrobe / suit / agent-skills authoring.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [economy, workflow, evolution, tooling]
+disable:
+  plugins: [gopls-lsp, swift-lsp, frontend-design]
+  mcps: [signoz, axiom, doppler]
 skill_include:
   - writing-plans
   - brainstorming

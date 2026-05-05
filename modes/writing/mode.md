@@ -1,10 +1,12 @@
 ---
 name: writing
-version: 1.0.0
+version: 1.1.0
 type: mode
 description: Prose / KB notes / docs.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [memory-management, workflow]
+enable:
+  plugins: [obsidian, context7]
 skill_include: []
 skill_exclude: []
 include:

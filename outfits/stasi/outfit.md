@@ -1,10 +1,13 @@
 ---
 name: stasi
-version: 1.0.0
+version: 1.1.0
 type: outfit
 description: Spying on sessions to audit and improve agent behavior.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [economy, workflow, evolution, context-management]
+disable:
+  plugins: [gopls-lsp, swift-lsp, frontend-design, plugin-dev, skill-creator]
+  mcps: [signoz, axiom, doppler]
 skill_include:
   - writing-plans
   - brainstorming

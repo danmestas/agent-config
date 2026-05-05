@@ -1,10 +1,15 @@
 ---
 name: debugging
-version: 1.0.0
+version: 1.1.0
 type: mode
 description: Hunting a bug — reproduce, minimize, hypothesise, instrument, fix, regression-test.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [backpressure, context-management]
+# Re-enables observability MCPs even if the active outfit disabled them
+# (e.g. frontend outfit drops signoz/axiom; debugging mode pulls them back).
+enable:
+  plugins: [context-mode]
+  mcps: [signoz, axiom]
 skill_include: []
 skill_exclude: []
 include:

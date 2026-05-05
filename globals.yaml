@@ -1,0 +1,88 @@
+schemaVersion: 1
+generated_at: 2026-05-05T01:03:27.892Z
+machine: m4-macbook.tail51604c.ts.net
+plugins:
+  obsidian:
+    source: manual
+    install: claude plugin install obsidian
+    discover_path: ~/.claude/plugins/cache/obsidian-skills/obsidian/1.0.0
+    version: 1.0.0
+  gopls-lsp:
+    source: claude-code-marketplace
+    install: claude plugin install gopls-lsp
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/gopls-lsp/1.0.0
+    version: 1.0.0
+  context7:
+    source: claude-code-marketplace
+    install: claude plugin install context7
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/context7/unknown
+  code-simplifier:
+    source: claude-code-marketplace
+    install: claude plugin install code-simplifier
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/code-simplifier/1.0.0
+    version: 1.0.0
+  frontend-design:
+    source: claude-code-marketplace
+    install: claude plugin install frontend-design
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown
+  superpowers:
+    source: claude-code-marketplace
+    install: claude plugin install superpowers
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7
+    version: 5.0.7
+  claude-hud:
+    source: manual
+    install: claude plugin install claude-hud
+    discover_path: ~/.claude/plugins/cache/claude-hud/claude-hud/0.0.11
+    version: 0.0.11
+  code-review:
+    source: claude-code-marketplace
+    install: claude plugin install code-review
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/code-review/unknown
+  plugin-dev:
+    source: claude-code-marketplace
+    install: claude plugin install plugin-dev
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/plugin-dev/unknown
+  swift-lsp:
+    source: claude-code-marketplace
+    install: claude plugin install swift-lsp
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/swift-lsp/1.0.0
+    version: 1.0.0
+  telegram:
+    source: claude-code-marketplace
+    install: claude plugin install telegram
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/telegram/0.0.6
+    version: 0.0.6
+  context-mode:
+    source: manual
+    install: claude plugin install context-mode
+    discover_path: ~/.claude/plugins/cache/context-mode/context-mode/1.0.103
+    version: 1.0.103
+  skill-creator:
+    source: claude-code-marketplace
+    install: claude plugin install skill-creator
+    discover_path: ~/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown
+mcps:
+  signoz:
+    source: claude-code-config
+    type: stdio
+    command: /Users/dmestas/.local/bin/signoz-mcp-server
+    has_env: true
+    discover_path: ~/.claude.json#mcpServers.signoz
+  doppler:
+    source: claude-code-config
+    type: stdio
+    command: npx
+    args:
+      - -y
+      - "@dopplerhq/mcp-server"
+      - --read-only
+    has_env: true
+    discover_path: ~/.claude.json#mcpServers.doppler
+  axiom:
+    source: claude-code-config
+    type: http
+    url: https://mcp.axiom.co/mcp
+    has_headers: true
+    discover_path: ~/.claude.json#mcpServers.axiom
+hooks: {}
