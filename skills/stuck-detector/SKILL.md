@@ -11,7 +11,8 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: evolution
+  primary: backpressure
+  secondary: [evolution]
 ---
 
 # stuck-detector

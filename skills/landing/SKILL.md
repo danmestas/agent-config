@@ -4,6 +4,8 @@ version: 1.0.0
 targets: [claude-code]
 type: skill
 description: Post-merge cleanup workflow. Discusses uncommitted worktree changes per-worktree before deleting; handles local + remote merged branches, stale refs, dist/ build artifacts, and surfaces today's memory entries for review. Use when the user wants to wrap up after merging a PR, clean up worktrees, tidy branches, do post-merge cleanup, "land the plane", "land", remove stale feature branches, or close out a development session.
+category:
+  primary: workflow
 ---
 
 # Landing

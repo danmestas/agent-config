@@ -11,7 +11,7 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: context-management
+  primary: memory-management
 ---
 
 # wiki-lint: Wiki Health Check

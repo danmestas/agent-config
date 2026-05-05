@@ -12,7 +12,7 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: context-management
+  primary: memory-management
 ---
 
 # wiki: Claude + Obsidian Knowledge Companion

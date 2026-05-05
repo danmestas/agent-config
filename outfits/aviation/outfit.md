@@ -1,16 +1,31 @@
 ---
 name: aviation
-version: 1.0.0
+version: 2.0.0
 type: outfit
-description: Aviation / flight planning work
-targets: [claude-code, codex, gemini, copilot]
-categories: [tooling, integrations, memorymanagement]
-skill_include: []
-skill_exclude: []
+description: Flight planning, NOTAMs, charts, ops references.
+targets: [claude-code, apm, codex, gemini, copilot, pi]
+categories: [economy, workflow, memory-management, integrations]
+skill_include:
+  - writing-plans
+  - brainstorming
+  - subagent-driven-development
+  - systematic-debugging
+  - knowledge-base-overview
+  - obsidian-markdown
+  - autoresearch
+  - apple-contacts
+skill_exclude:
+  - idiomatic-go
+  - datastar
+  - datastar-tao
+  - datastar-patterns
+  - shadcn-forms
 ---
 
 # Aviation Outfit
 
-Aviation context — flight planning, charts, ops references. Keeps integrations
-and tooling but drops language-specific coding skills. Optimized for
-cross-session memory of flight plans, briefing data, and aviation procedures.
+For Flight-Planner, NOTAMOrganizer, NotamsApi, preflightapi.backend, and
+flight-planner-kb. Force-loads the core4 plus `knowledge-base-overview`,
+`obsidian-markdown`, `autoresearch` (for charts/regs lookups), and
+`apple-contacts` (for crew/ATC contact lookups). Memory of plans and
+briefings, KB-leaning. Excludes coding-language and frontend skills.
