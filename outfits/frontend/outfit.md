@@ -1,10 +1,32 @@
 ---
 name: frontend
-version: 2.0.0
+version: 2.1.1
 type: outfit
 description: Datastar / shadcn / UI work.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [economy, workflow, backpressure, evolution, tooling]
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - economy
+  - workflow
+  - backpressure
+  - evolution
+  - tooling
+disable:
+  plugins:
+    - gopls-lsp
+    - swift-lsp
+  mcps:
+    - axiom
+    - axiom-codex
+    - doppler
+    - doppler-codex
+    - signoz
+    - signoz-codex
 skill_include:
   - writing-plans
   - brainstorming

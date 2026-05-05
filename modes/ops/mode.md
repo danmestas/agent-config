@@ -1,17 +1,37 @@
 ---
 name: ops
-version: 2.0.0
+version: 2.1.1
 type: mode
 description: Incident / infra change — observe before changing.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [workflow, integrations, backpressure]
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - workflow
+  - integrations
+  - backpressure
+enable:
+  mcps:
+    - axiom
+    - axiom-codex
+    - signoz
+    - signoz-codex
 skill_include: []
 skill_exclude: []
 include:
-  skills: [takeoff, signoz-dashboard-builder, investigating-agent-sessions, course-correct]
+  skills:
+    - takeoff
+    - signoz-dashboard-builder
+    - investigating-agent-sessions
+    - course-correct
   rules: []
   hooks: []
-  agents: [observability-engineer]
+  agents:
+    - observability-engineer
   commands: []
 ---
 

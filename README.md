@@ -121,6 +121,34 @@ Each script invokes [`suit-build`](https://github.com/danmestas/suit) via `npx -
 
 `npm run docs` only rewrites the region between `<!-- AUTO-GENERATED: COMPONENTS -->` and `<!-- /AUTO-GENERATED: COMPONENTS -->`. Everything outside the markers is hand-written and preserved across regenerations.
 
+## Globals registry
+
+`globals.yaml` is a per-machine snapshot of every Claude Code plugin and MCP
+server installed at *user scope* (read from
+`~/.claude/plugins/installed_plugins.json` for user-scope plugins, and
+`~/.claude.json`'s `mcpServers` block for MCPs). Suit (≥ v0.7) reads it so
+outfits, modes, and accessories can reference globals by name — enabling or
+disabling specific plugins/MCPs per session without uninstalling them.
+
+```bash
+npm run sync-globals                # write globals.yaml from this machine
+npm run sync-globals -- --dry-run   # print the snapshot, don't write
+npm run sync-globals -- --pr        # write, commit, push, open a PR via gh
+```
+
+Run `npm run sync-globals` after installing or removing a plugin or MCP at
+user scope to refresh the registry, then open a PR (the `--pr` flag does
+this for you when `gh` is on PATH and the working tree is otherwise clean).
+Outfits, modes, and accessories opt into globals via `enable:` / `disable:`
+blocks naming registered entries — see ADR-0014 in the suit repo (Phase D
+of v0.7 wires the resolver). MCP entries record only non-secret metadata —
+stdio MCPs capture `command`, `args`, and a `has_env` flag; HTTP MCPs
+capture `url` and a `has_headers` flag. Env values and header values stay
+in `~/.claude.json`.
+
+See [`globals.yaml.example`](globals.yaml.example) for the schema. Real
+`globals.yaml` files are expected to drift between collaborators.
+
 ## Categories
 
 Each link points at the component's own directory — open the `SKILL.md` (or agent / hook file) inside for the full writeup. The auto-generated [Components table](#components) below has descriptions for every entry.

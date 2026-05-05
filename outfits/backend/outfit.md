@@ -1,10 +1,27 @@
 ---
 name: backend
-version: 2.0.0
+version: 2.1.1
 type: outfit
-description: Backend dev work — Go, server, observability, deterministic systems.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [economy, workflow, backpressure, evolution, integrations, context-management]
+description: 'Backend dev work — Go, server, observability, deterministic systems.'
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - economy
+  - workflow
+  - backpressure
+  - evolution
+  - integrations
+  - context-management
+disable:
+  plugins:
+    - frontend-design
+    - frontend-design-codex
+    - swift-lsp
 skill_include:
   - writing-plans
   - brainstorming

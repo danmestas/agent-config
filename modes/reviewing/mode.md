@@ -1,17 +1,36 @@
 ---
 name: reviewing
-version: 1.0.0
+version: 1.1.1
 type: mode
 description: Code review — separate must-fix from suggestion.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [backpressure, evolution]
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - backpressure
+  - evolution
+enable:
+  plugins:
+    - code-review
+    - code-review-codex
+    - code-simplifier
 skill_include: []
 skill_exclude: []
 include:
-  skills: [requesting-code-review, receiving-code-review, verification-before-completion, ousterhout]
+  skills:
+    - requesting-code-review
+    - receiving-code-review
+    - verification-before-completion
+    - ousterhout
   rules: []
   hooks: []
-  agents: [code-reviewer, architect-review]
+  agents:
+    - code-reviewer
+    - architect-review
   commands: []
 ---
 

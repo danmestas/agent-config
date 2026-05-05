@@ -9,7 +9,8 @@
     "watch": "npx -y -p @agent-ops/suit suit-build watch",
     "docs": "npx -y -p @agent-ops/suit suit-build docs",
     "evolve": "npx -y -p @agent-ops/suit suit-build evolve",
-    "init": "npx -y -p @agent-ops/suit suit-build init"
+    "init": "npx -y -p @agent-ops/suit suit-build init",
+    "sync-globals": "npx -y -p @agent-ops/suit suit-build sync-globals"
   },
   "engines": {
     "node": ">=20.0.0"

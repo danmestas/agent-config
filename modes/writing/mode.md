@@ -1,14 +1,30 @@
 ---
 name: writing
-version: 1.0.0
+version: 1.1.1
 type: mode
 description: Prose / KB notes / docs.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [memory-management, workflow]
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - memory-management
+  - workflow
+enable:
+  plugins:
+    - context7
+    - context7-codex
+    - obsidian
 skill_include: []
 skill_exclude: []
 include:
-  skills: [obsidian-markdown, defuddle, brainstorming]
+  skills:
+    - obsidian-markdown
+    - defuddle
+    - brainstorming
   rules: []
   hooks: []
   agents: []

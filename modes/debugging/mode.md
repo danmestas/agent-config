@@ -1,17 +1,41 @@
 ---
 name: debugging
-version: 1.0.0
+version: 1.1.1
 type: mode
-description: Hunting a bug — reproduce, minimize, hypothesise, instrument, fix, regression-test.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [backpressure, context-management]
+description: >-
+  Hunting a bug — reproduce, minimize, hypothesise, instrument, fix,
+  regression-test.
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - backpressure
+  - context-management
+enable:
+  plugins:
+    - context-mode
+    - context-mode-codex
+  mcps:
+    - axiom
+    - axiom-codex
+    - signoz
+    - signoz-codex
 skill_include: []
 skill_exclude: []
 include:
-  skills: [systematic-debugging, investigating-agent-sessions, stuck-detector, course-correct]
+  skills:
+    - systematic-debugging
+    - investigating-agent-sessions
+    - stuck-detector
+    - course-correct
   rules: []
   hooks: []
-  agents: [debugger]
+  agents:
+    - debugger
   commands: []
 ---
 

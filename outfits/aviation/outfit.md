@@ -1,10 +1,36 @@
 ---
 name: aviation
-version: 2.0.0
+version: 2.1.1
 type: outfit
-description: Flight planning, NOTAMs, charts, ops references.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [economy, workflow, memory-management, integrations]
+description: 'Flight planning, NOTAMs, charts, ops references.'
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - economy
+  - workflow
+  - memory-management
+  - integrations
+disable:
+  plugins:
+    - frontend-design
+    - frontend-design-codex
+    - gopls-lsp
+    - plugin-dev
+    - plugin-dev-codex
+    - skill-creator
+    - swift-lsp
+  mcps:
+    - axiom
+    - axiom-codex
+    - doppler
+    - doppler-codex
+    - signoz
+    - signoz-codex
 skill_include:
   - writing-plans
   - brainstorming

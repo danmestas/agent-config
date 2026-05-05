@@ -1,10 +1,26 @@
 ---
 name: bones
-version: 1.0.0
+version: 1.1.1
 type: outfit
-description: The bones Go orchestrator — leaves, swarm, parallel work.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [economy, workflow, backpressure, evolution, integrations]
+description: 'The bones Go orchestrator — leaves, swarm, parallel work.'
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - economy
+  - workflow
+  - backpressure
+  - evolution
+  - integrations
+disable:
+  plugins:
+    - frontend-design
+    - frontend-design-codex
+    - swift-lsp
 skill_include:
   - writing-plans
   - brainstorming
