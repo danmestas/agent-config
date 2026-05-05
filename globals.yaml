@@ -1,5 +1,5 @@
 schemaVersion: 1
-generated_at: 2026-05-05T01:03:27.892Z
+generated_at: 2026-05-05T05:08:39.515Z
 machine: m4-macbook.tail51604c.ts.net
 plugins:
   obsidian:
@@ -62,6 +62,51 @@ plugins:
     source: claude-code-marketplace
     install: claude plugin install skill-creator
     discover_path: ~/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown
+  code-review-codex:
+    source: codex-marketplace
+    install: codex plugin install code-review
+    discover_path: ~/.codex/plugins/cache/claude-plugins-official/code-review
+    harness: codex
+  context7-codex:
+    source: codex-marketplace
+    install: codex plugin install context7
+    discover_path: ~/.codex/plugins/cache/claude-plugins-official/context7
+    harness: codex
+  context-mode-codex:
+    source: codex-marketplace
+    install: codex plugin install context-mode
+    discover_path: ~/.codex/plugins/cache/context-mode/context-mode
+    harness: codex
+  frontend-design-codex:
+    source: codex-marketplace
+    install: codex plugin install frontend-design
+    discover_path: ~/.codex/plugins/cache/claude-plugins-official/frontend-design
+    harness: codex
+  github:
+    source: codex-marketplace
+    install: codex plugin install github
+    discover_path: ~/.codex/plugins/cache/openai-curated/github
+    harness: codex
+  plugin-dev-codex:
+    source: codex-marketplace
+    install: codex plugin install plugin-dev
+    discover_path: ~/.codex/plugins/cache/claude-plugins-official/plugin-dev
+    harness: codex
+  software-philosophy:
+    source: codex-marketplace
+    install: codex plugin install software-philosophy
+    discover_path: ~/.codex/plugins/cache/agent-plugins/software-philosophy
+    harness: codex
+  superpowers-codex:
+    source: codex-marketplace
+    install: codex plugin install superpowers
+    discover_path: ~/.codex/plugins/cache/claude-plugins-official/superpowers
+    harness: codex
+  telegram-codex:
+    source: codex-marketplace
+    install: codex plugin install telegram
+    discover_path: ~/.codex/plugins/cache/claude-plugins-official/telegram
+    harness: codex
 mcps:
   signoz:
     source: claude-code-config
@@ -85,4 +130,36 @@ mcps:
     url: https://mcp.axiom.co/mcp
     has_headers: true
     discover_path: ~/.claude.json#mcpServers.axiom
+  axiom-codex:
+    source: codex-config
+    type: http
+    url: https://mcp.axiom.co/mcp
+    has_headers: true
+    discover_path: ~/.codex/config.toml#mcp_servers.axiom
+    harness: codex
+  doppler-codex:
+    source: codex-config
+    type: stdio
+    command: npx
+    args:
+      - -y
+      - "@dopplerhq/mcp-server"
+      - --read-only
+    has_env: true
+    discover_path: ~/.codex/config.toml#mcp_servers.doppler
+    harness: codex
+  context-mode:
+    source: codex-config
+    type: stdio
+    command: context-mode
+    has_env: false
+    discover_path: ~/.codex/config.toml#mcp_servers.context-mode
+    harness: codex
+  signoz-codex:
+    source: codex-config
+    type: stdio
+    command: /Users/dmestas/.local/bin/signoz-mcp-server
+    has_env: true
+    discover_path: ~/.codex/config.toml#mcp_servers.signoz
+    harness: codex
 hooks: {}

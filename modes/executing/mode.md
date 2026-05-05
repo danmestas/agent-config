@@ -1,16 +1,30 @@
 ---
 name: executing
-version: 1.1.0
+version: 1.1.1
 type: mode
-description: Working a plan — spawn subagents, dispatch parallel work, finish the branch.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [economy, workflow]
+description: 'Working a plan — spawn subagents, dispatch parallel work, finish the branch.'
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - economy
+  - workflow
 enable:
-  plugins: [superpowers]
+  plugins:
+    - superpowers
+    - superpowers-codex
 skill_include: []
 skill_exclude: []
 include:
-  skills: [executing-plans, subagent-driven-development, dispatching-parallel-agents, finishing-a-bones-leaf]
+  skills:
+    - executing-plans
+    - subagent-driven-development
+    - dispatching-parallel-agents
+    - finishing-a-bones-leaf
   rules: []
   hooks: []
   agents: []

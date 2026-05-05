@@ -1,16 +1,29 @@
 ---
 name: planning
-version: 1.1.0
+version: 1.1.1
 type: mode
-description: Designing before code — produce a plan, don't write the implementation yet.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
-categories: [economy, workflow]
+description: 'Designing before code — produce a plan, don''t write the implementation yet.'
+targets:
+  - claude-code
+  - apm
+  - codex
+  - gemini
+  - copilot
+  - pi
+categories:
+  - economy
+  - workflow
 enable:
-  plugins: [superpowers]
+  plugins:
+    - superpowers
+    - superpowers-codex
 skill_include: []
 skill_exclude: []
 include:
-  skills: [brainstorming, writing-plans, reflect]
+  skills:
+    - brainstorming
+    - writing-plans
+    - reflect
   rules: []
   hooks: []
   agents: []
