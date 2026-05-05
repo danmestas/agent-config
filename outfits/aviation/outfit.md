@@ -1,6 +1,6 @@
 ---
 name: aviation
-version: 2.1.1
+version: 2.1.2
 type: outfit
 description: 'Flight planning, NOTAMs, charts, ops references.'
 targets:
@@ -38,7 +38,7 @@ skill_include:
   - systematic-debugging
   - knowledge-base-overview
   - obsidian-markdown
-  - autoresearch
+  - vault-autoresearch
   - apple-contacts
 skill_exclude:
   - idiomatic-go
@@ -52,6 +52,7 @@ skill_exclude:
 
 For Flight-Planner, NOTAMOrganizer, NotamsApi, preflightapi.backend, and
 flight-planner-kb. Force-loads the core4 plus `knowledge-base-overview`,
-`obsidian-markdown`, `autoresearch` (for charts/regs lookups), and
-`apple-contacts` (for crew/ATC contact lookups). Memory of plans and
-briefings, KB-leaning. Excludes coding-language and frontend skills.
+`obsidian-markdown`, `vault-autoresearch` (for charts/regs lookups, staging
+into the vault for ingestion), and `apple-contacts` (for crew/ATC contact
+lookups). Memory of plans and briefings, KB-leaning. Excludes coding-language
+and frontend skills.

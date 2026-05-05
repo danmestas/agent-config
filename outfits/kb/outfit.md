@@ -1,6 +1,6 @@
 ---
 name: kb
-version: 1.1.1
+version: 1.1.2
 type: outfit
 description: Obsidian vault / knowledge curation.
 targets:
@@ -44,7 +44,7 @@ skill_include:
   - vault-lint
   - obsidian-bases
   - obsidian-canvas
-  - autoresearch
+  - vault-autoresearch
   - defuddle
   - knowledge-base-overview
 skill_exclude:
@@ -61,5 +61,6 @@ For Knowledge-Base and FirestormKB — Obsidian vault curation. Force-loads
 the core4 plus the full vault-* set (`vault-overview`, `vault-ingest`,
 `vault-query`, `vault-save`, `vault-lint`), the obsidian-* set
 (`obsidian-markdown`, `obsidian-bases`, `obsidian-canvas`), `defuddle` for
-cleaning ingested content, and `autoresearch` for KB-driven inquiry.
-Excludes coding-language and frontend skills.
+cleaning ingested content, and `vault-autoresearch` for KB-driven inquiry
+(stages into `.raw/` for `vault-ingest`). Excludes coding-language and
+frontend skills.
