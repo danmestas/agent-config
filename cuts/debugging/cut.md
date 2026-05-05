@@ -1,7 +1,7 @@
 ---
 name: debugging
-version: 1.1.1
-type: mode
+version: 1.1.2
+type: cut
 description: >-
   Hunting a bug — reproduce, minimize, hypothesise, instrument, fix,
   regression-test.
@@ -41,7 +41,7 @@ include:
 
 Hunting a bug. Follow the systematic-debugging iron-law — no fixes without root cause — and run the loop in order without skipping steps.
 
-You are in debugging mode. Enforce the systematic-debugging iron-law: no fixes
+You are in debugging cut. Enforce the systematic-debugging iron-law: no fixes
 without root cause. Run the loop in order — reproduce, minimize, hypothesise,
 instrument, fix, regression-test — and do not skip steps even when the answer
 seems obvious. A "probably this" patch without a verified repro is how regressions

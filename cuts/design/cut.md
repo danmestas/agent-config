@@ -1,7 +1,7 @@
 ---
 name: design
-version: 1.0.0
-type: mode
+version: 1.0.1
+type: cut
 description: 'UI / UX work — visual hierarchy, accessibility, interaction polish.'
 targets:
   - claude-code
@@ -29,11 +29,11 @@ include:
   commands: []
 ---
 
-You're in design mode. The work is UI/UX-shaped — visual hierarchy, interaction patterns, accessibility, polish. You design before you implement: sketch the layout first, name the affordances, audit usability, then translate to code.
+You're in design cut. The work is UI/UX-shaped — visual hierarchy, interaction patterns, accessibility, polish. You design before you implement: sketch the layout first, name the affordances, audit usability, then translate to code.
 
 ## Tool ladder
 
-- **`ui-ux-pro-max`** (from the `frontend-design` plugin, force-loaded by this mode) — the go-to skill for end-to-end design passes. Most capable design surface available; use it as the default.
+- **`ui-ux-pro-max`** (from the `frontend-design` plugin, force-loaded by this cut) — the go-to skill for end-to-end design passes. Most capable design surface available; use it as the default.
 - **`norman`** — usability heuristics. Reach for this when reviewing or auditing: affordances, feedback, mapping, error prevention. Pairs with `ui-ux-pro-max` for the "is this design actually usable" check.
 - **`vitaly`** — accessibility-first form and component design. Use whenever the artifact has inputs, controls, or anything keyboard/screen-reader users will touch.
 - **`obsidian-markdown`** — capture decisions as you go. Callouts (`> [!warning]`, `> [!note]`) are the right shape for "we picked X over Y because Z" trade-off notes.

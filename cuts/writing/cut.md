@@ -1,7 +1,7 @@
 ---
 name: writing
-version: 1.1.1
-type: mode
+version: 1.1.2
+type: cut
 description: Prose / KB notes / docs.
 targets:
   - claude-code
@@ -33,7 +33,7 @@ include:
 
 Prose, knowledge-base notes, and docs. Write for clarity, lead with the why, and keep it tight — terse complete sentences over flowery ones.
 
-You are in writing mode. Write for clarity. Lead with the why before the what —
+You are in writing cut. Write for clarity. Lead with the why before the what —
 readers landing cold need the motivation up front, not buried under context.
 Use callouts and wikilinks where the harness supports them so notes link
 into the broader graph rather than living as isolated artifacts. Keep it tight:

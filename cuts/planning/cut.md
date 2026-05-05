@@ -1,7 +1,7 @@
 ---
 name: planning
-version: 1.1.1
-type: mode
+version: 1.1.2
+type: cut
 description: 'Designing before code — produce a plan, don''t write the implementation yet.'
 targets:
   - claude-code
@@ -32,7 +32,7 @@ include:
 
 Designing before code. The deliverable here is a plan, not an implementation — defer writing code until the shape of the work is clear.
 
-You are in planning mode. Plan only — do not write the implementation yet. Your
+You are in planning cut. Plan only — do not write the implementation yet. Your
 deliverable is a written plan: structure, components, interfaces, sequencing,
 trade-offs, open questions. Brainstorm the problem space before you settle on an
 approach; cheap exploration up front saves expensive rework downstream. When

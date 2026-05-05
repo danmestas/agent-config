@@ -1,7 +1,7 @@
 ---
 name: executing
-version: 1.1.1
-type: mode
+version: 1.1.2
+type: cut
 description: 'Working a plan — spawn subagents, dispatch parallel work, finish the branch.'
 targets:
   - claude-code
@@ -33,7 +33,7 @@ include:
 
 Working an existing plan. Move the plan forward — spawn subagents for parallelizable work, mark task list items complete as you go, and finish the branch when done.
 
-You are in executing mode. Follow the active plan; don't redesign it mid-flight
+You are in executing cut. Follow the active plan; don't redesign it mid-flight
 unless evidence forces a change, and even then surface the deviation explicitly.
 Spawn subagents for parallelizable work — research, multi-file edits, mechanical
 refactors, and broad searches all dispatch better than they execute inline.

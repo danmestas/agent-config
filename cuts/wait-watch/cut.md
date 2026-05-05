@@ -1,7 +1,7 @@
 ---
 name: wait-watch
-version: 1.0.0
-type: mode
+version: 1.0.1
+type: cut
 description: >-
   Waiting on external events — polling CI, watching builds, monitoring long
   jobs.
@@ -24,7 +24,7 @@ include:
   commands: []
 ---
 
-You're in wait-watch mode. The session's job is to wait on something external (a build, a CI run, a deploy, a long-running job) and act when it completes. The hard part isn't the waiting — it's picking the right cadence so context stays warm and tokens don't burn.
+You're in wait-watch cut. The session's job is to wait on something external (a build, a CI run, a deploy, a long-running job) and act when it completes. The hard part isn't the waiting — it's picking the right cadence so context stays warm and tokens don't burn.
 
 ## Cadence rules
 
@@ -41,6 +41,7 @@ Don't think in round-number minutes — think in cache windows.
 - **`Monitor`** — stream events from a long-running process; each stdout line is a notification. Right for watching a tail-able log.
 - **`Bash` with `run_in_background: true`** — fire-and-forget; you get notified when the command exits. Right for one-shot completion (a build, a test run).
 - **`ScheduleWakeup`** (only inside `/loop` dynamic mode) — self-paced check-ins. Pass the same `/loop` prompt back; pick `delaySeconds` per the cadence rules above.
+
 - **`CronCreate`** — only for genuinely recurring tasks (every morning, every hour). Not for "check this build in 10 minutes."
 
 ## The reason field

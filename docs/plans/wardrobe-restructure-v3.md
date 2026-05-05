@@ -1,4 +1,4 @@
-# Wardrobe restructure v3 — bullet-proof outfits/modes/accessories
+# Wardrobe restructure v3 — bullet-proof outfits/cuts/accessories
 
 Status: **Draft** — proposal for review.
 Date: 2026-05-04
@@ -13,7 +13,7 @@ Methodology: systematic-debugging + dx-audit, anchored on session-usage signal m
 | Bucket | Count | State |
 |---|---:|---|
 | outfits | 6 | aviation, backend, frontend, machines, personal, taxes |
-| modes | 4 | code, design, focused, ops |
+| cuts | 4 | code, design, focused, ops |
 | accessories | 0 | placeholder README only |
 | skills | 70 | flat pool, all `targets:` set, **0 categorized** |
 | agents | 6 | architect-review, code-reviewer, debugger, gh-project-expert, golang-pro, observability-engineer |
@@ -24,12 +24,12 @@ Methodology: systematic-debugging + dx-audit, anchored on session-usage signal m
 ### 1.2 Defects
 
 1. **Outfit `skill_include` is too narrow.** Every outfit force-loads 0–3 skills. Heavy-use skills (planning, brainstorming, debugging, subagent dispatch) are not in any outfit; they rely entirely on description matching. That's not bullet-proof — a session that doesn't surface the right description never loads them.
-2. **Modes are body-only.** ADR-0010 made `include:` first-class on modes; none of the 4 modes use it. Modes are just prompt injection.
+2. **Cuts are body-only.** ADR-0010 made `include:` first-class on cuts; none of the 4 cuts use it. Cuts are just prompt injection.
 3. **Zero accessories.** ADR-0010 made accessories first-class for piecemeal opt-in; none exist.
 4. **TAXONOMY unused.** `docs/TAXONOMY.md` defines 8 categories. 0 / 70 skills carry a `categories:` field; only outfits do (and inconsistently).
 5. **Stale outfits.** `aviation` and `taxes` have empty `skill_include`. `aviation` excludes nothing despite Dan having 4 active aviation repos.
 6. **Duplicate domains, missing roles.** No outfit for the bones orchestrator project (Dan's #1 active repo, 36 sessions). No outfit for KB authoring (12 sessions on Knowledge-Base alone). No outfit for wardrobe/suit/agent-skills meta-tooling work (~21 sessions across those repos).
-7. **Mode taxonomy doesn't match work shape.** `code` mode injects "you are in code mode" — that overlaps with what every outfit already implies. `ops` mode has no body in current files. Real work shapes that recur: planning, executing, debugging, reviewing, ticketing, writing.
+7. **Cut taxonomy doesn't match work shape.** `code` cut injects "you are in code cut" — that overlaps with what every outfit already implies. `ops` cut has no body in current files. Real work shapes that recur: planning, executing, debugging, reviewing, ticketing, writing.
 
 ### 1.3 Session-usage signal (last 60 days, 71 projects)
 
@@ -57,6 +57,8 @@ Methodology: systematic-debugging + dx-audit, anchored on session-usage signal m
 | 5 | systematic-debugging | 21 |
 | 6 | using-git-worktrees | 19 |
 | 7 | orchestrator-mode | 15 |
+
+(Note: `orchestrator-mode` is the literal skill name, not the wardrobe primitive.)
 | 8 | obsidian-markdown | 8 |
 | 9 | test-driven-development | 8 |
 | 10 | finishing-a-development-branch | 7 |
@@ -83,13 +85,13 @@ Every primitive needs a one-sentence test. If a thing doesn't fit a test, it doe
 | Primitive | Test |
 |---|---|
 | **outfit** | "What kind of project is this?" — domain bundle, set once per session, large (5–15 force-loaded skills + agents + hooks + rules). |
-| **mode** | "What shape of work am I doing right now?" — work-shape overlay, smaller (3–8 skills), can replace outfit components. Includes a prompt body that biases the session. |
+| **cut** | "What shape of work am I doing right now?" — work-shape overlay, smaller (3–8 skills), can replace outfit components. Includes a prompt body that biases the session. |
 | **accessory** | "What single capability or constraint do I want layered on top?" — repeatable, additive only, 1–4 components per accessory. |
 | **skill** | "What's a single capability triggered by description?" — flat pool. Categories are the only structural axis. |
 
 **Invariants:**
 1. Outfits never overlap in domain. One project = one outfit choice.
-2. Modes never overlap in work-shape. One session-time = one mode (can switch).
+2. Cuts never overlap in work-shape. One session-time = one cut (can switch).
 3. Accessories are commutative — order doesn't change semantics.
 4. The 4 universal skills (`writing-plans`, `brainstorming`, `subagent-driven-development`, `systematic-debugging`) are force-loaded by **every** outfit. No exceptions. This is the bullet-proof core.
 
@@ -123,9 +125,9 @@ Drop: `taxes` (folds into `personal`).
 - systematic-debugging
 ```
 
-### 3.2 Modes (8 — replaces current 4)
+### 3.2 Cuts (8 — replaces current 4)
 
-| Mode | "I am doing..." | `include` | Body bias |
+| Cut | "I am doing..." | `include` | Body bias |
 |---|---|---|---|
 | `focused` (keep) | one task, no scope creep | — | "stay on the task; mention adjacent issues in one line; don't refactor neighbors" |
 | `planning` | designing before code | brainstorming + writing-plans + grill-me + reflect | "plan only, don't write code yet; produce a deliverable plan; ask one question at a time" |
@@ -136,7 +138,7 @@ Drop: `taxes` (folds into `personal`).
 | `writing` | prose / KB notes / docs | obsidian-markdown + defuddle + brainstorming | "write for clarity; lead with the why; use callouts and wikilinks; keep it tight" |
 | `ops` (keep, populate) | incident / infra change | takeoff + signoz-dashboard-builder + investigating-agent-sessions + course-correct | "observe before changing; take inventory first (takeoff); pull metrics; smallest-blast-radius first" |
 
-Drop: `code`, `design` (collapse — `code` was just "you are coding" which every outfit already implies; `design` collapses into `frontend` + `writing` modes layered).
+Drop: `code`, `design` (collapse — `code` was just "you are coding" which every outfit already implies; `design` collapses into `frontend` + `writing` cuts layered).
 
 ### 3.3 Accessory-as-role (revised)
 
@@ -184,7 +186,7 @@ All 70 skills get a `categories:` field. Mapping (one-pass, draft):
 
 ### 3.5 Default-resolution heuristics
 
-Add a `--auto` mode to `suit up` that picks an outfit based on repo signal:
+Add a `--auto` flag to `suit up` that picks an outfit based on repo signal:
 
 | Signal | Picked outfit |
 |---|---|
@@ -206,14 +208,14 @@ Single coordinated PR, like ADR-0011 was. Phases inside the PR:
 
 1. **Phase A — taxonomy backfill.** Add `categories:` to all 70 skills via a script (one-pass mapping per §3.4, hand-correct the long tail). Land on `feat/v3-restructure` branch.
 2. **Phase B — outfit rewrite.** Rewrite the 6 existing outfit files to the new `skill_include` shape; add 2 new outfits (`bones`, `kb`, `meta`); delete `taxes`.
-3. **Phase C — mode rewrite.** Drop `code` and `design`. Keep `focused`, populate `ops`. Add 6 new modes (`planning`, `executing`, `debugging`, `reviewing`, `ticketing`, `writing`). Each gets `include:` per §3.2.
+3. **Phase C — cut rewrite.** Drop `code` and `design`. Keep `focused`, populate `ops`. Add 6 new cuts (`planning`, `executing`, `debugging`, `reviewing`, `ticketing`, `writing`). Each gets `include:` per §3.2.
 4. **Phase D — accessories.** Create 10 accessory dirs with `accessory.md` per §3.3. Includes `rules/` fragments for `pr-policy` (this requires `rules/` to actually have content for the first time — write the PR-policy rule directly).
-5. **Phase E — validation.** Run `suit list outfits|modes|accessories` against the rewritten wardrobe and verify discovery. Run `suit show outfit <name>` for each. Run `suit prelaunch --dry-run` to confirm strict-include resolution doesn't break.
+5. **Phase E — validation.** Run `suit list outfits|cuts|accessories` against the rewritten wardrobe and verify discovery. Run `suit show outfit <name>` for each. Run `suit prelaunch --dry-run` to confirm strict-include resolution doesn't break.
 6. **Phase F — docs.** Update `wardrobe/README.md` "What's in here" table. Update `docs/TAXONOMY.md` if any category got dropped. Add `docs/COMPOSITION.md` documenting the scope rules from §2.
 
 **Suit-side change required:** the accessory-as-role behavior (§3.3) is **not** in the current resolver. ADR-0013 (in suit) documents the change; suit/src/lib/accessory.ts grows fall-through resolution; suit version bumps to 0.6.0. Wardrobe v3 PR depends on suit 0.6.0 being merged + released first.
 
-**Risk:** strict `include:` will fail prelaunch if a referenced skill name is wrong. Mitigation: a single `suit doctor`-like script that walks every outfit/mode/accessory and verifies all `include:` references resolve to a wardrobe component. Run it as the last step of phase E; gate the merge on a clean pass.
+**Risk:** strict `include:` will fail prelaunch if a referenced skill name is wrong. Mitigation: a single `suit doctor`-like script that walks every outfit/cut/accessory and verifies all `include:` references resolve to a wardrobe component. Run it as the last step of phase E; gate the merge on a clean pass.
 
 ---
 

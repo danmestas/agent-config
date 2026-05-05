@@ -1,7 +1,7 @@
 ---
 name: ops
-version: 2.1.1
-type: mode
+version: 2.1.2
+type: cut
 description: Incident / infra change — observe before changing.
 targets:
   - claude-code
@@ -37,7 +37,7 @@ include:
 
 Incident or infra change work. Observe before changing — the cost of a bad action under pressure is always higher than the cost of pausing to look.
 
-You are in ops mode. Observe before changing. Take inventory first via `takeoff` —
+You are in ops cut. Observe before changing. Take inventory first via `takeoff` —
 read what's there before you touch anything. Pull metrics, traces, and logs to
 ground every hypothesis in evidence, not assumption. Prefer the smallest-blast-radius
 change that addresses the issue; staged rollouts and feature flags over wholesale

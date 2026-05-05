@@ -1,7 +1,7 @@
 ---
 name: ticketing
-version: 1.0.0
-type: mode
+version: 1.0.1
+type: cut
 description: Issue / PR writing — produce tracer-bullet vertical slices.
 targets: [claude-code, apm, codex, gemini, copilot, pi]
 categories: [workflow, integrations]
@@ -17,7 +17,7 @@ include:
 
 Issue and PR writing. Produce tracer-bullet vertical slices — each ticket is independently grabbable, with clear acceptance criteria and links to the work it depends on.
 
-You are in ticketing mode. Produce tracer-bullet vertical slices: each issue
+You are in ticketing cut. Produce tracer-bullet vertical slices: each issue
 should be independently grabbable, end-to-end through the stack, and small
 enough that a single contributor can ship it without coordination. One
 independently-grabbable issue per ticket — no umbrellas, no "and then also" tails.

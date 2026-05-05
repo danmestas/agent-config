@@ -1,6 +1,6 @@
 # wardrobe
 
-Dan's content monorepo for AI-coding harnesses. Outfits, modes, accessories,
+Dan's content monorepo for AI-coding harnesses. Outfits, cuts, accessories,
 skills, agents, hooks, rules, and commands — authored once in canonical
 formats and shipped to Claude Code, APM, Codex, Gemini CLI, Copilot CLI, and
 Pi via [`suit`](https://github.com/danmestas/suit).
@@ -16,7 +16,7 @@ launch a harness:
 ```bash
 npm install -g @agent-ops/suit
 suit init https://github.com/danmestas/wardrobe
-suit claude --outfit backend --mode focused
+suit claude --outfit backend --cut focused
 ```
 
 Or work against a local clone:
@@ -32,10 +32,10 @@ Layer accessories onto the session at invocation time. Accessories can be a cura
 
 ```bash
 # bundle accessory
-suit claude --outfit backend --mode debugging --accessory philosophy
+suit claude --outfit backend --cut debugging --accessory philosophy
 
 # singleton accessory — any component name resolves
-suit claude --outfit backend --mode executing --accessory pr-policy --accessory test-driven-development
+suit claude --outfit backend --cut executing --accessory pr-policy --accessory test-driven-development
 ```
 
 ## What's in here
@@ -43,23 +43,23 @@ suit claude --outfit backend --mode executing --accessory pr-policy --accessory 
 | Directory | What it contains |
 |---|---|
 | `outfits/` | Long-lived role bundles (aviation, backend, bones, code, frontend, kb, meta, personal, stasi) — set the baseline component set. Every outfit force-loads the universal core4: `writing-plans`, `brainstorming`, `subagent-driven-development`, `systematic-debugging`. |
-| `modes/` | Work-shape overlays (debugging, executing, focused, ops, planning, reviewing, ticketing, writing) — extend/override outfit components and inject a prompt body. |
+| `cuts/` | Work-shape overlays (debugging, design, executing, focused, ops, planning, reviewing, ticketing, wait-watch, writing) — extend/override outfit components and inject a prompt body. |
 | `accessories/` | Two layers: (a) curated multi-component bundles (philosophy, skill-author, vault, gh-project) live here as `accessory.md`; (b) any wardrobe component name (skill / hook / rule / agent / command) is also reachable via `--accessory <name>` through accessory-as-role fall-through (suit ≥ 0.6, ADR-0013). |
 | `skills/` | Flat shared pool of `SKILL.md` capabilities triggered by description. Carry a `category:` block per the 8-axis TAXONOMY. |
 | `agents/` | Subagent definitions (`AGENT.md`). |
 | `hooks/` | Event-driven scripts (`HOOK.md` entrypoint, payload alongside). |
-| `rules/` | Harness-native rules referenced by outfits/modes/accessories. Currently: `pr-policy`. |
+| `rules/` | Harness-native rules referenced by outfits/cuts/accessories. Currently: `pr-policy`. |
 | `commands/` | Slash commands (`COMMAND.md`). |
 | `docs/` | Authoring docs (TAXONOMY, CONVENTIONS, CONTEXT, contributing, GH project setup, plans, ADRs). |
 
 ## How content gets to your harness
 
-When you run `suit claude --outfit backend --mode focused`, suit:
+When you run `suit claude --outfit backend --cut focused`, suit:
 
 1. Starts with an empty component set.
 2. Applies the outfit (`outfits/backend/outfit.md`) → fills baseline.
-3. Applies the mode (`modes/focused/mode.md`) → merges/overrides components
-   plus injects the mode body as additional context.
+3. Applies the cut (`cuts/focused/cut.md`) → merges/overrides components
+   plus injects the cut body as additional context.
 4. Applies each `--accessory <name>` flag in order.
 5. Emits per-harness via existing adapters into a temp tree the harness
    reads at launch.
@@ -77,7 +77,7 @@ and layout decisions.
 This is Dan's personal/team config. To start your own:
 
 - Fork [`suit-template`](https://github.com/danmestas/suit-template) —
-  minimal starter with one outfit and one mode.
+  minimal starter with one outfit and one cut.
 - Or fork this repo as a richer starting point and trim what you don't want.
 - Or `suit init https://github.com/your-username/your-fork` once your fork
   exists.
@@ -103,7 +103,7 @@ category:
 
 - [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) — cross-cutting rules every component follows (fail-safe hooks, flat-line changelogs, `.agent-config/` state directory, cross-harness contract).
 - [`docs/TAXONOMY.md`](docs/TAXONOMY.md) — the 8-axis taxonomy (Economy, Workflow, BackPressure, Tooling, Integrations, ContextManagement, MemoryManagement, Evolution) used to classify and bundle components.
-- [`docs/CONTEXT.md`](docs/CONTEXT.md) — domain vocabulary (skill, outfit, mode, accessory, harness, adapter, prelaunch, suit session).
+- [`docs/CONTEXT.md`](docs/CONTEXT.md) — domain vocabulary (skill, outfit, cut, accessory, harness, adapter, prelaunch, suit session).
 - [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — how to run validation locally and submit a PR.
 
 ## Building
@@ -127,7 +127,7 @@ Each script invokes [`suit-build`](https://github.com/danmestas/suit) via `npx -
 server installed at *user scope* (read from
 `~/.claude/plugins/installed_plugins.json` for user-scope plugins, and
 `~/.claude.json`'s `mcpServers` block for MCPs). Suit (≥ v0.7) reads it so
-outfits, modes, and accessories can reference globals by name — enabling or
+outfits, cuts, and accessories can reference globals by name — enabling or
 disabling specific plugins/MCPs per session without uninstalling them.
 
 ```bash
@@ -139,7 +139,7 @@ npm run sync-globals -- --pr        # write, commit, push, open a PR via gh
 Run `npm run sync-globals` after installing or removing a plugin or MCP at
 user scope to refresh the registry, then open a PR (the `--pr` flag does
 this for you when `gh` is on PATH and the working tree is otherwise clean).
-Outfits, modes, and accessories opt into globals via `enable:` / `disable:`
+Outfits, cuts, and accessories opt into globals via `enable:` / `disable:`
 blocks naming registered entries — see ADR-0014 in the suit repo (Phase D
 of v0.7 wires the resolver). MCP entries record only non-secret metadata —
 stdio MCPs capture `command`, `args`, and a `has_env` flag; HTTP MCPs
