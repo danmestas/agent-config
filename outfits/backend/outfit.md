@@ -27,7 +27,7 @@ skill_include:
   - brainstorming
   - subagent-driven-development
   - systematic-debugging
-  - idiomatic-go
+  - golang-patterns
   - signoz-dashboard-builder
   - deterministic-simulation-testing
   - farley
@@ -44,7 +44,7 @@ skill_exclude:
 # Backend Outfit
 
 For Go-heavy server work — serverdom, dagnats, firestorm-dataworks, EdgeSync,
-agent-infra. Force-loads the core4 plus `idiomatic-go`, observability tooling
+agent-infra. Force-loads the core4 plus `golang-patterns`, observability tooling
 (`signoz-dashboard-builder`), deterministic-sim philosophies
 (`deterministic-simulation-testing`, `farley`, `tigerstyle`, `ousterhout`),
 and `verification-before-completion`. Excludes Datastar and shadcn frontend

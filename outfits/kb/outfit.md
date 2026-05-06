@@ -48,7 +48,7 @@ skill_include:
   - defuddle
   - knowledge-base-overview
 skill_exclude:
-  - idiomatic-go
+  - golang-patterns
   - datastar
   - datastar-tao
   - datastar-patterns

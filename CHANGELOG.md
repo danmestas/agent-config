@@ -12,6 +12,20 @@ harness adapter changes, taxonomy shifts. The format is loosely based on
 
 ## [Unreleased] — wardrobe layout v2
 
+### Changed
+
+- `skills/idiomatic-go` superseded by `skills/golang-patterns`. The new skill
+  pulls in concurrency / interfaces / generics / testing / project-structure
+  reference packs from
+  [jeffallan/claude-skills](https://github.com/jeffallan/claude-skills) (MIT)
+  and rolls the prior idiomatic-go anti-pattern tables into
+  `skills/golang-patterns/references/idiomatic-go.md`.
+- `agents/golang-pro` body declares pairing with `golang-patterns` (no
+  schema-level dep field exists yet — prose only).
+- All outfits referencing `idiomatic-go` (backend, bones, personal, kb,
+  aviation, frontend's exclude, engineer's vs-comparison prose) updated to
+  `golang-patterns`.
+
 ### BREAKING
 
 - Repo renamed: `agent-config` → `wardrobe`.

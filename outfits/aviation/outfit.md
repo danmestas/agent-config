@@ -41,7 +41,7 @@ skill_include:
   - vault-autoresearch
   - apple-contacts
 skill_exclude:
-  - idiomatic-go
+  - golang-patterns
   - datastar
   - datastar-tao
   - datastar-patterns

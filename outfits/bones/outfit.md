@@ -31,7 +31,7 @@ skill_include:
   - finishing-a-bones-leaf
   - takeoff
   - landing
-  - idiomatic-go
+  - golang-patterns
   - dispatching-parallel-agents
 skill_exclude:
   - datastar
@@ -45,5 +45,5 @@ skill_exclude:
 For the bones repo and any bones-shaped workspace doing leaf/swarm
 orchestration. Force-loads the core4 plus the bones-powers pack
 (`using-bones-powers`, `using-bones-swarm`, `finishing-a-bones-leaf`,
-`takeoff`, `landing`), `idiomatic-go`, and `dispatching-parallel-agents`
+`takeoff`, `landing`), `golang-patterns`, and `dispatching-parallel-agents`
 for cross-leaf coordination. Excludes Datastar / shadcn frontend skills.

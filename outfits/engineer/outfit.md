@@ -95,5 +95,5 @@ Frontend-specific (`datastar`, `datastar-tao`, `datastar-patterns`, `shadcn-form
 ## Distinct from neighboring outfits
 
 - **vs `code`**: `code` is light and language-agnostic; `engineer` is rigor-heavy and language-agnostic. Same range of projects, different demands.
-- **vs `backend`**: `backend` adds Go-specific (`idiomatic-go`) + observability + deterministic-simulation-testing skills. `engineer` is the language-agnostic discipline floor that `backend` builds on.
+- **vs `backend`**: `backend` adds Go-specific (`golang-patterns`) + observability + deterministic-simulation-testing skills. `engineer` is the language-agnostic discipline floor that `backend` builds on.
 - **vs `meta`**: `meta` is for wardrobe / suit / agent-skills authoring; `engineer` is for shipping software in general.

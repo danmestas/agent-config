@@ -39,7 +39,7 @@ skill_include:
   - obsidian-markdown
   - norman
 skill_exclude:
-  - idiomatic-go
+  - golang-patterns
 ---
 
 # Frontend Outfit
@@ -47,5 +47,5 @@ skill_exclude:
 For Datastar / shadcn / UI work — studs-cycles, studs-cycles-pb, darken.
 Force-loads the core4 plus the full Datastar stack (`datastar-tao`,
 `datastar-patterns`, `datastar`), `shadcn-forms`, `obsidian-markdown`, and
-`norman` design heuristics. Excludes `idiomatic-go` since this is not a Go
+`norman` design heuristics. Excludes `golang-patterns` since this is not a Go
 project.

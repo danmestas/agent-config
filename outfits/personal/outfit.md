@@ -42,7 +42,7 @@ skill_include:
   - career-interview
   - memorize
 skill_exclude:
-  - idiomatic-go
+  - golang-patterns
   - datastar
   - datastar-tao
   - datastar-patterns
