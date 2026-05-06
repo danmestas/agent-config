@@ -12,6 +12,15 @@ harness adapter changes, taxonomy shifts. The format is loosely based on
 
 ## [Unreleased] — wardrobe layout v2
 
+### Added
+
+- `skills/ship-issue` — workflow skill that drives a single issue from
+  triage through merged PR with one operator authorization. Captures
+  the rhythm of read-and-label → agent brief → red-green TDD →
+  subagent code review → local-CI parity → push → watch CI →
+  squash-merge → cleanup → next-step-suggesting report. Tagged
+  `primary: workflow`, `secondary: [integrations, backpressure]`.
+
 ### Changed
 
 - `skills/idiomatic-go` superseded by `skills/golang-patterns`. The new skill
