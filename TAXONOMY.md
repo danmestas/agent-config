@@ -204,3 +204,47 @@ This gives a one-command read on posture along any axis. Combined with `--catego
 - **Where `context-mode` lives.** Listed as `primary: tooling, secondary: [economy]`. Reasonable case for the inverse (`primary: economy, secondary: [tooling]`) since the *motivating* concern is window cost. Final tag is a judgement call for the retag PR.
 - **Evolution scope.** Defined here as observation → eval → proposal. Whether Evolution skills *apply* changes (mutate other skills directly) or only *propose* them (write to a queue for human review) is left to the Evolution spec doc.
 - **Functional vs category plugin overlap.** `software-philosophy` (functional) overlaps with `backpressure-essentials` (category). Both can coexist; consumers pick by intent. No deduplication required.
+
+---
+
+## Section 6: Composition axes — outfit / cut / accessory (v2)
+
+The 8-category taxonomy above describes how we *tag* individual components. The **composition axes** describe how outfits, cuts, and accessories assemble those tagged components into a session config. Two parallel models live in the repo today:
+
+| Layer | v1 (domain-shaped) | v2 (role-shaped) |
+|---|---|---|
+| **Outfit** | Domain you work in (`backend`, `frontend`, `kb`, `bones`, `aviation`, `meta`, `personal`, `stasi`) | Who you are (`implementer`, `reviewer`, `planner`, `spy`, `orchestrator`, `quick`) |
+| **Cut** | Postural overlay (`planning`, `reviewing`, `executing`, `focused`, `debugging`, `wait-watch`, …) | Tech stack you're working on (`go-backend`, `ts-frontend`, `python-data`, `infra-cloudflare`, `bones-tooling`) |
+| **Accessory** | Curated behavior bundle (`philosophy`, `vault`, `gh-project`, `linear`, `skill-author`) | All of v1, *plus* project context (`project-bones`, `project-serverdom`, `project-dagnats`) |
+
+v1 stays alive for **solo dressing** (one operator playing all roles serially in a single session); v2 is for **orchestrator-driven multi-pane work** (one orchestrator session dispatching role-shaped subharness children). They coexist; pick the layer that matches the use case.
+
+The `project-` prefix on v2 project accessories avoids name collision with v1 domain outfits — suit's component namespace is flat, so `bones` outfit and `bones` accessory cannot coexist; `project-bones` does.
+
+### Venn-diagram composition (suit ≥ 0.10.0)
+
+Outfits can declare a `compose:` field with set operators on other outfits:
+
+```yaml
+compose:
+  - implementer + planner + reviewer  # union skills from three role outfits
+  - implementer - tag:research        # remove anything tagged research
+```
+
+`+` unions skills/accessories/hooks. `-` removes by name or by freeform `tag:<name>` (matches against each skill's `tags` array — orthogonal to the 8-category taxonomy above, which uses `category.primary` / `category.secondary`). Operators apply only to *sets* — system-prompt prose only unions, in declared order, with brief-wins on conflict per the orchestrator-suit skill's precedence rule.
+
+Resolution is lazy in-memory at `suit claude` / `suit up` time — no DB, no cache. Forward-compat: unknown outfit operands and unknown tags resolve to empty sets; a typo in `compose:` doesn't fail the build.
+
+### Orchestrator-driven spawn
+
+`skills/orchestrator-suit/SKILL.md` documents the loop. Short version: the orchestrator session in the `orchestrator` outfit dispatches role-shaped children via:
+
+```bash
+PANE=$(harness-spawn claude --cwd <project> \
+  --cmd "suit claude --outfit implementer --cut go-backend --accessory project-bones \
+    -- --append-system-prompt-file .scion/briefs/<task-id>-implementer.md")
+```
+
+Stateless suit (`suit claude`, not `suit up`) means multiple roles can target the same project simultaneously without `.claude/` write contention. Briefs are saved files under `.scion/briefs/` (or `<workspace>/.orchestrator/briefs/`), not regenerated prose — same brief = reproducible child. The `--cmd` flag on `harness-spawn` is added in agent-harness Phase 3 of the rollout (until then, manual two-step in the same skill body).
+
+For the full implementation arc and rollout plan: `docs/plans/2026-05-08-orchestrator-driven-wardrobe.md`.
