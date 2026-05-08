@@ -20,6 +20,20 @@ harness adapter changes, taxonomy shifts. The format is loosely based on
   subagent code review → local-CI parity → push → watch CI →
   squash-merge → cleanup → next-step-suggesting report. Tagged
   `primary: workflow`, `secondary: [integrations, backpressure]`.
+- `skills/spy-on-session` — generic, tool-agnostic counterpart to
+  `spy-on-bones-session`. Distills the four pillars of a live spy
+  audit (fingerprint files before/after the tool's bootstrap, read
+  the transcript JSONL as the source of truth, monitor the tool's
+  event stream live before the operator drives, write classified
+  findings inline as bug / inconvenience / improvement). Carries the
+  same hook-protocol envelope verification, network-egress check,
+  operator-coaching, idle-handling, and source-grounded reflection
+  rules — without any bones-specific verbs or paths. Triggers on
+  "spy on a Claude Code integration," "audit how a hook / skill /
+  MCP / sidecar behaves," "find what <tool> gets wrong on
+  <project>." Tools with their own spy skill (e.g.
+  `spy-on-bones-session`) keep precedence; this picks up everything
+  else. Tagged `primary: evolution`, `secondary: [tooling, backpressure]`.
 
 ### Changed
 
