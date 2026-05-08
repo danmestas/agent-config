@@ -34,6 +34,21 @@ harness adapter changes, taxonomy shifts. The format is loosely based on
 - All outfits referencing `idiomatic-go` (backend, bones, personal, kb,
   aviation, frontend's exclude, engineer's vs-comparison prose) updated to
   `golang-patterns`.
+- `skills/spy-on-bones-session` bumped 0.1.0 → 0.2.0 from lessons learned
+  running an end-to-end spy on `serverdom`. Adds: hook-protocol verification
+  sub-phase (catches the SessionStart `--json` envelope-shape bug class
+  before Phase 4); network-egress check on the bones hub process; explicit
+  "JSONL-is-the-truth, tmux capture is screen buffer" stance; a high-value
+  first-calls playbook (start `bones tasks watch --json` BEFORE anything
+  else; enumerate every subcommand `--help`); operator-coaching block on
+  REPL-only slash commands (`/doctor`, `claude doctor` TUI hangs on
+  redirect); idle-operator handling so a no-show doesn't burn three
+  9-minute `harness-listen` timeouts; an optional Phase 7 architectural
+  reflection that mandates source-grounded path:line citations via Explore
+  subagent rather than behavior-only speculation; new "What I did NOT
+  exercise" section in the report template (typical spy hits ~15% of bones
+  surface area). Adds 5 entries to Common mistakes table covering each
+  pattern.
 
 ### BREAKING
 
