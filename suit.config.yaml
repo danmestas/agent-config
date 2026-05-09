@@ -1,6 +1,4 @@
 # Repo-level adapter defaults. Per-component overrides live in SKILL.md frontmatter.
-apm:
-  package_scope: "@danmestas"
 claude-code:
   marketplace: claude-plugins-official
 codex:
