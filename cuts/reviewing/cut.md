@@ -5,7 +5,6 @@ type: cut
 description: Code review — separate must-fix from suggestion.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

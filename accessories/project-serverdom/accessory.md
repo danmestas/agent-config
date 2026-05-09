@@ -5,7 +5,6 @@ type: accessory
 description: Project context accessory for the serverdom repo — Go service with JSX-style codegen DSL for ServerDOM components. Apply when working in /Users/dmestas/projects/serverdom.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

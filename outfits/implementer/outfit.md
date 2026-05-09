@@ -5,7 +5,6 @@ type: outfit
 description: Implementer role — TDD, executing-plans, finishing-a-bones-leaf. For coding workers in orchestrated multi-role flows; pair with a stack cut and a project accessory.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

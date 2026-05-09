@@ -5,7 +5,6 @@ type: cut
 description: Incident / infra change — observe before changing.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

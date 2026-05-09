@@ -5,7 +5,6 @@ type: outfit
 description: 'Flight planning, NOTAMs, charts, ops references.'
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

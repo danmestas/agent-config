@@ -7,7 +7,6 @@ description: >-
   regression-test.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

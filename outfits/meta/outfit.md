@@ -5,7 +5,6 @@ type: outfit
 description: Wardrobe / suit / agent-skills authoring.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

@@ -5,7 +5,6 @@ type: cut
 description: TypeScript frontend stack cut — React, Vue, Svelte, vanilla TS UI. Body-references the frontend-design plugin and tailwindcss-master skills (loaded via plugin enable, not skill_include).
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

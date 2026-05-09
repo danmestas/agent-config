@@ -5,7 +5,6 @@ type: cut
 description: Go backend stack cut — Go services, CLIs, libraries. Loads golang-patterns and idiomatic Go discipline.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

@@ -5,7 +5,6 @@ type: outfit
 description: Spy role — read-only audits of how a tool integrates with a Claude Code session. Loads spy-on-session and investigating-agent-sessions. For audit workers in orchestrated multi-role flows; the project accessory activates tool-specific spy paths (e.g. spy-on-bones-session via accessory bones).
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

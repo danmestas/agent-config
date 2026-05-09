@@ -5,7 +5,6 @@ type: cut
 description: 'Designing before code — produce a plan, don''t write the implementation yet.'
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

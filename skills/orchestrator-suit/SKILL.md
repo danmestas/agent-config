@@ -5,7 +5,6 @@ type: skill
 description: Use when you are the orchestrator session driving role-shaped subharness children. Loads when the orchestrator outfit is active. Documents the spawn loop — receive intent → classify → spawn role-shaped child via stateless suit + harness-spawn → monitor → cherry-pick worktree → escalate → audit log. Triggers on "orchestrate", "dispatch a worker", "spawn an implementer / reviewer / planner / spy", "run the multi-role pipeline", "drive child harnesses", "spawn a worker session".
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

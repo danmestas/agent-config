@@ -5,7 +5,6 @@ type: cut
 description: 'Working a plan — spawn subagents, dispatch parallel work, finish the branch.'
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

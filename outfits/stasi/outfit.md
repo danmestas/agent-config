@@ -5,7 +5,6 @@ type: outfit
 description: Spying on sessions to audit and improve agent behavior.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

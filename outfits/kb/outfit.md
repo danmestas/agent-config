@@ -5,7 +5,6 @@ type: outfit
 description: Obsidian vault / knowledge curation.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

@@ -3,7 +3,7 @@ name: skill-author
 version: 1.0.0
 type: accessory
 description: Skill authoring + evaluation toolkit.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, copilot, pi]
 include:
   skills: [skill-creator, skill-development, description-linter, skill-eval-runner, skill-gap-detector]
   rules: []

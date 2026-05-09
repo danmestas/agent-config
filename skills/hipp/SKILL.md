@@ -11,7 +11,6 @@ description: >-
 type: skill
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

@@ -9,7 +9,6 @@ description: >-
   done', '/ci-watch'.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot

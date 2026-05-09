@@ -5,7 +5,6 @@ type: cut
 description: 'UI / UX work — visual hierarchy, accessibility, interaction polish.'
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
   - copilot
