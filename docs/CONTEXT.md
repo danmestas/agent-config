@@ -31,7 +31,7 @@ The build pipeline lives in the standalone [`suit` repo](https://github.com/danm
 
 - **manifest** — the YAML frontmatter on a component (SKILL.md, AGENT.md, HOOK.md, RULES.md, COMMAND.md, outfit.md, cut.md, accessory.md).
 - **catalog** — the discovered set of components for a given harness home (e.g. `~/.claude/skills/`).
-- **harness** — a downstream agent runtime: `claude-code`, `apm`, `codex`, `gemini`, `copilot`, `pi`.
+- **harness** — a downstream agent runtime. First-tier (bulletproof): `claude-code`. Well-supported: `codex`, `gemini`, `pi`. Anything else is DIY — see `docs/HARNESS_INTEGRATION.md`.
 - **adapter** — code that emits a component into one harness's expected layout. Lives in suit.
 - **resolution** — the outfit/cut/accessory-applied view of a catalog: which skills to drop, what cut prompt to inject. Computed and persisted by suit when callers (e.g. the `suit` launcher) need both.
 - **suit session** — the lifecycle of one `suit <harness> ...` invocation. Stages, in order: (1) resolveTarget, (2) persistResolution, (3) prelaunchForTarget, (4) exec. Implemented in suit.
