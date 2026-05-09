@@ -7,7 +7,6 @@ targets:
   - claude-code
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - backpressure

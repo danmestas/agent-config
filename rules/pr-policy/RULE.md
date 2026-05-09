@@ -3,7 +3,7 @@ name: pr-policy
 version: 1.0.0
 type: rules
 description: Force PR-policy + local-CI rules — no direct commits to main, run CI locally before declaring PR ready.
-targets: [claude-code, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, pi]
 category:
   primary: workflow
   secondary: [backpressure]

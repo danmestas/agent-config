@@ -11,7 +11,6 @@ targets:
   - claude-code
   - codex
   - gemini
-  - copilot
   - pi
 category:
   primary: integrations

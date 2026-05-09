@@ -66,7 +66,6 @@ bones-powers skill content uses Claude Code tool names (TodoWrite, Skill, Read, 
 
 - Codex: `references/codex-tools.md`
 - Gemini: `references/gemini-tools.md`
-- Copilot CLI: `references/copilot-tools.md`
 - Pi: `references/pi-tools.md`
 
 When you encounter a Claude Code tool name in a bones-powers skill running on another harness, translate using the relevant mapping. The agent reads this meta-skill at session start (via the gated SessionStart hook), so the mapping is implicit context for all downstream skill reads.

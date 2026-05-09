@@ -3,7 +3,7 @@ name: ticketing
 version: 1.0.1
 type: cut
 description: Issue / PR writing — produce tracer-bullet vertical slices.
-targets: [claude-code, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, pi]
 categories: [workflow, integrations]
 skill_include: []
 skill_exclude: []

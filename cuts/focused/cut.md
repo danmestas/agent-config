@@ -3,7 +3,7 @@ name: focused
 version: 2.0.1
 type: cut
 description: Single-task deep focus, no scope creep.
-targets: [claude-code, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, pi]
 categories: [backpressure, workflow]
 skill_include: []
 skill_exclude: []
