@@ -38,12 +38,14 @@ skill_include:
   - systematic-debugging
   - investigating-agent-sessions
   - spy-on-bones-session
+  - spy-on-session
   - dx-audit
   - description-linter
   - skill-gap-detector
   - skill-eval-runner
   - stuck-detector
   - course-correct
+  - monitoring-the-operator
 skill_exclude: []
 ---
 
