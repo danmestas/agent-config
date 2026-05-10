@@ -5,10 +5,8 @@ type: outfit
 description: 'Journaling, resume, life admin (formerly personal + taxes).'
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - economy

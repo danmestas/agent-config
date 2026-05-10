@@ -9,10 +9,8 @@ description: >-
   'transition to in-progress', 'add comment to LIN-X', '/linear', 'lin issue'.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 category:
   primary: integrations

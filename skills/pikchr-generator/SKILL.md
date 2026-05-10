@@ -18,7 +18,6 @@ description: |
 type: skill
 targets:
   - claude-code
-  - apm
 category:
   primary: tooling
 ---
@@ -45,8 +44,7 @@ Every command below uses `$SKILL_DIR`. Set it once per session:
 SKILL_DIR="$(
   for c in \
     "$HOME/.claude/skills/pikchr-generator" \
-    "$PWD/.claude/skills/pikchr-generator" \
-    "$PWD/.apm/skills/pikchr-generator"; do
+    "$PWD/.claude/skills/pikchr-generator"; do
     [[ -f "$c/SKILL.md" ]] && echo "$c" && break
   done
 )"

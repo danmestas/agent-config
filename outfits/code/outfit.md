@@ -3,7 +3,7 @@ name: code
 version: 2.0.0
 type: outfit
 description: Generic coding work — language-agnostic baseline for any code project.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, pi]
 categories: [economy, workflow, backpressure, evolution]
 skill_include:
   - writing-plans

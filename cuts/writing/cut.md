@@ -5,10 +5,8 @@ type: cut
 description: Prose / KB notes / docs.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - memory-management

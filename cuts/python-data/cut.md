@@ -5,10 +5,8 @@ type: cut
 description: Python data stack cut — pandas/polars, ETL, ML, notebook-style analysis. Type hints, no surprise mutation.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

@@ -5,10 +5,8 @@ type: cut
 description: Bones tooling stack cut — for working ON the bones binary itself (Go + fossil + nats). Different from working IN a bones-instrumented project (use accessory bones for that).
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

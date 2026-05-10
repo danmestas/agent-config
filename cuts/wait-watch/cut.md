@@ -7,10 +7,8 @@ description: >-
   jobs.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

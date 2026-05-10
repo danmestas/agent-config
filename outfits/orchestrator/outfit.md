@@ -5,10 +5,8 @@ type: outfit
 description: Orchestrator role — drives subharness children via stateless suit launches piped through harness-spawn. Does not write code. For parent sessions managing multi-role pipelines (implementer + reviewer + planner + spy).
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

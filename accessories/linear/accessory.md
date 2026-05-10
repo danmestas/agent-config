@@ -5,10 +5,8 @@ type: accessory
 description: Linear toolkit — issue management via CLI + method etiquette.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 include:
   skills:

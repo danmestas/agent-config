@@ -5,10 +5,8 @@ type: outfit
 description: Quick generalist outfit composed from implementer + planner + reviewer for solo flow. Use when working alone on a small task and the role keeps shifting. For orchestrated multi-pane work, use the individual role outfits instead — quick is the v2 generalist replacement for v1 domain outfits.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

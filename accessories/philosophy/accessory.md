@@ -3,7 +3,7 @@ name: philosophy
 version: 1.0.0
 type: accessory
 description: Philosophy pack — Ousterhout, TigerStyle, Farley, HIPP, Norman, Vitaly.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, pi]
 include:
   skills: [ousterhout, tigerstyle, farley, hipp, norman, vitaly]
   rules: []

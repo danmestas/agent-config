@@ -3,7 +3,7 @@ name: gh-project
 version: 1.0.0
 type: accessory
 description: GitHub project board toolkit.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, pi]
 include:
   skills: [gh-project-charter, gh-project-setup, gh-project-operations, gh-project-shared]
   rules: []

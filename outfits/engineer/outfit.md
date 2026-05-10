@@ -5,10 +5,8 @@ type: outfit
 description: General software engineering — language-agnostic discipline pack with philosophy, review, testing, and self-correction.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - economy

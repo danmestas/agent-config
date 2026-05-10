@@ -3,7 +3,7 @@ name: vault
 version: 1.0.0
 type: accessory
 description: Obsidian vault toolkit — ingest, query, save, lint, plus markdown/bases/canvas authoring.
-targets: [claude-code, apm, codex, gemini, copilot, pi]
+targets: [claude-code, codex, gemini, pi]
 include:
   skills: [vault-ingest, vault-query, vault-save, vault-lint, obsidian-markdown, obsidian-bases, obsidian-canvas]
   rules: []

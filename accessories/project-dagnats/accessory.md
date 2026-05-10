@@ -5,10 +5,8 @@ type: accessory
 description: Project context accessory for the dagnats repo — NATS-based DAG coordination. Apply when working in /Users/dmestas/projects/dagnats.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 include:
   skills: []

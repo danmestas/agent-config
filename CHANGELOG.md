@@ -12,8 +12,34 @@ harness adapter changes, taxonomy shifts. The format is loosely based on
 
 ## [Unreleased] — wardrobe layout v2
 
+### Removed
+
+- **APM target** — frontmatter `targets:` arrays no longer include `apm`.
+  Repo-level `apm:` block dropped from `suit.config.yaml`. APM was
+  scaffolded but never shipped (no published packages, no consumer); the
+  wardrobe stops authoring against it. Suit's apm adapter remains as
+  dead code with no inputs from this repo until a follow-up PR removes
+  it upstream.
+
+### Changed
+
+- **Copilot demoted to DIY tier.** Frontmatter `targets:` no longer
+  include `copilot`. `copilot:` block dropped from `suit.config.yaml`.
+  Cross-harness tool name reference (`skills/using-bones-powers/references/copilot-tools.md`)
+  removed. The previously-emitted `copilot-instructions.md` artifact
+  is no longer produced. To consume wardrobe content from Copilot CLI,
+  follow [`docs/HARNESS_INTEGRATION.md`](docs/HARNESS_INTEGRATION.md).
+- **Tiered harness support.** README and `docs/CONTEXT.md` reframed:
+  - Bulletproof: `claude-code`.
+  - Well-supported: `codex`, `gemini`, `pi`.
+  - DIY: anything else.
+
 ### Added
 
+- `docs/HARNESS_INTEGRATION.md` — porting guide for the DIY tier.
+  Documents the frontmatter contract, composition rules, per-harness
+  emission shapes for the four kept targets, and pointers into the
+  upstream `suit` source as the canonical schema.
 - `skills/ship-issue` — workflow skill that drives a single issue from
   triage through merged PR with one operator authorization. Captures
   the rhythm of read-and-label → agent brief → red-green TDD →

@@ -5,10 +5,8 @@ type: outfit
 description: 'Backend dev work — Go, server, observability, deterministic systems.'
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - economy

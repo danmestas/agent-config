@@ -5,10 +5,8 @@ type: outfit
 description: Reviewer role — block-or-ship verdicts on diffs. Loads requesting/receiving-code-review and the philosophy lenses (hipp, ousterhout, norman). For review workers in orchestrated multi-role flows.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

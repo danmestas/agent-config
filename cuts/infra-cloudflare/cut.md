@@ -5,10 +5,8 @@ type: cut
 description: Cloudflare infrastructure stack cut — Workers, Pages, R2, D1, KV, Queues, Durable Objects, Workflows. Body-references the cloudflare plugin namespace skills (loaded via plugin enable, not skill_include).
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

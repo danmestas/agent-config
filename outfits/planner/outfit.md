@@ -5,10 +5,8 @@ type: outfit
 description: Planner role — produces a written plan with bite-sized tasks, defers implementation. Loads writing-plans, brainstorming, dispatching-parallel-agents. For planning workers in orchestrated multi-role flows.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - workflow

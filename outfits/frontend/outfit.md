@@ -5,10 +5,8 @@ type: outfit
 description: Datastar / shadcn / UI work.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 categories:
   - economy

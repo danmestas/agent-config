@@ -18,10 +18,8 @@ description: >-
   / discussion mode.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 category:
   primary: workflow

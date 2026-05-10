@@ -5,10 +5,8 @@ version: 0.1.0
 type: skill
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 category:
   primary: tooling

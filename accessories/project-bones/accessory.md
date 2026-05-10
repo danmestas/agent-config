@@ -5,10 +5,8 @@ type: accessory
 description: Project context accessory for the bones repo — loads bones-specific skills (using-bones-powers, using-bones-swarm, spy-on-bones-session, finishing-a-bones-leaf). Apply when working in or against a project that uses bones. Named project-bones (not bones) to avoid collision with the existing bones outfit.
 targets:
   - claude-code
-  - apm
   - codex
   - gemini
-  - copilot
   - pi
 include:
   skills:
