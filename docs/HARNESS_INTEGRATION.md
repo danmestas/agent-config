@@ -33,6 +33,7 @@ Every authored component has YAML frontmatter on a manifest file (`SKILL.md`, `A
 | `skill_include` / `skill_exclude` | string[] | Outfit/cut: skill manifest. |
 | `include` | object | Accessory: `{ skills?, rules?, hooks?, agents?, commands? }`. |
 | `overrides` | object | Per-target field overrides: `{ <target>: { ...harness-specific... } }`. |
+| `permissions` | object | Outfit-only (v1). Per-target passthrough emitted into the harness's native permission config. Four opaque sub-fields keyed by `Target` enum: `claude-code`, `codex`, `gemini`, `pi`. See "Permissions emit" below. |
 
 The canonical schema (Zod, with full validation) lives in [`suit/src/lib/schema.ts`](https://github.com/danmestas/suit/blob/main/src/lib/schema.ts) and the composition algorithm in [`suit/src/lib/rules.ts`](https://github.com/danmestas/suit/blob/main/src/lib/rules.ts). When in doubt, read those — this doc enumerates the fields wardrobe authors actually fill in, not every field the schema permits.
 
@@ -64,6 +65,46 @@ This is what suit emits today for the kept harnesses. A new adapter mirrors the 
 | `pi` | `.pi/AGENTS.md`, `.pi/skills/<name>/SKILL.md`, `.pi/extensions/<name>/...` for runtime extensions |
 
 The tracked source in this repo lives under `outfits/`, `cuts/`, `accessories/`, `skills/`, `agents/`, `rules/`, `hooks/`, `commands/`. Everything at the repo root that names a harness (`CLAUDE.md`, `GEMINI.md`, `.claude/`, `.gemini/`, `.pi/`, `AGENTS.md`) is *emitted* by suit, not authored. Don't hand-edit those files in this repo — your edits get clobbered the next build.
+
+### Permissions emit (suit ≥ 0.14)
+
+Outfits may carry a `permissions:` frontmatter block to author harness-native
+permission config. The block has four opaque sub-fields, one per target. Each
+sub-block is emitted verbatim into the target's native permission file via
+deep-merge — no cross-harness translation, no LCD vocabulary.
+
+```yaml
+permissions:
+  claude-code:
+    allow: ["Bash(git status:*)", "mcp__signoz__signoz_search_logs"]
+    deny:  ["Bash(rm -rf:*)"]
+  codex:
+    approval_policy: on-request
+    sandbox_mode: workspace-write
+  gemini:
+    general: { defaultApprovalMode: default }
+    security: { folderTrust: { enabled: true } }
+  pi:
+    tools: [read, bash, write]
+```
+
+| Target | Output file | Note |
+|--------|-------------|------|
+| `claude-code` | `.claude/settings.local.json` (`permissions` key) | Wrapped under a `permissions:` key, matching Claude's settings shape. Merged with hook fragments at the same path. |
+| `codex` | `codex.config.toml` | Top-level merge. Coexists with MCP emit at the same path via TOML deep-merge in `suit/lib/merge.ts`. |
+| `gemini` | `.gemini/settings.fragment.json` | Top-level merge. |
+| `pi` | `.pi/permissions.json` | Forward-compat marker. Pi today has no declarative permission surface — file is consistent with the existing `.pi/mcp.experimental.json` convention. |
+
+Missing block, or missing target sub-block, = no emit and harness defaults apply.
+
+**Scope (v1):** outfits only. Cuts and accessories declaring `permissions:`
+fail validation (Zod `.strict()`); layered composition semantics for
+permission merges across the resolution stack are deferred to v2.
+
+Each target's sub-block is written in that harness's native syntax — there is
+no cross-harness rule translation in v1. Authoring `bash_allow: [git]` once and
+expecting it to populate all four targets won't work; declare the rule in each
+target sub-block where you want it.
 
 ## DIY playbook
 
