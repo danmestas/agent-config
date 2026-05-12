@@ -37,6 +37,29 @@ skill_exclude:
   - datastar-tao
   - datastar-patterns
   - shadcn-forms
+permissions:
+  claude-code:
+    allow:
+      - "Bash(git status:*)"
+      - "Bash(git diff:*)"
+      - "Bash(git log:*)"
+      - "Bash(git branch:*)"
+      - "Bash(git fetch:*)"
+      - "Bash(go test:*)"
+      - "Bash(go build:*)"
+      - "Bash(go vet:*)"
+      - "Bash(go fmt:*)"
+      - "Bash(go run:*)"
+      - "Bash(npm run test:*)"
+      - "Bash(npm run validate:*)"
+      - "mcp__signoz__signoz_search_logs"
+      - "mcp__signoz__signoz_query_metrics"
+      - "mcp__signoz__signoz_search_traces"
+      - "mcp__signoz__signoz_list_services"
+    deny:
+      - "Bash(rm -rf:*)"
+      - "Bash(git push --force:*)"
+      - "Bash(git push -f:*)"
 ---
 
 # Backend Outfit
