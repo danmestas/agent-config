@@ -150,6 +150,16 @@ Spec-compliance and code-quality reviewers are read-only — they inspect the im
 
 If a reviewer needs write access (e.g., to annotate or commit a finding), open a sibling slot session (e.g., `--slot=spec-review`, `--slot=code-review`) via a separate `bones swarm join`.
 
+## Subagent Boundaries: Coordinator Owns Scheduling
+
+The coordinator owns all wakeups, cron schedules, and Monitor lifecycles for the duration of a parallel-subagent run. Subagents must NOT call `ScheduleWakeup`, `CronCreate`, or arm Monitors of their own — not even as safety nets against their own slowness.
+
+**Why:** subagents finish their work and report back, but any wakeups they scheduled keep firing later against a coordinator that has moved on. The coordinator has no authoritative way to cancel a subagent's leaked schedule without paging through every subagent's task graph. Real-world observation: parallel worktree subagents scheduled "safety net" `/loop` wakeups in case they hung; they didn't hang, they finished cleanly, and the wakeups then fired hours later as stale no-ops at the coordinator — the coordinator had to spend turns confirming each one was a no-op against already-merged work.
+
+Bake the prohibition into every implementer prompt explicitly: *"do not call `ScheduleWakeup`, `CronCreate`, or arm Monitors; report back when done."* If a subagent genuinely needs to wait on an external event (CI finishing, deploy completing, log line matching), the coordinator arms the Monitor at the coordinator level after the subagent reports back — the subagent's job is to finish and exit, not to manage cadence.
+
+This applies to both `bones swarm join` flows and direct `Agent`-tool dispatches with `isolation: "worktree"`. The rule is about who owns the lifecycle, not about the dispatch mechanism.
+
 ## Model Selection
 
 Use the least powerful model that can handle each role to conserve cost and increase speed.
@@ -323,6 +333,7 @@ Done!
 - **Start code quality review before spec compliance is ✅** (wrong order)
 - Move to next task while either review has open issues
 - **Mirror bones tasks into TodoWrite at coordinator level** (source of truth is bones tasks, not TodoWrite)
+- **Allow a subagent to call `ScheduleWakeup`, `CronCreate`, or arm a Monitor** (those belong to the coordinator — see "Subagent Boundaries" above)
 
 **If subagent asks questions:**
 - Answer clearly and completely

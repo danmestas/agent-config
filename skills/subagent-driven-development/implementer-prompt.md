@@ -32,6 +32,13 @@ Task tool (general-purpose):
     bones swarm commit -m '<progress note>'
     ```
 
+    **Lifecycle constraint:** Do NOT call `ScheduleWakeup`, `CronCreate`, or arm Monitors —
+    those belong to the coordinator. Report back when your work is done; the coordinator
+    handles any follow-up cadence or external-event waiting. Even if you think "I'll
+    schedule a check-in just in case I get stuck" — don't. You typically finish faster
+    than that wakeup window, and the wakeup then fires later as a stale no-op against
+    a coordinator that has moved on.
+
     ---
 
     You are implementing Task N: [task name]
