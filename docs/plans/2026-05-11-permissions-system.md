@@ -1,5 +1,7 @@
 # Permissions System Implementation Plan
 
+> **STATUS — landed.** Phase 1 (suit) shipped as `@agent-ops/suit@0.14.0` (suit PR #59); Phase 2 (wardrobe canary + docs) shipped via this plan's same branch. The implementation is the source of truth — read [`suit/src/lib/schema.ts`](https://github.com/danmestas/suit/blob/main/src/lib/schema.ts) for the canonical schema. See "Implementation notes — post-merge" at the end of this doc for the deviations encountered during execution.
+
 > **For agentic workers:** Use `subagent-driven-development` (recommended) or `executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. This plan spans two repos; respect the **phase gate** at the end of Phase 1.
 
 **Goal:** Let wardrobe outfits author a `permissions:` block in frontmatter that suit emits verbatim into each target harness's native permission config file.
@@ -1006,3 +1008,39 @@ Passthrough-only is the smallest honest interface. LCD verbs are a v2 candidate,
 - **Plan location**: `docs/plans/` (wardrobe convention), not `docs/bones-powers/plans/`. Wardrobe doesn't use bones.
 - **No bones task materialization**: wardrobe and suit don't use the `bones` task graph. The plan is the executable artifact.
 - **No subagent-driven-development handoff prompt**: cross-repo work with explicit phase gate; the human operator picks execution mode after reviewing this doc.
+
+---
+
+## Implementation notes — post-merge
+
+Deviations between the plan as written and what actually shipped. Recorded so future agents reading this doc don't re-make the same assumptions.
+
+### Schema key naming: `claude-code`, not `claude`
+
+The plan's YAML examples used `permissions.claude.*` everywhere. Implementation uses `permissions.claude-code.*` to match suit's existing `Target` enum (`['claude-code', 'codex', 'gemini', 'pi']`), the same name authors already write in `targets:`. Eliminates an internal mapping in `applyPassthroughPermissions` (just indexes by `Target` directly). The wardrobe canary in `outfits/backend/outfit.md` reflects the final shape.
+
+### TOML merge support added to `lib/merge.ts` (scope expansion)
+
+The plan did not anticipate that `codex.config.toml` would already be a multi-source emit path. The existing `emitMcp` in `suit/src/adapters/codex.ts` writes there; an outfit's `permissions.codex` emit would collide at `compose.ts#dedupeByPath` because `isJsonMergeable('codex.config.toml')` is false. Added during Phase 1 Task 5:
+
+- `isTomlMergeable(filepath)` / `mergeTomlBuffers(a, b)` — TOML parse → deepMerge → re-stringify via `@iarna/toml`
+- `isMergeable(filepath)` / `mergeBuffers(filepath, a, b)` dispatcher (handles both JSON and TOML)
+- `compose.ts` updated to use the dispatcher
+
+10 new merge tests cover this. The change is API-additive: existing `isJsonMergeable` / `mergeJsonBuffers` still export.
+
+### Suit local CI is `typecheck + build + test`, not `npm run validate`
+
+The plan's Task 7 step 5 instructs `npm run validate` for suit. That script doesn't exist in suit — it's a wardrobe-only script. Suit's CI (`.github/workflows/ci.yml`) runs `npm run typecheck` (`tsc --noEmit`), `npm run build` (`tsc + postbuild`), `npm link`, and `npm test` (`vitest run`). The Phase 1 PR mirrored all four locally before push.
+
+### Outfit case in adapters: previously `[]`, now emits per-target
+
+The plan implicitly assumed adapters had a `permissions` emit slot to extend. They didn't — every adapter's outfit case returned `[]` with the comment "Outfits are harness-agnostic, consumed by `ac` at resolution time. Not emitted per-target." The Phase 1 implementation changed that contract for outfits (cuts/accessories still emit `[]`). Each adapter's outfit case now routes to an `emitOutfit(component)` function that calls `applyPassthroughPermissions` and writes the target-native file.
+
+### `Bash(git push:main)` doesn't match Claude's rule grammar
+
+The plan's canary suggested denying `Bash(git push:main)`. Claude's rule grammar treats `:<suffix>` as a prefix match on args, so this rule would match `git push main` (no remote argument) but NOT `git push origin main`. There's no way to express "deny push specifically to the main branch" with the rule grammar alone — that's a hooks job. The actual canary in `outfits/backend/outfit.md` denies `Bash(git push --force:*)` and `Bash(git push -f:*)` instead; the "no push to main" intent is enforced via the `pr-policy` accessory's prose rules.
+
+### Files committed as `.fragment.json`, runtime resolves to `.local.json`
+
+The plan referenced `.claude/settings.fragment.json` as the Claude destination. That's the *adapter-level* emit name; `compose.ts` then merges all fragments and `up.ts` (or the prepare workflow) writes the runtime-visible `.claude/settings.local.json` (or `.claude/settings.json`, depending on flags). Both names are accurate at different layers. `HARNESS_INTEGRATION.md` references the user-visible `.local.json` since that's what authors interact with; this plan retains the `.fragment.json` references since they describe the adapter contract.
