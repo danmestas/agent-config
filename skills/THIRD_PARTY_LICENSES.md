@@ -92,3 +92,64 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+---
+
+## rtk-ai/rtk
+
+- **Source:** https://github.com/rtk-ai/rtk
+- **License:** Apache License 2.0
+- **Upstream commit:** `3ba1634` (`dev-0.40.1-rc.222`)
+- **Vendored components:**
+
+  **Skills (under `skills/`, all prefixed with `rtk-`):**
+  - `rtk-triage/SKILL.md` — from `.claude/skills/rtk-triage/SKILL.md`
+  - `rtk-tdd/SKILL.md` — from `.claude/skills/rtk-tdd/SKILL.md`
+  - `rtk-tdd-rust/SKILL.md` and `rtk-tdd-rust/references/testing-patterns.md` — from `.claude/skills/tdd-rust/`
+  - `rtk-issue-triage/SKILL.md` and `rtk-issue-triage/templates/issue-comment.md` — from `.claude/skills/issue-triage/`
+  - `rtk-pr-triage/SKILL.md` and `rtk-pr-triage/templates/review-comment.md` — from `.claude/skills/pr-triage/`
+  - `rtk-pr-review/SKILL.md` — from `.claude/skills/pr-review/SKILL.md`
+  - `rtk-security-guardian/SKILL.md` — from `.claude/skills/security-guardian/SKILL.md`
+  - `rtk-code-simplifier/SKILL.md` — from `.claude/skills/code-simplifier/SKILL.md`
+  - `rtk-design-patterns/SKILL.md` — from `.claude/skills/design-patterns/SKILL.md`
+  - `rtk-performance/SKILL.md` — from `.claude/skills/performance/SKILL.md`
+  - `rtk-ship/SKILL.md` — from `.claude/skills/ship/SKILL.md`
+  - `rtk-repo-recap/SKILL.md` — from `.claude/skills/repo-recap/SKILL.md`
+
+  **Agents (under `agents/`):**
+  - `rtk-testing-specialist/AGENT.md` — from `.claude/agents/rtk-testing-specialist.md`
+  - `rtk-rust-expert/AGENT.md` — from `.claude/agents/rust-rtk.md` (upstream name `rust-rtk` renamed to `rtk-rust-expert` for prefix consistency)
+
+  **Hooks (under `hooks/`):**
+  - `rtk-suggest/` (HOOK.md + `hooks/rtk-suggest.sh`) — from `.claude/hooks/rtk-suggest.sh`
+  - `rtk-rewrite/` (HOOK.md + `hooks/rtk-rewrite.sh`) — from `.claude/hooks/rtk-rewrite.sh`
+  - `rtk-pre-commit-format/` (HOOK.md + `hooks/rtk-pre-commit-format.sh`) — from `.claude/hooks/bash/pre-commit-format.sh`
+
+Adaptations applied:
+- **Renames for provenance**: every skill, agent, and hook was prefixed `rtk-` to make upstream provenance unambiguous. Components already prefixed (`rtk-triage`, `rtk-tdd`, `rtk-rewrite`, `rtk-suggest`, `rtk-testing-specialist`) kept their names. The upstream agent `rust-rtk` was renamed to `rtk-rust-expert` for prefix consistency. The upstream hook subdirectory script `bash/pre-commit-format.sh` was promoted to a top-level hook component named `rtk-pre-commit-format`.
+- **Frontmatter**: rewrote upstream Anthropic-style skill spec (`name`, `description`, `allowed-tools`, `effort`, `tags`, `triggers`, `model`) into the wardrobe schema (`name`, `version`, `targets`, `type`, `category`, `license`). Hook frontmatter mapped to the wardrobe hook schema (`hooks:` block with event matchers + commands). Descriptions were rewritten into directive "Use when..." triggering form. All `category.primary` values are drawn from the wardrobe-validated set (workflow, backpressure, economy, etc.).
+- **Cross-references**: internal references to upstream skill names (`/issue-triage`, `/pr-triage`, `/repo-recap`) were rewritten to their renamed equivalents (`/rtk-issue-triage`, `/rtk-pr-triage`, `/rtk-repo-recap`) inside `rtk-triage`, `rtk-issue-triage`, `rtk-pr-triage`, and `rtk-pr-review`. Template footers ("Triaged via … `/issue-triage`") were updated to the new names. The `code-reviewer` agent reference in `rtk-pr-triage` was left as-is — the wardrobe already provides an `agents/code-reviewer` component.
+- **Hook scripts**: payload `.sh` files copied verbatim except for emoji removal in user-facing system messages (`⚡`, `🦀`, `🚀`, `✅`, `❌`) and the upstream "Generated with Claude Code" / "Co-Authored-By: Claude" trailers in template commit messages. No behavioural changes — `command -v rtk` graceful pass-through in `rtk-rewrite.sh` and the `rtk rewrite` exit-code protocol (0/1/2/3) are preserved intact.
+- **Body content**: skill and agent bodies are largely as-published upstream, with light emoji stripping and AI-attribution trailers removed in keeping with wardrobe conventions. The full rtk-specific guidance (lazy_static regex, 60-90% token-savings assertions, fallback patterns, cross-platform shell escaping, security threat model) was preserved intact — it is the substance of the pack.
+
+### Apache License 2.0 (excerpt)
+
+```
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+```
+
+Full Apache-2.0 license text is preserved at the upstream source: https://github.com/rtk-ai/rtk/blob/main/LICENSE
