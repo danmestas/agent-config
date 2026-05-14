@@ -41,7 +41,7 @@ include:
 ---
 ```
 
-**Composition semantics — Option A (decided).** Fit is a strict overlay layered onto outfit/cut/accessory composition. Set-algebra dedup (already implemented in suit) handles overlap. `--outfit engineer --fit engineer` is allowed and harmlessly redundant. A fit alone (no outfit) is allowed but uncommon. B/C alternatives discussed in the prior revision are deferred indefinitely — revisit only if real friction emerges.
+**Composition semantics — Option A (decided).** Fit is a strict overlay layered onto outfit/cut/accessory composition. Set-algebra dedup (already implemented in suit) handles overlap. `--outfit engineer --fit engineer-fit` is allowed and harmlessly redundant. A fit alone (no outfit) is allowed but uncommon. B/C alternatives discussed in the prior revision are deferred indefinitely — revisit only if real friction emerges.
 
 ## Skill loadout per fit
 
@@ -157,7 +157,7 @@ Replace these 10 wardrobe skills with no-git-scrubbed upstream versions of `obra
 
 ## Composition semantics — Option A (decided)
 
-Fit composes as a strict overlay onto the existing set-algebra pipeline (suit already runs this across outfit/cut/accessory; fit becomes a fourth axis fed in). `--outfit code --fit senior` = code's skills ∪ senior fit's additions, dedupe. Redundancy on `--outfit engineer --fit engineer` is accepted as harmless. Fit-alone launches are allowed but uncommon — outfit remains the conventional base.
+Fit composes as a strict overlay onto the existing set-algebra pipeline (suit already runs this across outfit/cut/accessory; fit becomes a fourth axis fed in). `--outfit code --fit senior` = code's skills ∪ senior fit's additions, dedupe. Redundancy on `--outfit engineer --fit engineer-fit` is accepted as harmless. Fit-alone launches are allowed but uncommon — outfit remains the conventional base.
 
 ## Tasks / sequence
 

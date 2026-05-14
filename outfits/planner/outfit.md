@@ -48,6 +48,14 @@ skill_include:
   - cavecrew
 skill_exclude:
   - executing-plans
+include:
+  hooks:
+    - rtk-suggest
+    - rtk-rewrite
+    - rtk-pre-commit-format
+  agents:
+    - rtk-testing-specialist
+    - rtk-rust-expert
 ---
 
 # Planner Outfit

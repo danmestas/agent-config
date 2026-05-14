@@ -1,5 +1,5 @@
 ---
-name: engineer
+name: engineer-fit
 version: 1.0.0
 type: fit
 description: 'Standard engineering tier — the superpowers workflow scaffold (no-git): plan, execute, verify, review, dispatch. Use as default for fluent engineers shipping reasonably-scoped changes.'

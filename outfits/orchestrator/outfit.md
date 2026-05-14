@@ -39,6 +39,14 @@ skill_include:
 skill_exclude:
   - test-driven-development
   - executing-plans
+include:
+  hooks:
+    - rtk-suggest
+    - rtk-rewrite
+    - rtk-pre-commit-format
+  agents:
+    - rtk-testing-specialist
+    - rtk-rust-expert
 ---
 
 # Orchestrator Outfit

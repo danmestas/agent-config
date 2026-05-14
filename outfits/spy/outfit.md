@@ -45,6 +45,14 @@ skill_include:
   - caveman-stats
   - cavecrew
 skill_exclude: []
+include:
+  hooks:
+    - rtk-suggest
+    - rtk-rewrite
+    - rtk-pre-commit-format
+  agents:
+    - rtk-testing-specialist
+    - rtk-rust-expert
 ---
 
 # Spy Outfit
