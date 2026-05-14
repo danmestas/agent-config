@@ -5,6 +5,9 @@ type: outfit
 description: Generic coding work — language-agnostic baseline for any code project.
 targets: [claude-code, codex, gemini, pi]
 categories: [economy, workflow, backpressure, evolution]
+enable:
+  mcps:
+    - context-mode
 skill_include:
   - writing-plans
   - brainstorming
@@ -14,6 +17,25 @@ skill_include:
   - tigerstyle
   - verification-before-completion
   - executing-plans
+  - rtk-triage
+  - rtk-tdd
+  - rtk-tdd-rust
+  - rtk-issue-triage
+  - rtk-pr-triage
+  - rtk-pr-review
+  - rtk-security-guardian
+  - rtk-code-simplifier
+  - rtk-design-patterns
+  - rtk-performance
+  - rtk-ship
+  - rtk-repo-recap
+  - caveman
+  - caveman-commit
+  - caveman-compress
+  - caveman-help
+  - caveman-review
+  - caveman-stats
+  - cavecrew
 skill_exclude: []
 ---
 

@@ -153,3 +153,56 @@ Adaptations applied:
 ```
 
 Full Apache-2.0 license text is preserved at the upstream source: https://github.com/rtk-ai/rtk/blob/main/LICENSE
+
+---
+
+## JuliusBrussee/caveman
+
+- **Source:** https://github.com/JuliusBrussee/caveman
+- **License:** MIT
+- **Copyright:** Copyright (c) 2026 Julius Brussee
+- **Upstream commit:** `63a91ec`
+- **Vendored skills (under `skills/`):**
+  - `caveman/SKILL.md` — from `skills/caveman/SKILL.md`
+  - `caveman-commit/SKILL.md` — from `skills/caveman-commit/SKILL.md`
+  - `caveman-review/SKILL.md` — from `skills/caveman-review/SKILL.md`
+  - `caveman-help/SKILL.md` — from `skills/caveman-help/SKILL.md`
+  - `caveman-stats/SKILL.md` — from `skills/caveman-stats/SKILL.md`
+  - `cavecrew/SKILL.md` — from `skills/cavecrew/SKILL.md`
+  - `caveman-compress/SKILL.md` plus `caveman-compress/SECURITY.md` and `caveman-compress/scripts/*.py` (`__init__.py`, `__main__.py`, `benchmark.py`, `cli.py`, `compress.py`, `detect.py`, `validate.py`) — from `skills/caveman-compress/`
+
+Naming: upstream skill names were already prefixed `caveman-` (with one bare `caveman` and the orchestrator skill `cavecrew`), and none collide with the existing `pocock-caveman` (different upstream — Matt Pocock's pack). Skills are vendored with their upstream names unchanged.
+
+Adaptations applied:
+- **Frontmatter**: rewrote the upstream Anthropic-style frontmatter (`name`, `description`) into the wardrobe schema (`name`, `version`, `targets`, `type`, `category`, `license`). Descriptions were rewritten into directive "Use when..." triggering form. All `category.primary` values are `economy` — these skills exist to cut token usage.
+- **Body content**: largely as-published upstream. Light edits: removed emoji severity prefixes in `caveman-review` (replaced with bare `bug:` / `risk:` / `nit:` / `q:` so the skill works in emoji-free contexts) and used plain "Bad:" / "Good:" labels instead of red-X / green-check emoji on the examples; otherwise the caveman voice and rules are preserved intact.
+- **AI-attribution policy**: the upstream `caveman-commit` skill already forbids "Generated with Claude Code" trailers in commit messages — that rule was preserved and generalised to "Any AI-attribution trailer". No upstream files contained Claude/Anthropic co-author trailers that needed stripping.
+- **Subagent companions**: the `cavecrew` skill orchestrates three subagents (`cavecrew-investigator`, `cavecrew-builder`, `cavecrew-reviewer`) that live as agent components in the upstream `agents/` directory. Those agents were NOT vendored here — only the orchestrator skill. The skill body references the upstream source for callers who want the agent specs.
+- **Supporting files**: the `caveman-compress` scripts are vendored verbatim. They call the Anthropic Python SDK (or fall back to the `claude` CLI) to do the actual compression — these are operational dependencies, not AI attribution, and remain as-is.
+- **No-git scrub**: not applied to this pack. Caveman skills target Conventional Commits and PR review workflows, so git-specific language is part of the substance.
+
+### MIT License Text
+
+```
+MIT License
+
+Copyright (c) 2026 Julius Brussee
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

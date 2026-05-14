@@ -12,6 +12,9 @@ categories:
   - workflow
   - evolution
   - backpressure
+enable:
+  mcps:
+    - context-mode
 disable:
   plugins:
     - frontend-design
@@ -26,6 +29,25 @@ skill_include:
   - finishing-a-bones-leaf
   - subagent-driven-development
   - verification-before-completion
+  - rtk-triage
+  - rtk-tdd
+  - rtk-tdd-rust
+  - rtk-issue-triage
+  - rtk-pr-triage
+  - rtk-pr-review
+  - rtk-security-guardian
+  - rtk-code-simplifier
+  - rtk-design-patterns
+  - rtk-performance
+  - rtk-ship
+  - rtk-repo-recap
+  - caveman
+  - caveman-commit
+  - caveman-compress
+  - caveman-help
+  - caveman-review
+  - caveman-stats
+  - cavecrew
 skill_exclude: []
 ---
 

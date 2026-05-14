@@ -13,6 +13,9 @@ categories:
   - workflow
   - evolution
   - context-management
+enable:
+  mcps:
+    - context-mode
 disable:
   plugins:
     - frontend-design
@@ -44,6 +47,25 @@ skill_include:
   - stuck-detector
   - course-correct
   - monitoring-the-operator
+  - rtk-triage
+  - rtk-tdd
+  - rtk-tdd-rust
+  - rtk-issue-triage
+  - rtk-pr-triage
+  - rtk-pr-review
+  - rtk-security-guardian
+  - rtk-code-simplifier
+  - rtk-design-patterns
+  - rtk-performance
+  - rtk-ship
+  - rtk-repo-recap
+  - caveman
+  - caveman-commit
+  - caveman-compress
+  - caveman-help
+  - caveman-review
+  - caveman-stats
+  - cavecrew
 skill_exclude: []
 ---
 

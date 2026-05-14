@@ -13,6 +13,9 @@ categories:
   - workflow
   - memory-management
   - integrations
+enable:
+  mcps:
+    - context-mode
 disable:
   plugins:
     - frontend-design
@@ -38,6 +41,25 @@ skill_include:
   - obsidian-markdown
   - vault-autoresearch
   - apple-contacts
+  - rtk-triage
+  - rtk-tdd
+  - rtk-tdd-rust
+  - rtk-issue-triage
+  - rtk-pr-triage
+  - rtk-pr-review
+  - rtk-security-guardian
+  - rtk-code-simplifier
+  - rtk-design-patterns
+  - rtk-performance
+  - rtk-ship
+  - rtk-repo-recap
+  - caveman
+  - caveman-commit
+  - caveman-compress
+  - caveman-help
+  - caveman-review
+  - caveman-stats
+  - cavecrew
 skill_exclude:
   - golang-patterns
   - datastar
