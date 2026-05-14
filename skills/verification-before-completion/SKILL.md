@@ -1,9 +1,9 @@
 ---
 name: verification-before-completion
-version: 1.0.0
+version: 1.1.0
 targets: [claude-code]
 type: skill
-description: Use when about to claim work is complete, fixed, or passing in a bones workspace, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+description: Use when about to claim work is complete, fixed, or passing, before checkpointing or requesting review — requires running verification commands and confirming output before making any success claims; evidence before assertions always
 category:
   primary: backpressure
 ---
@@ -51,14 +51,14 @@ Skip any step = lying, not verifying
 | Build succeeds | Build command: exit 0 | Linter passing, logs look good |
 | Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
 | Regression test works | Red-green cycle verified | Test passes once |
-| Agent completed | `bones repo status` shows changes | Agent reports "success" |
+| Agent completed | Workspace diff shows changes | Agent reports "success" |
 | Requirements met | Line-by-line checklist | Tests passing |
 
 ## Red Flags - STOP
 
 - Using "should", "probably", "seems to"
 - Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to commit/push/PR without verification
+- About to checkpoint/publish/request review without verification
 - Trusting agent success reports
 - Relying on partial verification
 - Thinking "just this once"
@@ -106,7 +106,7 @@ Skip any step = lying, not verifying
 
 **Agent delegation:**
 ```
-✅ Agent reports success → bones repo status → Verify changes → Report actual state
+✅ Agent reports success → Inspect the actual workspace state → Verify changes → Report actual state
 ❌ Trust agent report
 ```
 
@@ -125,7 +125,7 @@ From 24 failure memories:
 - ANY variation of success/completion claims
 - ANY expression of satisfaction
 - ANY positive statement about work state
-- Committing, PR creation, task completion
+- Checkpointing, requesting review, task completion
 - Moving to next task
 - Delegating to agents
 
@@ -142,11 +142,3 @@ From 24 failure memories:
 Run the command. Read the output. THEN claim the result.
 
 This is non-negotiable.
-
-## Bones context
-
-When verifying in a bones workspace:
-
-- **Workspace cleanliness**: use `bones repo status` (not `git status`) to confirm a clean working tree before claiming work is committed or staged.
-- **Inside a swarm session**: run verification commands from `cd "$(bones swarm cwd --slot=$SLOT)"` to ensure you're in the leaf's worktree, not the main checkout.
-- **Test isolation**: swarm sessions each have their own worktree; running tests from the wrong cwd produces results for a different checkout state — always anchor to the leaf before claiming tests pass.

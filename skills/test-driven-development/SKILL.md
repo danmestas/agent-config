@@ -1,9 +1,9 @@
 ---
 name: test-driven-development
-version: 1.0.0
+version: 1.1.0
 targets: [claude-code]
 type: skill
-description: Use when implementing any feature or bugfix in a bones workspace, before writing implementation code
+description: Use when implementing any feature or bugfix, before writing implementation code
 category:
   primary: workflow
 ---
@@ -241,7 +241,7 @@ The "waste" is keeping code you can't trust. Working code without real tests is 
 **"TDD is dogmatic, being pragmatic means adapting"**
 
 TDD IS pragmatic:
-- Finds bugs before commit (faster than debugging after)
+- Finds bugs before checkpoint (faster than debugging after)
 - Prevents regressions (tests catch breaks immediately)
 - Documents behavior (tests show how to use code)
 - Enables refactoring (change freely, tests catch breaks)
@@ -361,7 +361,7 @@ Never fix bugs without a test.
 
 ## Testing Anti-Patterns
 
-When adding mocks or test utilities, read @testing-anti-patterns.md to avoid common pitfalls:
+When adding mocks or test utilities, watch for common pitfalls:
 - Testing mock behavior instead of real behavior
 - Adding test-only methods to production classes
 - Mocking without understanding dependencies

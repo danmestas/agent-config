@@ -1,9 +1,9 @@
 ---
 name: receiving-code-review
-version: 1.0.0
+version: 1.1.0
 targets: [claude-code]
 type: skill
-description: Use when receiving code review feedback in a bones workspace, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
+description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
 category:
   primary: workflow
 ---
@@ -57,8 +57,8 @@ WHY: Items may be related. Partial understanding = wrong implementation.
 your human partner: "Fix 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
 
-❌ WRONG: Implement 1,2,3,6 now, ask about 4,5 later
-✅ RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5 before proceeding."
+WRONG: Implement 1,2,3,6 now, ask about 4,5 later
+RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5 before proceeding."
 ```
 
 ## Source-Specific Handling
@@ -115,19 +115,6 @@ FOR multi-item feedback:
   4. Verify no regressions
 ```
 
-## Acting on feedback in a swarm session
-
-When the review fires while you're inside a swarm session (typical implementer path), the canonical re-dispatch loop is documented in `bones-powers:subagent-driven-development` § "Re-dispatch on Review Issues":
-
-1. **Close the current session as failed** — releases the claim, posts feedback to the task thread:
-   ```bash
-   bones swarm close --result=fail --summary='<one-line feedback summary>'
-   ```
-2. **Coordinator dispatches a fresh implementer** with the original task + the review feedback.
-3. **Fresh implementer re-claims** via `bones swarm join`, addresses the feedback, then `swarm close --result=success`.
-
-This ensures review-driven re-work is recorded in the task graph (as `--result=fail` followed by re-claim) rather than buried in an in-place edit.
-
 ## When To Push Back
 
 Push back when:
@@ -150,15 +137,16 @@ Push back when:
 
 When feedback IS correct:
 ```
-✅ "Fixed. [Brief description of what changed]"
-✅ "Good catch - [specific issue]. Fixed in [location]."
-✅ [Just fix it and show in the code]
+"Fixed. [Brief description of what changed]"
+"Good catch - [specific issue]. Fixed in [location]."
+[Just fix it and show in the code]
 
-❌ "You're absolutely right!"
-❌ "Great point!"
-❌ "Thanks for catching that!"
-❌ "Thanks for [anything]"
-❌ ANY gratitude expression
+NEVER:
+"You're absolutely right!"
+"Great point!"
+"Thanks for catching that!"
+"Thanks for [anything]"
+ANY gratitude expression
 ```
 
 **Why no thanks:** Actions speak. Just fix it. The code itself shows you heard the feedback.
@@ -169,12 +157,13 @@ When feedback IS correct:
 
 If you pushed back and were wrong:
 ```
-✅ "You were right - I checked [X] and it does [Y]. Implementing now."
-✅ "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
+"You were right - I checked [X] and it does [Y]. Implementing now."
+"Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
 
-❌ Long apology
-❌ Defending why you pushed back
-❌ Over-explaining
+NEVER:
+Long apology
+Defending why you pushed back
+Over-explaining
 ```
 
 State the correction factually and move on.
@@ -196,31 +185,31 @@ State the correction factually and move on.
 **Performative Agreement (Bad):**
 ```
 Reviewer: "Remove legacy code"
-❌ "You're absolutely right! Let me remove that..."
+WRONG: "You're absolutely right! Let me remove that..."
 ```
 
 **Technical Verification (Good):**
 ```
 Reviewer: "Remove legacy code"
-✅ "Checking... build target is 10.15+, this API needs 13+. Need legacy for backward compat. Current impl has wrong bundle ID - fix it or drop pre-13 support?"
+RIGHT: "Checking... build target is 10.15+, this API needs 13+. Need legacy for backward compat. Current impl has wrong bundle ID - fix it or drop pre-13 support?"
 ```
 
 **YAGNI (Good):**
 ```
 Reviewer: "Implement proper metrics tracking with database, date filters, CSV export"
-✅ "Grepped codebase - nothing calls this endpoint. Remove it (YAGNI)? Or is there usage I'm missing?"
+RIGHT: "Grepped codebase - nothing calls this endpoint. Remove it (YAGNI)? Or is there usage I'm missing?"
 ```
 
 **Unclear Item (Good):**
 ```
 your human partner: "Fix items 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
-✅ "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
+RIGHT: "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
 ```
 
-## GitHub Thread Replies
+## Inline Review Replies
 
-When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
+When replying to inline review comments on a hosted review platform, reply in the comment thread itself, not as a top-level review comment. The threaded context is what makes the conversation legible to other reviewers later.
 
 ## The Bottom Line
 

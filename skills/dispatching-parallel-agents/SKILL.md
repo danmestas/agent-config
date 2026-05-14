@@ -1,9 +1,9 @@
 ---
 name: dispatching-parallel-agents
-version: 1.0.0
+version: 1.1.0
 targets: [claude-code]
 type: skill
-description: Run N concurrent slot sessions in a bones workspace for parallel debugging or independent work. Discover ready work via bones swarm tasks --slot=X --json. Roll up cross-slot status via bones tasks aggregate. Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies.
+description: Run N concurrent subagent sessions for parallel debugging or independent work. Discover ready work from the task list; roll up cross-agent status by aggregating results when agents complete. Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies.
 category:
   primary: context-management
 ---
@@ -116,40 +116,17 @@ Return: Summary of what you found and what you fixed.
 
 ## Common Mistakes
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
+**Too broad:** "Fix all the tests" - agent gets lost
+**Specific:** "Fix agent-tool-abort.test.ts" - focused scope
 
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
+**No context:** "Fix the race condition" - agent doesn't know where
+**Context:** Paste the error messages and test names
 
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
+**No constraints:** Agent might refactor everything
+**Constraints:** "Do NOT change production code" or "Fix tests only"
 
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
-
-## Parallel = N concurrent slot sessions
-
-In bones, parallelism is expressed via slots. Each slot can hold one open swarm session (one leaf + one claimed task + one worktree). To run N agents in parallel:
-
-1. Pick N slot names (e.g. `alpha`, `beta`, `gamma`).
-2. For each slot, dispatch a fresh subagent that runs:
-   ```bash
-   READY_TASK=$(bones swarm tasks --slot="$SLOT" --json | jq -r '.[0].id')
-   bones swarm join --slot="$SLOT" --task-id="$READY_TASK"
-   # ... do the work ...
-   bones swarm close --result=success --summary='<note>'
-   ```
-
-The N sessions run independently, each in its own leaf/worktree.
-
-## Cross-slot status
-
-```bash
-bones tasks aggregate --json
-```
-
-Returns a per-slot summary: ready / claimed / closed counts. Use this to monitor parallel progress without polling each slot individually.
+**Vague output:** "Fix it" - you don't know what changed
+**Specific:** "Return summary of root cause and changes"
 
 ## When NOT to Use
 

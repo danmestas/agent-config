@@ -1,9 +1,9 @@
 ---
 name: writing-plans
-version: 1.0.0
+version: 1.1.0
 targets: [claude-code]
 type: skill
-description: Use when you have a spec or requirements for a multi-step task in a bones workspace, before touching code — produces a bones task graph plan with slot assignments and leaf-level steps
+description: Use when you have a spec or requirements for a multi-step task, before touching code — produces a structured task plan with assignments and leaf-level steps
 category:
   primary: workflow
 ---
@@ -12,15 +12,15 @@ category:
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent checkpoints.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
-**Context:** This should be run in a dedicated worktree (created by brainstorming skill).
+**Context:** If working in an isolated work area, it should have been set up during brainstorming.
 
-**Save plans to:** `docs/bones-powers/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
 
 ## Scope Check
@@ -45,7 +45,7 @@ This structure informs the task decomposition. Each task should produce self-con
 - "Run it to make sure it fails" - step
 - "Implement the minimal code to make the test pass" - step
 - "Run the tests and make sure they pass" - step
-- "Commit" - step
+- "Checkpoint your progress" - step
 
 ## Plan Document Header
 
@@ -54,7 +54,7 @@ This structure informs the task decomposition. Each task should produce self-con
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use bones-powers:subagent-driven-development (recommended) or bones-powers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -68,7 +68,7 @@ This structure informs the task decomposition. Each task should produce self-con
 ## Task Structure
 
 ````markdown
-### Task N: [Component Name]  `[slot: <slot-name>]`
+### Task N: [Component Name]
 
 **Files:**
 - Create: `exact/path/to/file.py`
@@ -100,18 +100,10 @@ def function(input):
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Checkpoint your progress**
 
-```bash
-bones repo add tests/path/test.py src/path/file.py && bones repo ci -m "feat: add specific feature" tests/path/test.py src/path/file.py
-```
+Stage and save a snapshot of `tests/path/test.py` and `src/path/file.py` with a clear message ("feat: add specific feature").
 ````
-
-### Slot annotation
-
-Each task carries a `[slot: <name>]` tag matching the bones swarm slot that should claim it. Slots group tasks by worker type (e.g. `infra`, `frontend`, `data`). One slot per task; tasks without a natural slot use `[slot: any]`.
-
-Slot names become `--slot=<name>` arguments when the plan is materialized into bones tasks at the end of this skill (see "## Plan → bones tasks" below).
 
 ## No Placeholders
 
@@ -127,7 +119,7 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - Exact file paths always
 - Complete code in every step — if a step changes code, show the code
 - Exact commands with expected output
-- DRY, YAGNI, TDD, frequent commits
+- DRY, YAGNI, TDD, frequent checkpoints
 
 ## Self-Review
 
@@ -139,43 +131,24 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
-If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
-
-## Plan → bones tasks
-
-After the plan is saved AND user-reviewed, materialize it into the bones task graph (per spec § 4.4 of `docs/superpowers/specs/2026-04-29-bones-powers-design.md`):
-
-```bash
-PLAN=docs/bones-powers/plans/<filename>.md
-bones repo add "$PLAN"
-bones repo ci -m "add <feature> plan" "$PLAN"
-
-# Root task (no slot, no parent)
-ROOT_ID=$(bones tasks create "<feature>" --files="$PLAN" --json | jq -r .id)
-echo "Root task: $ROOT_ID"
-
-# One child per plan task — repeat for each [slot: X] task in the plan
-bones tasks create "<task-1-title>" --parent="$ROOT_ID" --slot="<slot>" --files="$PLAN"
-bones tasks create "<task-2-title>" --parent="$ROOT_ID" --slot="<slot>" --files="$PLAN"
-# ... (one per task in the plan)
-```
-
-Children inherit no fields automatically — be explicit. Reuse `--files="$PLAN"` on every child so `bones tasks show <id>` always surfaces the source-of-truth plan.
+If you find issues, fix them inline. No need to re-review — just fix and move on.
 
 ## Execution Handoff
 
-After tasks are emitted, offer execution choice:
+After saving the plan, offer execution choice:
 
-> "Plan materialized. Root task `<ROOT_ID>` with N children. Two execution modes (per spec § 5):
->
-> 1. **`subagent-driven-development` (recommended for parallel work)** — dispatches a fresh implementer subagent per child task, each in its own slot/leaf via `bones swarm join`. Two-stage review between tasks.
->
-> 2. **`executing-plans` (single-session inline)** — coordinator loops through `bones tasks list --parent=<ROOT_ID>`, claiming and closing each task in this session.
->
-> Which mode?"
+**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
 
-If `subagent-driven-development` chosen:
-- **REQUIRED SUB-SKILL:** Use `bones-powers:subagent-driven-development`.
+**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
 
-If `executing-plans` chosen:
-- **REQUIRED SUB-SKILL:** Use `bones-powers:executing-plans`.
+**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+
+**Which approach?"**
+
+**If Subagent-Driven chosen:**
+- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development
+- Fresh subagent per task + two-stage review
+
+**If Inline Execution chosen:**
+- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
+- Batch execution with checkpoints for review

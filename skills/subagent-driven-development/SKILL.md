@@ -1,23 +1,23 @@
 ---
 name: subagent-driven-development
-version: 1.0.0
+version: 1.1.0
 targets: [claude-code]
 type: skill
-description: Execute a plan in parallel slot sessions. Each implementer subagent runs in its own bones swarm session (slot + claim + worktree atomic via bones swarm join). Two-stage review (spec compliance + code quality) per task. Use when the plan has independent tasks that can run concurrently; use executing-plans instead for single-session inline runs.
+description: Execute a plan in parallel by dispatching a fresh subagent per task. Each implementer subagent runs in isolated context (no inheritance from the controller). Two-stage review (spec compliance + code quality) per task. Use when the plan has independent tasks that can run concurrently; use executing-plans instead for single-session inline runs.
 category:
   primary: context-management
   secondary: [workflow]
 ---
 
-> **Execution mode**: this skill is for **parallel slot sessions** — multiple subagents claim and run plan steps concurrently, each in its own slot/leaf. For single-session inline runs, use `bones-powers:executing-plans` instead. (Per spec § 5 boundary.)
-
 # Subagent-Driven Development
 
-Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review. Each implementer runs in its own bones swarm session — isolated leaf, claimed task, dedicated worktree.
+Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task + bones swarm session (atomic claim) + two-stage review (spec then quality) = high quality, fast iteration
+**Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
+
+**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
 
 ## When to Use
 
@@ -45,15 +45,6 @@ digraph when_to_use {
 - Two-stage review after each task: spec compliance first, then code quality
 - Faster iteration (no human-in-loop between tasks)
 
-## Coordinator Setup
-
-```bash
-ROOT_ID=<paste from writing-plans output>
-bones tasks list --parent="$ROOT_ID" --json | jq '.[] | {id, title, slot, status}'
-```
-
-This is the source of truth. The coordinator does NOT mirror tasks into TodoWrite (per spec § 6). Tasks are claimed and closed atomically through the swarm session of each implementer subagent.
-
 ## The Process
 
 ```dot
@@ -65,100 +56,41 @@ digraph process {
         "Dispatch implementer subagent (./implementer-prompt.md)" [shape=box];
         "Implementer subagent asks questions?" [shape=diamond];
         "Answer questions, provide context" [shape=box];
-        "Implementer: swarm join + TodoWrite + implement + swarm close" [shape=box];
+        "Implementer subagent implements, tests, checkpoints, self-reviews" [shape=box];
         "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)" [shape=box];
         "Spec reviewer subagent confirms code matches spec?" [shape=diamond];
-        "Re-dispatch on spec failure (swarm close fail + fresh join)" [shape=box];
+        "Implementer subagent fixes spec gaps" [shape=box];
         "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer subagent approves?" [shape=diamond];
-        "Re-dispatch on quality failure (swarm close fail + fresh join)" [shape=box];
-        "Task closed success in bones tasks" [shape=box];
+        "Implementer subagent fixes quality issues" [shape=box];
+        "Mark task complete in TodoWrite" [shape=box];
     }
 
-    "bones tasks list --parent=ROOT_ID (source of truth)" [shape=box];
+    "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
-    "Use bones-powers:finishing-a-bones-leaf" [shape=box style=filled fillcolor=lightgreen];
+    "Wrap up the work" [shape=box style=filled fillcolor=lightgreen];
 
-    "bones tasks list --parent=ROOT_ID (source of truth)" -> "Dispatch implementer subagent (./implementer-prompt.md)";
+    "Read plan, extract all tasks with full text, note context, create TodoWrite" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
     "Implementer subagent asks questions?" -> "Answer questions, provide context" [label="yes"];
     "Answer questions, provide context" -> "Dispatch implementer subagent (./implementer-prompt.md)";
-    "Implementer subagent asks questions?" -> "Implementer: swarm join + TodoWrite + implement + swarm close" [label="no"];
-    "Implementer: swarm join + TodoWrite + implement + swarm close" -> "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)";
+    "Implementer subagent asks questions?" -> "Implementer subagent implements, tests, checkpoints, self-reviews" [label="no"];
+    "Implementer subagent implements, tests, checkpoints, self-reviews" -> "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)";
     "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)" -> "Spec reviewer subagent confirms code matches spec?";
-    "Spec reviewer subagent confirms code matches spec?" -> "Re-dispatch on spec failure (swarm close fail + fresh join)" [label="no"];
-    "Re-dispatch on spec failure (swarm close fail + fresh join)" -> "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)" [label="re-review"];
+    "Spec reviewer subagent confirms code matches spec?" -> "Implementer subagent fixes spec gaps" [label="no"];
+    "Implementer subagent fixes spec gaps" -> "Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)" [label="re-review"];
     "Spec reviewer subagent confirms code matches spec?" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="yes"];
     "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" -> "Code quality reviewer subagent approves?";
-    "Code quality reviewer subagent approves?" -> "Re-dispatch on quality failure (swarm close fail + fresh join)" [label="no"];
-    "Re-dispatch on quality failure (swarm close fail + fresh join)" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
-    "Code quality reviewer subagent approves?" -> "Task closed success in bones tasks" [label="yes"];
-    "Task closed success in bones tasks" -> "More tasks remain?";
+    "Code quality reviewer subagent approves?" -> "Implementer subagent fixes quality issues" [label="no"];
+    "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
+    "Code quality reviewer subagent approves?" -> "Mark task complete in TodoWrite" [label="yes"];
+    "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
-    "Dispatch final code reviewer subagent for entire implementation" -> "Use bones-powers:finishing-a-bones-leaf";
+    "Dispatch final code reviewer subagent for entire implementation" -> "Wrap up the work";
 }
 ```
-
-## For Each Task: Implementer Dispatch
-
-For each task in the bones task graph:
-
-1. **Coordinator dispatches a fresh implementer subagent** with:
-   - Task `id`, `slot`, full task title and body from `bones tasks show $TASK_ID`
-   - The plan path (from `--files`)
-   - Brief feedback context if this is a re-dispatch after review
-
-2. **Implementer's first action** (per spec § 5.5):
-   ```bash
-   bones swarm join --slot="$SLOT" --task-id="$TASK_ID"
-   ```
-   This atomically: opens a leaf, claims the task, prepares a worktree.
-
-3. **Implementer's second action**: TodoWrite a fresh checklist of the in-task micro-steps (per hybrid task model § 6).
-
-4. **Implementer does the work**, heartbeating via `bones swarm commit -m '…'`.
-
-5. **Implementer closes the swarm session**:
-   ```bash
-   bones swarm close --result=success --summary='<one-line result>'
-   ```
-
-## Re-dispatch on Review Issues
-
-If the spec-compliance reviewer or code-quality reviewer reports issues:
-
-1. **Implementer closes the swarm session as failed**:
-   ```bash
-   bones swarm close --result=fail --summary='<feedback summary>'
-   ```
-   This releases the claim. The task returns to the pending pool with the failure summary attached to its thread.
-
-2. **Coordinator dispatches a fresh implementer** with the original task + the review feedback as additional context.
-
-3. **New implementer joins via `bones swarm join`** (re-claims the same task), addresses the feedback, and re-runs the review loops.
-
-This loop continues until both reviews pass.
-
-## Reviewer Dispatch
-
-Spec-compliance and code-quality reviewers are read-only — they inspect the implementer's leaf directly without claiming a slot of their own. Dispatch them as fresh subagents with:
-- The task text
-- The implementer's report
-- The path to the implementer's worktree (from `bones swarm cwd --slot=$SLOT`)
-
-If a reviewer needs write access (e.g., to annotate or commit a finding), open a sibling slot session (e.g., `--slot=spec-review`, `--slot=code-review`) via a separate `bones swarm join`.
-
-## Subagent Boundaries: Coordinator Owns Scheduling
-
-The coordinator owns all wakeups, cron schedules, and Monitor lifecycles for the duration of a parallel-subagent run. Subagents must NOT call `ScheduleWakeup`, `CronCreate`, or arm Monitors of their own — not even as safety nets against their own slowness.
-
-**Why:** subagents finish their work and report back, but any wakeups they scheduled keep firing later against a coordinator that has moved on. The coordinator has no authoritative way to cancel a subagent's leaked schedule without paging through every subagent's task graph. Real-world observation: parallel worktree subagents scheduled "safety net" `/loop` wakeups in case they hung; they didn't hang, they finished cleanly, and the wakeups then fired hours later as stale no-ops at the coordinator — the coordinator had to spend turns confirming each one was a no-op against already-merged work.
-
-Bake the prohibition into every implementer prompt explicitly: *"do not call `ScheduleWakeup`, `CronCreate`, or arm Monitors; report back when done."* If a subagent genuinely needs to wait on an external event (CI finishing, deploy completing, log line matching), the coordinator arms the Monitor at the coordinator level after the subagent reports back — the subagent's job is to finish and exit, not to manage cadence.
-
-This applies to both `bones swarm join` flows and direct `Agent`-tool dispatches with `isolation: "worktree"`. The rule is about who owns the lifecycle, not about the dispatch mechanism.
 
 ## Model Selection
 
@@ -204,82 +136,73 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 ```
 You: I'm using Subagent-Driven Development to execute this plan.
 
-[bones tasks list --parent=ROOT_ID]
-→ [T1: Hook installation script | slot=alpha | status=pending]
-→ [T2: Recovery modes | slot=beta | status=pending]
-...
+[Read plan file once: docs/superpowers/plans/feature-plan.md]
+[Extract all 5 tasks with full text and context]
+[Create TodoWrite with all tasks]
 
 Task 1: Hook installation script
 
-[bones tasks show T1_ID → full task text]
-[Dispatch implementation subagent with task text + context]
-  Implementer first: bones swarm join --slot=alpha --task-id=T1_ID
-  Implementer second: TodoWrite [setup, tests, commit, self-review]
+[Get Task 1 text and context (already extracted)]
+[Dispatch implementation subagent with full task text + context]
 
 Implementer: "Before I begin - should the hook be installed at user or system level?"
 
-You: "User level (~/.config/bones-powers/hooks/)"
+You: "User level (~/.config/superpowers/hooks/)"
 
 Implementer: "Got it. Implementing now..."
 [Later] Implementer:
   - Implemented install-hook command
   - Added tests, 5/5 passing
   - Self-review: Found I missed --force flag, added it
-  - bones swarm close --result=success --summary='install-hook with --force, 5/5 tests'
+  - Checkpointed progress
 
-[Dispatch spec compliance reviewer with implementer's worktree path]
-Spec reviewer: ✅ Spec compliant - all requirements met, nothing extra
+[Dispatch spec compliance reviewer]
+Spec reviewer: Spec compliant - all requirements met, nothing extra
 
-[bones tasks show T1_ID — confirms closed:success]
+[Capture change identifiers, dispatch code quality reviewer]
+Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
+
+[Mark Task 1 complete]
 
 Task 2: Recovery modes
 
-[bones tasks show T2_ID → full task text]
-[Dispatch implementation subagent with task text + context]
-  Implementer first: bones swarm join --slot=beta --task-id=T2_ID
-  Implementer second: TodoWrite [verify mode, repair mode, tests, commit]
+[Get Task 2 text and context (already extracted)]
+[Dispatch implementation subagent with full task text + context]
 
 Implementer: [No questions, proceeds]
 Implementer:
   - Added verify/repair modes
   - 8/8 tests passing
   - Self-review: All good
-  - bones swarm close --result=success --summary='verify+repair modes, 8/8 tests'
+  - Checkpointed progress
 
 [Dispatch spec compliance reviewer]
-Spec reviewer: ❌ Issues:
+Spec reviewer: Issues:
   - Missing: Progress reporting (spec says "report every 100 items")
   - Extra: Added --json flag (not requested)
 
-[Coordinator dispatches fresh implementer with original task + review feedback]
-  New implementer: bones swarm close --result=fail --summary='missing progress reporting, extra --json flag'
-  New implementer: bones swarm join --slot=beta --task-id=T2_ID  (re-claim)
-  New implementer: TodoWrite [remove --json, add progress reporting, re-test]
-
 [Implementer fixes issues]
 Implementer: Removed --json flag, added progress reporting
-  bones swarm close --result=success --summary='progress reporting added, --json removed'
 
 [Spec reviewer reviews again]
-Spec reviewer: ✅ Spec compliant now
+Spec reviewer: Spec compliant now
 
 [Dispatch code quality reviewer]
 Code reviewer: Strengths: Solid. Issues (Important): Magic number (100)
 
-[Re-dispatch implementer with quality feedback]
-  bones swarm close --result=fail --summary='magic number 100 needs PROGRESS_INTERVAL constant'
-  bones swarm join --slot=beta --task-id=T2_ID
-  Implementer: Extracted PROGRESS_INTERVAL constant
-  bones swarm close --result=success --summary='PROGRESS_INTERVAL constant extracted'
+[Implementer fixes]
+Implementer: Extracted PROGRESS_INTERVAL constant
 
 [Code reviewer reviews again]
-Code reviewer: ✅ Approved
+Code reviewer: Approved
+
+[Mark Task 2 complete]
 
 ...
 
 [After all tasks]
 [Dispatch final code-reviewer]
-Final reviewer: All requirements met, ready to merge
+Final reviewer: All requirements met, ready to wrap up
 
 Done!
 ```
@@ -289,7 +212,7 @@ Done!
 **vs. Manual execution:**
 - Subagents follow TDD naturally
 - Fresh context per task (no confusion)
-- Parallel-safe (subagents each hold their own slot)
+- Parallel-safe (subagents don't interfere)
 - Subagent can ask questions (before AND during work)
 
 **vs. Executing Plans:**
@@ -298,11 +221,10 @@ Done!
 - Review checkpoints automatic
 
 **Efficiency gains:**
-- Coordinator queries bones tasks list (no file reading overhead)
-- Controller curates exactly what context is needed via `bones tasks show`
+- No file reading overhead (controller provides full text)
+- Controller curates exactly what context is needed
 - Subagent gets complete information upfront
 - Questions surfaced before work begins (not after)
-- Atomic claim via `bones swarm join` prevents double-work
 
 **Quality gates:**
 - Self-review catches issues before handoff
@@ -313,27 +235,25 @@ Done!
 
 **Cost:**
 - More subagent invocations (implementer + 2 reviewers per task)
-- Controller does more prep work (querying bones task graph)
+- Controller does more prep work (extracting all tasks upfront)
 - Review loops add iterations
 - But catches issues early (cheaper than debugging later)
 
 ## Red Flags
 
 **Never:**
-- Start implementation on main/master branch without explicit user consent
+- Start implementation on the shared mainline without explicit user consent
 - Skip reviews (spec compliance OR code quality)
 - Proceed with unfixed issues
-- Dispatch multiple implementation subagents for the same slot (conflicts)
-- Make subagent read plan file (provide full text via `bones tasks show` instead)
+- Dispatch multiple implementation subagents in parallel (conflicts)
+- Make subagent read plan file (provide full text instead)
 - Skip scene-setting context (subagent needs to understand where task fits)
 - Ignore subagent questions (answer before letting them proceed)
 - Accept "close enough" on spec compliance (spec reviewer found issues = not done)
-- Skip review loops (reviewer found issues = implementer closes fail + fresh join = review again)
+- Skip review loops (reviewer found issues = implementer fixes = review again)
 - Let implementer self-review replace actual review (both are needed)
-- **Start code quality review before spec compliance is ✅** (wrong order)
+- **Start code quality review before spec compliance is approved** (wrong order)
 - Move to next task while either review has open issues
-- **Mirror bones tasks into TodoWrite at coordinator level** (source of truth is bones tasks, not TodoWrite)
-- **Allow a subagent to call `ScheduleWakeup`, `CronCreate`, or arm a Monitor** (those belong to the coordinator — see "Subagent Boundaries" above)
 
 **If subagent asks questions:**
 - Answer clearly and completely
@@ -341,9 +261,7 @@ Done!
 - Don't rush them into implementation
 
 **If reviewer finds issues:**
-- Implementer closes swarm session as failed (`bones swarm close --result=fail`)
-- Coordinator dispatches fresh implementer with feedback
-- New implementer re-joins via `bones swarm join`
+- Implementer (same subagent) fixes them
 - Reviewer reviews again
 - Repeat until approved
 - Don't skip the re-review
@@ -355,13 +273,11 @@ Done!
 ## Integration
 
 **Required workflow skills:**
-- **bones-powers:using-bones-swarm** - REQUIRED: understand slot sessions before starting
-- **bones-powers:writing-plans** - Creates the plan this skill executes
-- **bones-powers:requesting-code-review** - Code review template for reviewer subagents
-- **bones-powers:finishing-a-bones-leaf** - Complete development after all tasks
+- **superpowers:writing-plans** - Creates the plan this skill executes
+- **superpowers:requesting-code-review** - Code review template for reviewer subagents
 
 **Subagents should use:**
-- **bones-powers:test-driven-development** - Subagents follow TDD for each task
+- **superpowers:test-driven-development** - Subagents follow TDD for each task
 
 **Alternative workflow:**
-- **bones-powers:executing-plans** - Use for single-session inline execution instead of parallel slot sessions
+- **superpowers:executing-plans** - Use for parallel session instead of same-session execution

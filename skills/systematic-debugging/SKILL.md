@@ -1,9 +1,9 @@
 ---
 name: systematic-debugging
-version: 1.0.0
+version: 1.1.0
 targets: [claude-code]
 type: skill
-description: Use when encountering any bug, test failure, or unexpected behavior in a bones workspace, before proposing fixes
+description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
 category:
   primary: workflow
   secondary: [backpressure]
@@ -71,7 +71,7 @@ You MUST complete each phase before proceeding to the next.
 
 3. **Check Recent Changes**
    - What changed that could cause this?
-   - Git diff, recent commits
+   - Inspect recent diffs and the change history
    - New dependencies, config changes
    - Environmental differences
 
@@ -182,7 +182,7 @@ You MUST complete each phase before proceeding to the next.
    - Automated test if possible
    - One-off test script if no framework
    - MUST have before fixing
-   - Use the `bones-powers:test-driven-development` skill for writing proper failing tests
+   - Use the `superpowers:test-driven-development` skill for writing proper failing tests
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -217,15 +217,6 @@ You MUST complete each phase before proceeding to the next.
    **Discuss with your human partner before attempting more fixes**
 
    This is NOT a failed hypothesis - this is a wrong architecture.
-
-## Bones context
-
-When debugging in a bones workspace:
-
-- **Workspace state checks**: use `bones repo status` (not `git status`) to confirm a clean working tree during phase 1 (root-cause investigation).
-- **Log inspection**: bones swarm sessions log to `.bones/leaves/<slot>/leaf.log`. Tail this for trace data during phase 2 (pattern analysis).
-- **Reproduction in isolation**: open a fresh swarm session in a sibling slot (`bones swarm join --slot=debug-<id> --task-id=<id>`) to reproduce a bug without polluting the main workspace.
-- **Artifact preservation**: if you need to keep failed-test output across debugging iterations, commit the artifact via `bones swarm commit -m 'debug snapshot'` so it's recorded on the leaf — `swarm close --result=fail` does not lose committed work.
 
 ## Red Flags - STOP and Follow Process
 
@@ -299,8 +290,8 @@ These techniques are part of systematic debugging and available in this director
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
 
 **Related skills:**
-- **bones-powers:test-driven-development** - For creating failing test case (Phase 4, Step 1)
-- **bones-powers:verification-before-completion** - Verify fix worked before claiming success
+- **superpowers:test-driven-development** - For creating failing test case (Phase 4, Step 1)
+- **superpowers:verification-before-completion** - Verify fix worked before claiming success
 
 ## Real-World Impact
 
