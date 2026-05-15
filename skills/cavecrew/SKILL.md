@@ -92,5 +92,10 @@ Subagents drop caveman → normal English for security warnings, irreversible-ac
 
 ## Subagent companions
 
-The three subagents this skill orchestrates are bundled separately in the wardrobe (agent components, not part of this skill directory). See the upstream repo for the original agent specs:
-https://github.com/JuliusBrussee/caveman/tree/main/agents
+The three subagents this skill orchestrates are bundled separately in the wardrobe as agent components:
+
+- `agents/cavecrew-investigator` — read-only locator
+- `agents/cavecrew-builder` — surgical 1-2 file edit
+- `agents/cavecrew-reviewer` — diff/branch/file reviewer
+
+Load them alongside this skill to get the full orchestration loop.
