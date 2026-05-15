@@ -23,7 +23,7 @@ license:
   path: src/hooks/caveman-mode-tracker.js
 hooks:
   UserPromptSubmit:
-    command: node hooks/caveman-mode-tracker.js
+    command: hooks/caveman-mode-tracker.js
     timeout: 5
 ---
 
