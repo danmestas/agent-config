@@ -34,7 +34,7 @@ if [[ -f "$parent_transcript" ]]; then
     # That turn also carries the tool_use_id, which we use to find the original
     # Agent tool_use and pull its description + subagent_type.
     tool_use_id="$(jq -r --arg id "$agent_id" '
-      select(.type=="user" and (.toolUseResult?.agentId // "") == $id)
+      select(.type=="user" and ((.toolUseResult? | objects | .agentId?) // "") == $id)
       | .message.content[]? | select(.type=="tool_result") | .tool_use_id
     ' "$parent_transcript" 2>/dev/null | head -1)"
 
@@ -52,11 +52,35 @@ if [[ -f "$parent_transcript" ]]; then
     # Fallback: grab agentType from the tool_result if the tool_use lookup missed
     if [[ -z "$agent_type" ]]; then
       agent_type="$(jq -r --arg id "$agent_id" '
-        select(.type=="user" and (.toolUseResult?.agentId // "") == $id)
-        | .toolUseResult.agentType // empty
+        select(.type=="user" and ((.toolUseResult? | objects | .agentId?) // "") == $id)
+        | ((.toolUseResult? | objects | .agentType?) // empty)
       ' "$parent_transcript" 2>/dev/null | head -1)"
     fi
+
+    # Pull the subagent's actual reply text (the "punchline") for TTS. Content
+    # can be a string OR an array of {type:"text", text:"..."} blocks.
+    result_text="$(jq -r --arg id "$agent_id" '
+      select(.type=="user" and ((.toolUseResult? | objects | .agentId?) // "") == $id)
+      | .message.content[]?
+      | select(.type=="tool_result")
+      | if (.content|type) == "string" then .content
+        else (.content | map(select(.type=="text") | .text) | join(" "))
+        end
+    ' "$parent_transcript" 2>/dev/null | head -1)"
   fi
+fi
+
+# Clean the reply for TTS: strip code fences, inline code, markdown link
+# syntax, heading/emphasis markers, table pipes; collapse whitespace; cap at
+# ~150 chars (≈10s of speech).
+summary=""
+if [[ -n "${result_text:-}" ]]; then
+  summary="$(printf '%s' "$result_text" \
+    | sed -E 's/```[^`]*```//g; s/`[^`]*`//g; s/\[([^]]+)\]\([^)]+\)/\1/g; s/[*_#>|~]//g' \
+    | tr '\n' ' ' \
+    | tr -s ' ' \
+    | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' \
+    | cut -c 1-150)"
 fi
 
 # If parent transcript didn't yield a project name, fall back to the
@@ -71,7 +95,11 @@ agent_type_spoken="${agent_type//-/ }"
 project_prefix=""
 [[ -n "$project" ]] && project_prefix="In $project, "
 
-if [[ -n "$agent_type_spoken" && -n "$description" ]]; then
+if [[ -n "$agent_type_spoken" && -n "$summary" ]]; then
+  text="${project_prefix}the $agent_type_spoken agent reports: $summary"
+elif [[ -n "$summary" ]]; then
+  text="${project_prefix}a subagent reports: $summary"
+elif [[ -n "$agent_type_spoken" && -n "$description" ]]; then
   text="${project_prefix}the $agent_type_spoken agent finished: $description."
 elif [[ -n "$description" ]]; then
   text="${project_prefix}a subagent finished: $description."
