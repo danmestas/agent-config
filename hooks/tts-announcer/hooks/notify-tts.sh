@@ -27,5 +27,5 @@ else
   text="$msg"
 fi
 
-speak "$voice" "$text" /tmp/claude-tts-notify.mp3
+speak "$voice" "$text" /tmp/claude-tts-notify.wav
 exit 0

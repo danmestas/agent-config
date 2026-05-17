@@ -28,7 +28,7 @@ async function speak(text: string, project: string) {
   const voice = await chooseVoiceForProject(project);
   const kokoroUrl = process.env.KOKORO_URL || DEFAULT_KOKORO_URL;
   const outDir = path.join(os.tmpdir(), 'pi-tts');
-  const outFile = path.join(outDir, `${sanitizeFilePart(project)}.mp3`);
+  const outFile = path.join(outDir, `${sanitizeFilePart(project)}.wav`);
   await mkdir(outDir, { recursive: true });
 
   const response = await fetch(`${kokoroUrl}/v1/audio/speech`, {
