@@ -51,7 +51,7 @@ get_voice_for_project() {
 # POSTs to the Kokoro-compatible TTS daemon and plays the resulting audio
 # in the background (non-blocking).
 speak() {
-  local voice="$1" text="$2" out="${3:-/tmp/claude-tts.mp3}"
+  local voice="$1" text="$2" out="${3:-/tmp/claude-tts.wav}"
   curl -sf --max-time 10 "$KOKORO_URL/v1/audio/speech" \
     -H 'Content-Type: application/json' \
     -d "$(jq -nc --arg v "$voice" --arg t "$text" \

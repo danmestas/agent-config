@@ -83,5 +83,5 @@ else
   text="A subagent just finished."
 fi
 
-speak "$voice" "$text" /tmp/claude-tts-subagent.mp3
+speak "$voice" "$text" /tmp/claude-tts-subagent.wav
 exit 0
