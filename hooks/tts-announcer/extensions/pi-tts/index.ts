@@ -34,11 +34,11 @@ async function speak(text: string, project: string) {
   const response = await fetch(`${kokoroUrl}/v1/audio/speech`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'kokoro', voice, input: text, response_format: 'mp3' }),
+    body: JSON.stringify({ model: 'supertonic', voice, input: text, response_format: 'mp3' }),
   });
 
   if (!response.ok) {
-    throw new Error(`Kokoro request failed: ${response.status}`);
+    throw new Error(`TTS request failed: ${response.status}`);
   }
 
   const bytes = Buffer.from(await response.arrayBuffer());

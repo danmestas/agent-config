@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code Notification hook — speaks the notification message via Kokoro TTS,
+# Claude Code Notification hook — speaks the notification message via local TTS,
 # prefixed with the project name so you can tell which session is calling when
 # multiple Claude sessions are running in parallel. The voice is assigned
 # per-project (first time → random pick, then stable) so voice + project name

@@ -2,12 +2,12 @@
 name: tts-announcer
 version: 0.1.0
 description: >
-  Local, offline voice announcements for Claude Code and Pi via Kokoro-82M TTS.
+  Local, offline voice announcements for Claude Code and Pi via on-device TTS.
   Wires Notification + SubagentStop hooks so the terminal whispers progress
   instead of going *bing*. Useful when subagents run for minutes and you've
   wandered off. Use when the user wants TTS announcements, voice notifications,
   audible subagent feedback, or mentions "/tts", "speak", "announce", or
-  "Kokoro". Audio never leaves the machine; no API keys.
+  "Supertonic". Audio never leaves the machine; no API keys.
 type: hook
 targets:
   - claude-code
@@ -23,7 +23,7 @@ hooks:
 
 # tts-announcer
 
-Local, private voice announcements for Claude Code and Pi powered by [Kokoro-82M](https://github.com/hexgrad/kokoro). Audio never leaves your machine.
+Local, private voice announcements for Claude Code and Pi powered by [Supertonic](https://github.com/supertone-inc/supertonic). Audio never leaves your machine.
 
 ## How it works
 
@@ -38,11 +38,15 @@ The Pi adapter ships a parallel implementation under `extensions/pi-tts/` for th
 
 ## Install
 
-The hooks shell out to a Kokoro container (Docker). Install Kokoro once:
+The hooks POST to a Kokoro-compatible local TTS daemon at `KOKORO_URL` (default `http://localhost:8880`). Currently backed by [supertonic-tts-daemon](https://github.com/dmestas/supertonic-tts-daemon) (on-device ONNX, no Docker):
 
 ```bash
-docker run --name kokoro -d -p 8880:8880 ghcr.io/hexgrad/kokoro:latest
+git clone <supertonic-tts-daemon repo> ~/projects/supertonic-tts-daemon
+bash ~/projects/supertonic-tts-daemon/bin/start.sh   # first run downloads ~260MB
+# Or run in the background via the bundled launchctl plist — see daemon README.
 ```
+
+The endpoint shape is `POST /v1/audio/speech` (OpenAI-compatible). Any local TTS service that speaks that API will work — point `KOKORO_URL` at it. The historical Kokoro Docker (`ghcr.io/hexgrad/kokoro`) is also a valid backend.
 
 Then enable the hook through `suit-build build --target claude-code` (which emits the appropriate `.claude/settings.fragment.json` entries) or install manually with the legacy `install.sh` from the source repo.
 
@@ -52,7 +56,7 @@ A stable random voice is assigned per project on first use, so different repos s
 
 ## Files
 
-- `hooks/lib.sh` — shared TTS helpers (Kokoro endpoint, audio playback, debouncing)
+- `hooks/lib.sh` — shared TTS helpers (Kokoro-compatible endpoint, audio playback, debouncing)
 - `hooks/notify-tts.sh` — Notification hook entry point
 - `hooks/subagent-stop-tts.sh` — SubagentStop hook entry point
 - `extensions/pi-tts/` — Pi coding-agent hook variant (TS extension)

@@ -3,13 +3,11 @@ import os from 'node:os';
 import path from 'node:path';
 
 export const DEFAULT_KOKORO_URL = 'http://localhost:8880';
-export const DEFAULT_VOICE = 'af_bella';
+export const DEFAULT_VOICE = 'F1';
 export const DEFAULT_VOICES_FILE = path.join(os.homedir(), '.claude', 'tts-voices.json');
 export const VOICE_POOL = [
-  'af_bella', 'af_sarah', 'af_nicole', 'af_sky', 'af_heart', 'af_aoede', 'af_jessica',
-  'am_adam', 'am_michael', 'am_liam', 'am_puck', 'am_fenrir',
-  'bf_emma', 'bf_alice', 'bf_lily',
-  'bm_george', 'bm_lewis', 'bm_daniel',
+  'F1', 'F2', 'F3', 'F4', 'F5',
+  'M1', 'M2', 'M3', 'M4', 'M5',
 ];
 
 async function readVoiceMap(voicesFile) {

@@ -4,13 +4,12 @@
 KOKORO_URL="${KOKORO_URL:-http://localhost:8880}"
 VOICES_FILE="${TTS_VOICES_FILE:-$HOME/.claude/tts-voices.json}"
 
-# Curated pool of distinct, high-quality Kokoro voices. Edit to taste.
+# Curated pool of Supertonic voice styles. Edit to taste.
 # First-time per-project assignment randomly picks from this list.
+# Backend: supertonic-tts-daemon (Kokoro-compatible API on localhost:8880).
 VOICE_POOL=(
-  af_bella af_sarah af_nicole af_sky af_heart af_aoede af_jessica
-  am_adam am_michael am_liam am_puck am_fenrir
-  bf_emma bf_alice bf_lily
-  bm_george bm_lewis bm_daniel
+  F1 F2 F3 F4 F5
+  M1 M2 M3 M4 M5
 )
 
 # get_voice_for_project <project_name> → echoes a voice id
@@ -19,14 +18,14 @@ VOICE_POOL=(
 #   1. $TTS_VOICE environment variable (global override)
 #   2. Existing mapping in $VOICES_FILE
 #   3. Random pick from $VOICE_POOL, persisted to $VOICES_FILE
-#   4. af_bella (hard fallback)
+#   4. F1 (hard fallback)
 get_voice_for_project() {
   local project="$1"
   if [[ -n "${TTS_VOICE:-}" ]]; then
     echo "$TTS_VOICE"; return
   fi
   if [[ -z "$project" ]]; then
-    echo "af_bella"; return
+    echo "F1"; return
   fi
   [[ -f "$VOICES_FILE" ]] || echo '{}' > "$VOICES_FILE"
   local voice
@@ -49,13 +48,14 @@ get_voice_for_project() {
 }
 
 # speak <voice> <text> [output_path]
-# Calls Kokoro and plays the resulting audio in the background (non-blocking).
+# POSTs to the Kokoro-compatible TTS daemon and plays the resulting audio
+# in the background (non-blocking).
 speak() {
   local voice="$1" text="$2" out="${3:-/tmp/claude-tts.mp3}"
   curl -sf --max-time 10 "$KOKORO_URL/v1/audio/speech" \
     -H 'Content-Type: application/json' \
     -d "$(jq -nc --arg v "$voice" --arg t "$text" \
-          '{model:"kokoro", voice:$v, input:$t, response_format:"mp3"}')" \
+          '{model:"supertonic", voice:$v, input:$t, response_format:"mp3"}')" \
     -o "$out" \
     && afplay "$out" &
 }
