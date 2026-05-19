@@ -165,6 +165,78 @@ For a pipeline design, use:
 ## First 3 Implementation Steps
 ```
 
+## GitHub Actions playbook
+
+When the pipeline lives in GitHub Actions, map Farley's stages onto workflow files in `.github/workflows/`. Keep the principles primary; this section is concrete tactics, not a substitute for the audit.
+
+### Triggers
+
+- `push: branches: [main]` for the post-merge canonical run.
+- `pull_request:` so the commit + acceptance stages evaluate the candidate BEFORE it reaches main.
+- `merge_group:` so the required-status-check jobs run in GitHub's merge queue (when enabled). Pre-wire this even if the queue isn't on yet — it's a no-op until you flip the rule, and it removes a future migration.
+
+### Concurrency
+
+Add at workflow level:
+```yaml
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+```
+
+This kills superseded runs on the same branch — a push-and-fix-and-push iteration won't accumulate parallel runs. Keep `github.workflow` in the key so unrelated workflows don't cross-cancel. **Do NOT apply concurrency with `cancel-in-progress: true` to deploy jobs** — you don't want to kill a halfway-done production deploy when a fresh push arrives. Separate workflow, or scope concurrency on deploys to queueing-only (`cancel-in-progress: false`).
+
+### Stages
+
+Use `needs:` to chain stages; parallelize within a stage with `strategy.matrix` or independent jobs.
+
+- **Commit stage** (one job): checkout, restore cache, build, lint, fast unit tests, static checks. Upload the artifact. Target < 10 min.
+- **Acceptance stage** (one or more jobs, all `needs: commit-stage`): integration tests, contract tests, security scans (CodeQL, Trivy), non-functional checks. Reuses the artifact — do NOT rebuild.
+- **Deploy stages** (`needs:` the acceptance jobs): one job per environment, `environment:` key for secrets and protection rules. Smoke test after deploy; pipe to rollback on failure.
+
+### Artifacts: build once, promote
+
+- `actions/upload-artifact@v4` after the commit stage; `actions/download-artifact@v4` in later jobs. **Immutability is the contract**: the same SHA flows through every environment.
+- For container images, push to a registry once and reference by digest in deploys. Avoid `:latest`.
+- `actions/cache@v4` for dependency caches (or built-in `cache: true` on setup-go/setup-node/setup-java).
+
+### Branch protection: the speed trap
+
+`required_status_checks.strict: true` (UI: "Require branches to be up to date before merging") forces every PR to rebase + rerun CI every time main moves. In a wave of N coordinated PRs, the last one reruns N times. The latency is multiplicative.
+
+- `strict: false` removes the loop. The PR runs CI against its own base; a recent main-merge doesn't invalidate the run. Trade-off: a PR can merge against a main it wasn't tested against. Merge queue fixes that trade-off, but `strict: false` alone is often the right pragmatic choice — the test suite is the actual safety net, not the rebase.
+- Merge queue is the proper answer when you need both speed and "tested against latest main." GitHub provides it via Rulesets (Settings → Rules → Rulesets → "Require merge queue"). Once enabled, every PR's merge button becomes "Merge when ready"; GitHub queues, rebases, reruns CI, and squashes in order.
+- **Plan gating** (observed): merge queue isn't available on personal-user-owned repos on Free plans. The API rejects ruleset creation with an empty-string 422, the UI hides the option entirely. Workaround: transfer the repo to a GitHub organization (org-owned repos see the option), or upgrade. Or live with `strict: false` + concurrency group — that combination kills ~80% of the rebase-rerun pain without the queue.
+
+### Reusable workflows + composite actions
+
+Extract repeated steps so every project's commit-stage logic is identical. "One route to production" applies to *how the pipeline is built*, not just what it produces.
+
+- `.github/workflows/_reusable-build.yml` with `on: workflow_call:` triggered from every consumer workflow.
+- `.github/actions/<name>/action.yml` for step-level composites.
+
+### Secrets
+
+- Repo or environment secrets for build-time tokens. Environment secrets carry the approval gate.
+- OIDC federation (`permissions: id-token: write` + `actions/cloud-auth@vN`) for cloud deploys — no long-lived credentials checked into secrets.
+
+### Common pitfalls
+
+- **Concurrency group too narrow** (`group: ${{ github.ref }}` only) cancels across unrelated workflows on the same branch. Scope with `github.workflow`.
+- **Concurrency on deploys** silently cancels in-progress production releases. Don't.
+- **Path-filter skipping that hangs PRs**: a skipped job doesn't satisfy branch protection's required-check list. Either drop the check from required, or emit a no-op status from the skipped path.
+- **`actions/checkout@vN` default `fetch-depth: 1`** breaks `git describe`, `git log` diffs, and SBOM tools. Set `fetch-depth: 0` where you need history.
+- **Required status check name drift**: the contexts named in branch protection must EXACTLY match the workflow's `jobs.<id>.name` (after substitutions). A rename in YAML without a matching settings update leaves PRs blocked forever.
+- **No `merge_group:` trigger on required jobs**: enabling merge queue then breaks every PR because the queue's `refs/merge-queue/*` ref doesn't trigger the workflow. Pre-wire the trigger even before turning the queue on.
+
+## Learnings log
+
+Concrete findings from real adoption work. Add to this list when something non-obvious bites.
+
+- **2026-05-19** — `strict: true` cost a 9-PR wave roughly 4× the wall time it should have taken (each later PR reran 4-5 times as main advanced). Flipping `strict: false` on the same day restored sub-linear merge throughput. The concurrency group was a quieter win — caught a few mid-iteration cancellations.
+- **2026-05-19** — Personal-account Free-tier repos cannot enable GitHub merge queue. Both the ruleset POST API and the Rulesets UI hide it. No public diagnostic; the API returns 422 with an empty error string. Two workarounds: transfer to an org, or just live without it after `strict: false`.
+- **2026-05-19** — Pre-wiring the `merge_group:` workflow trigger before enabling the queue is free insurance. Reverse order (enable queue first) blocks every PR until you push the trigger fix.
+
 ## Source anchors
 
 - Dave Farley, Continuous Delivery Ltd. and Modern Software Engineering materials: CD as engineering discipline, empirical learning, deployability, feedback, and complexity management.
